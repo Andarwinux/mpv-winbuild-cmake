@@ -1,15 +1,14 @@
 ExternalProject_Add(sqlite
-    URL https://www.sqlite.org/2020/sqlite-autoconf-3330000.tar.gz
-    URL_HASH SHA3_256=6e94e9453cedf8f2023e3923f856741d1e28a2271e9f93d24d95fa48870edaad
+    DEPENDS
+        zlib
+    URL https://www.sqlite.org/2024/sqlite-autoconf-3470200.tar.gz
+    URL_HASH SHA3_256=52cd4a2304b627abbabe1a438ba853d0f6edb8e2774fcb5773c7af11077afe94
     DOWNLOAD_DIR ${SOURCE_LOCATION}
-    CONFIGURE_COMMAND ${EXEC} autoreconf -fi && CONF=1 <SOURCE_DIR>/configure
-        --host=${TARGET_ARCH}
-        --prefix=${MINGW_INSTALL_PREFIX}
-        --enable-static
-        --disable-shared
+    CONFIGURE_COMMAND ${autoreshit}
+    COMMAND ${EXEC} CONF=1 ./configure
+        ${autoshit_confuck_args}
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
-    BUILD_IN_SOURCE 1
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

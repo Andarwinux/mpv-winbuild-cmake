@@ -1,10 +1,10 @@
-set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download)
+set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download patch configure build install)
 include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
-    gmp
     xz
     lzo
     uchardet
+    sleef
     libsamplerate
     rubberband
     zlib
@@ -12,7 +12,6 @@ list(APPEND ep
     bzip2
     libjpeg
     lcms2
-    lame
     ogg
     vorbis
     opus-dnn
@@ -20,10 +19,9 @@ list(APPEND ep
     speex
     libmodplug
     libvpx
-    xvidcore
     game-music-emu
     libpng
-    x264
+    vmaf
     x265
     libdvdcss
     libdvdread
@@ -31,9 +29,6 @@ list(APPEND ep
     libiconv
     luajit
     fribidi
-    expat
-    nettle
-    mbedtls
     libxml2
     brotli
     freetype2
@@ -56,15 +51,12 @@ list(APPEND ep
     dav1d
     libwebp
     vapoursynth
-    libbs2b
     openssl
     libssh
     libsrt
     libarchive
     highway
     libjxl
-    uavs3d
-    davs2
     angle-headers
     mujs
     spirv-headers
@@ -75,33 +67,53 @@ list(APPEND ep
     vulkan
     libsdl2
     openal-soft
-    libopenmpt
     shaderc
     glad
     fast_float
     libdovi
+    libhdr10plus
     svtav1
+    svtav1-psy
     libplacebo
     libva
     libzvbi
     libaribcaption
-    libsixel
+    opencl-header
+    opencl
+    fdk-aac
+    directx-header
+    liblc3
+    libvidstab
+    frei0r
+    vvenc
+    codec2
     ffmpeg
+    libsixel
     mpv
-    mpv-release
     mpv-packaging
+    nghttp3
+    nghttp2
+    c-ares
+    libpsl
     curl
-    flac
-    opusfile
-    libopusenc
-    opus-tools
-    termcap
-    readline
-    cryptopp
+    mpv-debug-plugin
+    mpv-menu-plugin
     sqlite
-    libuv
-    libsodium
-    megasdk
+    libva-utils
+    libssh2
+    aria2
+    vkoverhead
+    zenlib
+    libmediainfo
+    mediainfo
+    mimalloc
+    #telegram-bot-api
+    #qt6-qtbase
+    #qt6-qttools
+    #qt6-qtsvg
+    #boost
+    #libtorrent
+    #qbittorrent
 )
 foreach(package IN LISTS ep)
     if(NOT ${SINGLE_SOURCE_LOCATION} STREQUAL "")
@@ -119,12 +131,13 @@ list(LENGTH ep ep_length)
 message(STATUS "Parsing ${ep_length} packages")
 
 # Exclude packages which dont depend on mpv when update
-list(APPEND removed "flac" "opusfile" "libopusenc" "opus-tools" "termcap" "readline" "cryptopp" "sqlite" "libuv" "libsodium" "megasdk" "libsixel" "curl" "libressl" "mbedtls" "nettle" "gmp")
+list(APPEND removed "vkoverhead libva-utils")
 list(REMOVE_ITEM repo ${removed})
 list(REMOVE_ITEM ep ${removed})
 list(TRANSFORM repo APPEND "-force-update" OUTPUT_VARIABLE update)
 list(TRANSFORM ep APPEND "-download" OUTPUT_VARIABLE download)
 list(TRANSFORM ep APPEND "-fullclean" OUTPUT_VARIABLE fullclean)
+list(TRANSFORM ep APPEND "-removeprefix" OUTPUT_VARIABLE removeprefix)
 
 add_custom_target(update
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${update}
@@ -137,7 +150,13 @@ add_custom_target(download
 
 add_custom_target(package-fullclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${fullclean}
-    COMMENT "Remove all stamp files, reset git HEAD"
+    COMMENT "Remove all build and stamp files, reset git HEAD"
+)
+
+add_custom_target(package-removeprefix
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${removeprefix}
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target rebuild_cache
+    COMMENT "Remove all source directory"
 )
 
 add_custom_target(cargo-clean

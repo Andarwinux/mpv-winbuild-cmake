@@ -1,0 +1,26 @@
+From 75e20bf7d187efc9f1eb545895365b18348fe3d3 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sun, 21 Jul 2024 00:00:00 +0000
+Subject: [PATCH] fuck curl
+
+---
+ src/tool_getparam.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/tool_getparam.c b/src/tool_getparam.c
+index 4c9392cc6..1e5379f69 100644
+--- a/src/tool_getparam.c
++++ b/src/tool_getparam.c
+@@ -1410,6 +1410,9 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
+          that aware of that state */
+       nextarg = (char *)"";
+ 
++    config->native_ca_store = toggle;
++    config->proxy_native_ca_store = toggle;
++
+     switch(cmd) {
+     case C_RANDOM_FILE: /* --random-file */
+     case C_EGD_FILE: /* --egd-file */
+-- 
+2.45.2
+

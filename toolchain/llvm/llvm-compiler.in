@@ -1,35 +1,94 @@
 #!/bin/bash
-PROG=@CMAKE_INSTALL_PREFIX@/bin/@clang_compiler@
-FLAGS="$FLAGS -target @TARGET_CPU@-pc-windows-gnu"
-FLAGS="$FLAGS @driver_mode@ --sysroot @MINGW_INSTALL_PREFIX@"
-FLAGS="$FLAGS -fuse-ld=lld --ld-path=@TARGET_ARCH@-ld"
-FLAGS="$FLAGS -Wno-unused-command-line-argument"
+PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/@clang_compiler@
+FLAGS="-target @TARGET_CPU@-pc-windows-gnu"
+FLAGS+=" --sysroot @MINGW_INSTALL_PREFIX@"
+FLAGS+=" -fuse-ld=lld --ld-path=@TARGET_ARCH@-ld"
+FLAGS+=" -Wno-unused-command-line-argument -Wno-int-conversion -Wno-packed -Wno-unused-function -Wno-macro-redefined -Wno-backend-plugin"
+FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -D__CRT__NO_INLINE -UHAS_80_BIT_LONG_DOUBLE -DHAS_80_BIT_LONG_DOUBLE=0"
+FLAGS+=" -Xclang -fno-pch-timestamp -fno-split-lto-unit -fno-auto-import"
 
 if [ "@TARGET_CPU@" == "aarch64" ]; then
-    ARCH_FLAGS="-mcpu=@GCC_ARCH@ -mtune=@M_TUNE@"
+    ARCH_FLAGS="-mcpu=@GCC_ARCH@"
 else
-    ARCH_FLAGS="-march=@GCC_ARCH@ -mtune=@M_TUNE@"
+    ARCH_FLAGS="-march=@GCC_ARCH@"
 fi
 
 if [ "$CONF" == "1" ]; then
     SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
 else
-    FLAGS="$FLAGS -gcodeview @cfi@ @opt@"
-    if [ "@ENABLE_CCACHE@" == "ON" ]; then
+    FLAGS+=" -mguard=cf -gcodeview -gno-codeview-command-line -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize"
+    if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$NOCCACHE" != "1" ]; then
         CCACHE="ccache"
     fi
     if [ "$GC" != "0" ]; then
-        CLANG_GC="-fdata-sections -ffunction-sections"
+        FLAGS+=" -ffunction-sections"
     fi
     if [ "$LTO" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
-        LTO_FLAGS="-flto=thin"
+        LTO_FLAGS="-flto=thin -fwhole-program-vtables"
         if [ "@LLD_LTO_ALL_THREADS@" == "ON" ] && [ "$LTO_JOB" != "1" ]; then
-            LTO_FLAGS="$LTO_FLAGS -flto-jobs=@CPU_COUNT@"
+            LTO_FLAGS+=" -flto-jobs=@CPU_COUNT@"
+        fi
+    else
+        FLAGS+=" @llvm_mllvm@ @polly@"
+        if [ "@TARGET_CPU@" == "aarch64" ]; then
+            FLAGS+=" -mllvm -enable-gvn-sink=false"
         fi
     fi
-    if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
-        export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw" #enable profraw output only when CONF!=1
+    if [ "$EXCEP" != "1" ]; then
+        FLAGS+=" -fno-exceptions"
+        if [ "$RTTI" != "1" ]; then
+            FLAGS+=" -fno-rtti"
+        fi
+        if [ "$UNWIND" != "1" ]; then
+            FLAGS+=" -fno-unwind-tables -fno-asynchronous-unwind-tables"
+        fi
     fi
+    if [ "@GCC_ARCH_HAS_AVX@" == "ON" ]; then
+        FLAGS+=" -Wa,-msse2avx"
+        if [ "@GCC_ARCH_HAS_AVX512@" != "ON" ]; then
+            FLAGS+=" -mno-gather"
+        fi
+    fi
+    if [ "$LE_TLS" != "0" ]; then
+        FLAGS+=" -ftls-model=local-exec"
+    fi
+    if [ "$FP80" != "1" ]; then
+        FLAGS+=" -Xclang -mlong-double-64"
+    fi
+    if [ "$HIDE" == "1" ]; then
+        FLAGS+=" -fvisibility-from-dllstorageclass -fvisibility-dllexport=hidden"
+    fi
+    if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
+        export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw"
+    fi
+    if [ "@CLANG_PACKAGES_PGO@" == "USE" ] && [ "$PGO" != "0" ]; then
+        PGO_FLAGS="-fprofile-use=@CLANG_PACKAGES_PROFDATA_FILE@"
+    fi
+    FLAGS+=" @CLANG_FLAGS@ $EXTRA_CFLAGS"
+    FLAGS_INIT="$EXTRA_CFLAGS_INIT"
 fi
 
-$CCACHE "$PROG" $LTO_FLAGS $ARCH_FLAGS "$@" $FLAGS $CLANG_GC @CLANG_FLAGS@ @linker@ $SKIP_OPT
+if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$PGO" != "0" ]; then
+    PGO_FLAGS="-fprofile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64"
+fi
+
+filtered_args=()
+if [ -n "$FILTER_FLAGS" ]; then
+    read -r -a filter_flags_array <<< "$FILTER_FLAGS"
+    for arg in "$@"; do
+        skip=0
+        for filter_flag in "${filter_flags_array[@]}"; do
+            if [ "$arg" == "$filter_flag" ]; then
+                skip=1
+                break
+            fi
+        done
+        if [ $skip -eq 0 ]; then
+            filtered_args+=("$arg")
+        fi
+    done
+else
+    filtered_args=("$@")
+fi
+
+$CCACHE "$PROG" $LTO_FLAGS $PGO_FLAGS $ARCH_FLAGS $FLAGS_INIT "${filtered_args[@]}" $FLAGS $SKIP_OPT

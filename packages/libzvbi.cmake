@@ -4,14 +4,14 @@ ExternalProject_Add(libzvbi
         libiconv
     GIT_REPOSITORY https://github.com/zapping-vbi/zvbi.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --filter=tree:0"
+    GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_TAG main
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} <SOURCE_DIR>/autogen.sh && CONF=1 <SOURCE_DIR>/configure
-        --host=${TARGET_ARCH}
-        --prefix=${MINGW_INSTALL_PREFIX}
-        --disable-shared
+    CONFIGURE_COMMAND ${autoreshit}
+    COMMAND ${EXEC} CONF=1 ./configure
+        ${autoshit_confuck_args}
         --enable-static
         --with-pic
         --without-doxygen
@@ -22,9 +22,8 @@ ExternalProject_Add(libzvbi
         --disable-proxy
         --disable-examples
         --disable-tests
-    BUILD_COMMAND ${MAKE}
+    BUILD_COMMAND ${MAKE} UNWIND=1
     INSTALL_COMMAND ${MAKE} install
-    BUILD_IN_SOURCE 1
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

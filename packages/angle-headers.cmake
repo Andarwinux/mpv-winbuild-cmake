@@ -3,9 +3,11 @@ ExternalProject_Add(angle-headers
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_REMOTE_NAME origin
     GIT_TAG main
-    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --sparse --filter=tree:0"
+    GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone include/EGL include/KHR"
     GIT_SUBMODULES ""
+    GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

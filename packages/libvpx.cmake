@@ -1,7 +1,8 @@
 ExternalProject_Add(libvpx
-    GIT_REPOSITORY https://chromium.googlesource.com/webm/libvpx.git
+    GIT_REPOSITORY https://github.com/webmproject/libvpx.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --filter=tree:0"
+    GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_TAG main
     UPDATE_COMMAND ""
@@ -18,7 +19,7 @@ ExternalProject_Add(libvpx
         --as=yasm
         --enable-debug
         --enable-vp9-highbitdepth
-    BUILD_COMMAND ${MAKE}
+    BUILD_COMMAND ${MAKE} UNWIND=1
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

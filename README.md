@@ -99,7 +99,7 @@ After that, build mpv as usual:
 
 ## Compiling with Clang
 
-Supported target architecture (`TARGET_ARCH`) with clang is: `x86_64-w64-mingw32` , `i686-w64-mingw32` , `aarch64-w64-mingw32`. The `aarch64` are untested.
+Supported target architecture (`TARGET_ARCH`) with clang is: `x86_64-w64-mingw32` , `i686-w64-mingw32` , `aarch64-w64-mingw32`.
 
 Example:
 
@@ -157,89 +157,93 @@ to update flags which will pass on gcc, g++ and etc.
 ## Information about packages
 
 - Git/Hg
+    - amf-headers
     - ANGLE
+    - aom
+    - avisynth-headers
+    - brotli
+    - bzip2
+    - dav1d
+    - directx-header
+    - fast_float
     - FFmpeg
-    - xz
-    - x264
-    - x265 (multilib)
-    - uchardet
-    - rubberband (with libsamplerate)
-    - opus
-    - openal-soft
-    - mpv
-    - luajit
+    - fontconfig
+    - freetype2
+    - fribidi
+    - game-music-emu
+    - glad
+    - glslang
+    - graphengine
+    - harfbuzz
+    - highway
+    - lcms2
+    - libarchive
+    - libaribcaption
+    - libass
+    - libbluray
+    - libdovi
+    - libdvdcss
+    - libdvdnav
+    - libdvdread
+    - libjpeg
+    - libjxl
+    - libmediainfo
+    - libmodplug
+    - libmysofa
+    - libopenmpt
+    - libplacebo
+    - libpng
+    - libsamplerate
+    - libsdl2
+    - libsixel
+    - libsoxr
+    - libsrt
+    - libssh
+    - libudfread
+    - libunibreak
+    - libva
+    - libvpl
     - libvpx
     - libwebp
-    - libpng
-    - libsoxr
-    - libzimg (with graphengine)
-    - libdvdread
-    - libdvdnav
-    - libdvdcss
-    - libudfread
-    - libbluray
-    - libunibreak
-    - libass
-    - libmysofa
-    - lcms2
-    - lame
-    - harfbuzz
-    - game-music-emu
-    - freetype2
-    - flac
-    - opus-tools
-    - mujs
-    - libarchive
-    - libjpeg
-    - shaderc (with spirv-headers, spirv-tools, glslang)
-    - vulkan-header
-    - vulkan
-    - spirv-cross
-    - fribidi
-    - ~~nettle~~
-    - curl
     - libxml2
-    - amf-headers
-    - avisynth-headers
-    - nvcodec-headers
-    - libvpl
-    - megasdk (with termcap, readline, cryptopp, sqlite, libuv, libsodium)
-    - aom
-    - dav1d
-    - libplacebo (with glad, fast_float, xxhash)
-    - fontconfig
-    - libbs2b
-    - libssh
-    - libsrt
-    - libjxl (with brotli, highway)
-    - libmodplug
-    - uavs3d
-    - davs2
-    - libsixel
-    - libdovi
-    - libva
+    - libzimg
     - libzvbi
-    - svtav1
-    - libaribcaption
-    - zlib (zlib-ng)
-    - zstd
-    - expat
-    - openssl
-    - libsdl2
-    - speex
-    - vorbis
+    - luajit
+    - mpv
+    - mpv-debug-plugin
+    - mpv-menu-plugin
+    - mujs
+    - nvcodec-headers
     - ogg
-    - bzip2
+    - openal-soft
+    - opencl
+    - opencl-header
+    - openssl
+    - opus
+    - rubberband
+    - shaderc
+    - speex
+    - spirv-cross
+    - spirv-headers
+    - spirv-tools
+    - svtav1
+    - uchardet
+    - vmaf
+    - vorbis
+    - vulkan
+    - vulkan-header
+    - x265
+    - xxhash
+    - xz
+    - zenlib
+    - zlib-ng
+    - zstd
 
 - Zip
-    - xvidcore (1.3.7)
-    - lzo (2.10)
-    - libopenmpt (0.7.12)
     - libiconv (1.18)
-    - ~~gmp (6.3.0)~~
+    - libopenmpt (0.7.12)
+    - lzo (2.10)
     - vapoursynth (R65/R63)
-    - ~~mbedtls (3.5.0)~~
-    - ~~libressl (3.1.5)~~
 
 
 ### WSL workaround

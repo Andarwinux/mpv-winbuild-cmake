@@ -1,9 +1,4 @@
-if(${TARGET_CPU} MATCHES "x86_64" OR ${TARGET_CPU} MATCHES "aarch64")
-    set(rev "R65")
-else()
-    set(rev "R63")
-    set(dlltool_opts "-U")
-endif()
+set(rev "R70")
 
 string(REPLACE "R" "" PC_VERSION ${rev})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vapoursynth.pc.in ${CMAKE_CURRENT_BINARY_DIR}/vapoursynth.pc @ONLY)
@@ -36,15 +31,6 @@ ExternalProject_Add_Step(vapoursynth generate-def
     LOG 1
 )
 
-if(COMPILER_TOOLCHAIN STREQUAL "gcc")
-ExternalProject_Add_Step(vapoursynth generate-lib
-    DEPENDEES generate-def
-    WORKING_DIRECTORY <SOURCE_DIR>
-    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -d VSScript.def -y libvsscript.a ${dlltool_opts}
-    COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -d VapourSynth.def -y libvapoursynth.a ${dlltool_opts}
-    LOG 1
-)
-elseif(COMPILER_TOOLCHAIN STREQUAL "clang")
 ExternalProject_Add_Step(vapoursynth generate-lib
     DEPENDEES generate-def
     WORKING_DIRECTORY <SOURCE_DIR>
@@ -52,7 +38,6 @@ ExternalProject_Add_Step(vapoursynth generate-lib
     COMMAND ${EXEC} ${TARGET_ARCH}-dlltool -m ${dlltool_image} -d VapourSynth.def -l VapourSynth.lib
     LOG 1
 )
-endif()
 
 ExternalProject_Add_Step(vapoursynth download-header
     DEPENDEES generate-lib
@@ -74,6 +59,8 @@ ExternalProject_Add_Step(vapoursynth manual-install
     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/VSScript4.h ${MINGW_INSTALL_PREFIX}/include/vapoursynth/VSScript4.h
     # Copying libs
     ${vapoursynth_manual_install_copy_lib}
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/VSScript.lib ${MINGW_INSTALL_PREFIX}/lib/VSScript.lib
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/VapourSynth.lib ${MINGW_INSTALL_PREFIX}/lib/VapourSynth.lib
     # Copying .pc files
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/vapoursynth.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/vapoursynth.pc
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/vapoursynth-script.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/vapoursynth-script.pc

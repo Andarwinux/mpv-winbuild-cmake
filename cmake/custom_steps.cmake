@@ -15,35 +15,32 @@ function(cleanup _name _last_step)
     endif()
 
     if(_git_repository)
-        if(_build_in_source)
-            set(remove_cmd "git -C <SOURCE_DIR> clean -dfx")
+        if(EXISTS ${source_dir}/.git)
+            if(_build_in_source)
+                set(remove_cmd "git -C <SOURCE_DIR> clean -dfx")
+            else()
+                set(remove_cmd "find <BINARY_DIR> -mindepth 1 -delete && git -C <SOURCE_DIR> clean -df")
+            endif()
+            set(COMMAND_FORCE_UPDATE COMMAND bash -c "git -C <SOURCE_DIR> am --abort 2> /dev/null || true"
+                                     COMMAND ${stamp_dir}/reset_head.sh
+                                     COMMAND bash -c "git -C <SOURCE_DIR> restore .")
         else()
-            set(remove_cmd "find <BINARY_DIR> -mindepth 1 -delete && git -C <SOURCE_DIR> clean -df")
+            set(remove_cmd "find <BINARY_DIR> -mindepth 1 -delete")
         endif()
-        set(COMMAND_FORCE_UPDATE COMMAND bash -c "git -C <SOURCE_DIR> am --abort 2> /dev/null || true"
-                                 COMMAND ${stamp_dir}/reset_head.sh
-                                 COMMAND bash -c "git -C <SOURCE_DIR> restore .")
+    else()
+        set(remove_cmd "find <BINARY_DIR> -mindepth 1 -delete")
     endif()
 
     # <STAMP_DIR> doesn't resolve into full path, so <LOG_DIR> is used instead since its same folder.
     ExternalProject_Add_Step(${_name} fullclean
-        COMMAND ${EXEC} find <LOG_DIR> -type f " ! -iname '*.cmake' " -size 0c -delete # remove 0 byte files which are stamp files
+        COMMAND ${EXEC} find <LOG_DIR> -type f " ! -iname '*.cmake' " -size 0c -delete
+        COMMAND ${EXEC} ${remove_cmd}
         ${COMMAND_FORCE_UPDATE}
         ALWAYS TRUE
         EXCLUDE_FROM_MAIN TRUE
         INDEPENDENT TRUE
         LOG 1
-        COMMENT "Deleting all stamp files of ${_name} package"
-    )
-
-    ExternalProject_Add_Step(${_name} liteclean
-        COMMAND ${EXEC} rm -f <LOG_DIR>/${_name}-build
-                              <LOG_DIR>/${_name}-install
-        ALWAYS TRUE
-        EXCLUDE_FROM_MAIN TRUE
-        INDEPENDENT TRUE
-        LOG 1
-        COMMENT "Deleting build, install stamp files of ${_name} package"
+        COMMENT "Deleting all build and stamp files of ${_name} package"
     )
 
     ExternalProject_Add_Step(${_name} postremovebuild
@@ -54,26 +51,15 @@ function(cleanup _name _last_step)
         COMMENT "Deleting build directory of ${_name} package after install"
     )
 
-    ExternalProject_Add_Step(${_name} removebuild
-        DEPENDEES fullclean
-        COMMAND ${EXEC} ${remove_cmd}
-        ALWAYS TRUE
-        EXCLUDE_FROM_MAIN TRUE
-        INDEPENDENT TRUE
-        LOG 1
-        COMMENT "Deleting build directory of ${_name} package"
-    )
-
     ExternalProject_Add_Step(${_name} removeprefix
-        COMMAND ${EXEC} rm -rf <INSTALL_DIR> ${source_dir}
-        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target rebuild_cache
+        COMMAND ${EXEC} find ${source_dir} <INSTALL_DIR> -mindepth 1 -delete
         ALWAYS TRUE
         EXCLUDE_FROM_MAIN TRUE
         INDEPENDENT TRUE
         LOG 1
         COMMENT "Deleting everything about ${_name} package"
     )
-    ExternalProject_Add_StepTargets(${_name} fullclean liteclean removeprefix removebuild)
+    ExternalProject_Add_StepTargets(${_name} fullclean removeprefix)
 endfunction()
 
 function(force_rebuild_git _name)
@@ -90,6 +76,12 @@ function(force_rebuild_git _name)
         set(reset "${git_reset}")
     else()
         set(reset "@{u}") # eg: origin/master
+    endif()
+    if("${git_remote_name}" STREQUAL "")
+        set(git_remote_name "origin")
+    endif()
+    if("${git_tag}" STREQUAL "")
+        set(git_tag "master")
     endif()
 
 file(WRITE ${stamp_dir}/reset_head.sh
@@ -114,7 +106,7 @@ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_
         INDEPENDENT TRUE
         WORKING_DIRECTORY <SOURCE_DIR>
         COMMAND bash -c "git am --abort 2> /dev/null || true"
-        COMMAND bash -c "git fetch --filter=tree:0 --no-recurse-submodules"
+        COMMAND bash -c "git fetch --filter=tree:0 ${git_remote_name} ${git_tag}"
         COMMAND ${stamp_dir}/reset_head.sh
     )
     ExternalProject_Add_StepTargets(${_name} force-update)
@@ -143,34 +135,4 @@ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_
             ERROR_QUIET
         )
     endif()
-endfunction()
-
-function(force_rebuild_svn _name)
-    ExternalProject_Add_Step(${_name} force-update
-        DEPENDEES download update
-        DEPENDERS patch build install
-        COMMAND svn revert -R .
-        COMMAND svn up
-        WORKING_DIRECTORY <SOURCE_DIR>
-        LOG 1
-    )
-endfunction()
-
-function(force_rebuild_hg _name)
-    ExternalProject_Add_Step(${_name} force-update
-        DEPENDEES download update
-        DEPENDERS patch build install
-        COMMAND hg --config "extensions.purge=" purge --all
-        COMMAND hg update -C
-        WORKING_DIRECTORY <SOURCE_DIR>
-        LOG 1
-    )
-endfunction()
-
-function(force_meson_configure _name)
-    ExternalProject_Add_Step(${_name} force-meson-configure
-        DEPENDERS configure
-        COMMAND ${EXEC} rm -rf <BINARY_DIR>/meson-*
-        LOG 1
-    )
 endfunction()

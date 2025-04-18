@@ -1,0 +1,11 @@
+[binaries]
+c = 'clang'
+cpp = 'clang++'
+as = 'clang'
+ar = 'llvm-ar'
+ranlib = 'llvm-ranlib'
+objcopy = 'llvm-objcopy'
+strip = 'llvm-strip'
+nasm = 'nasm'
+pkg-config = 'pkg-config'
+cmake = ''

@@ -1,0 +1,95 @@
+#!/bin/bash
+PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/@clang_compiler@
+FLAGS="-target @TARGET_CPU@-pc-windows-gnu"
+FLAGS+=" --sysroot @MINGW_INSTALL_PREFIX@"
+FLAGS+=" -fuse-ld=lld --ld-path=@TARGET_ARCH@-ld"
+FLAGS+=" -Wno-unused-command-line-argument -Wno-int-conversion -Wno-packed -Wno-unused-function -Wno-macro-redefined -Wno-backend-plugin -Wno-c++11-narrowing"
+FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -UHAS_80_BIT_LONG_DOUBLE -DHAS_80_BIT_LONG_DOUBLE=0"
+FLAGS+=" -Xclang -fno-pch-timestamp -Xclang -mlong-double-64 -fno-split-lto-unit -fno-auto-import -fno-temp-file"
+FLAGS+=" -fno-builtin-sin -fno-builtin-sinf -fno-builtin-cos -fno-builtin-cosf -fno-builtin-sinl -fno-builtin-cosl"
+
+if [ "@TARGET_CPU@" == "aarch64" ]; then
+    ARCH_FLAGS="-mcpu=@GCC_ARCH@"
+else
+    ARCH_FLAGS="-march=@GCC_ARCH@"
+fi
+
+if [ "$CONF" == "1" ]; then
+    SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
+else
+    FLAGS+=" -mguard=cf -gcodeview -gno-codeview-command-line -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize"
+    if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$NOCCACHE" != "1" ]; then
+        CCACHE="ccache"
+    fi
+    if [ "$GC" != "0" ]; then
+        FLAGS+=" -ffunction-sections"
+    fi
+    if [ "$LTO" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
+        LTO_FLAGS="-flto=thin -fwhole-program-vtables"
+        if [ "@LLD_LTO_ALL_THREADS@" == "ON" ] && [ "$LTO_JOB" != "1" ]; then
+            LTO_FLAGS+=" -flto-jobs=@CPU_COUNT@"
+        fi
+    else
+        FLAGS+=" @llvm_mllvm@ @polly@"
+        if [ "@TARGET_CPU@" == "aarch64" ]; then
+            FLAGS+=" -mllvm -enable-gvn-sink=false"
+        fi
+    fi
+    if [ "$EXCEP" != "1" ]; then
+        FLAGS+=" -fno-exceptions"
+        if [ "$RTTI" != "1" ]; then
+            FLAGS+=" -fno-rtti"
+        fi
+        if [ "$UNWIND" != "1" ]; then
+            FLAGS+=" -fno-unwind-tables -fno-asynchronous-unwind-tables"
+        fi
+    fi
+    if [ "@GCC_ARCH_HAS_AVX@" == "ON" ]; then
+        FLAGS+=" -Wa,-msse2avx -mno-vzeroupper"
+        if [ "@GCC_ARCH_HAS_AVX512@" != "ON" ]; then
+            FLAGS+=" -mno-gather"
+        fi
+    fi
+    if [ "$LE_TLS" != "0" ]; then
+        FLAGS+=" -ftls-model=local-exec"
+    fi
+    if [ "$HIDE" == "1" ]; then
+        FLAGS+=" -fvisibility-from-dllstorageclass -fvisibility-dllexport=hidden"
+    fi
+    if [ "$NO_DEBUG" != "1" ]; then
+        FLAGS+=" -gline-tables-only -fdebug-info-for-profiling"
+    fi
+    if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
+        export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw"
+    fi
+    if [ "@CLANG_PACKAGES_PGO@" == "USE" ] && [ "$PGO" != "0" ]; then
+        PGO_FLAGS="-fprofile-use=@CLANG_PACKAGES_PROFDATA_FILE@"
+    fi
+    FLAGS+=" @CLANG_FLAGS@ $EXTRA_CFLAGS"
+    FLAGS_INIT="$EXTRA_CFLAGS_INIT"
+fi
+
+if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$PGO" != "0" ]; then
+    PGO_FLAGS="-fprofile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64"
+fi
+
+filtered_args=()
+if [ -n "$FILTER_FLAGS" ]; then
+    read -r -a filter_flags_array <<< "$FILTER_FLAGS"
+    for arg in "$@"; do
+        skip=0
+        for filter_flag in "${filter_flags_array[@]}"; do
+            if [ "$arg" == "$filter_flag" ]; then
+                skip=1
+                break
+            fi
+        done
+        if [ $skip -eq 0 ]; then
+            filtered_args+=("$arg")
+        fi
+    done
+else
+    filtered_args=("$@")
+fi
+
+$CCACHE "$PROG" $LTO_FLAGS $PGO_FLAGS $ARCH_FLAGS $FLAGS_INIT "${filtered_args[@]}" $FLAGS $SKIP_OPT

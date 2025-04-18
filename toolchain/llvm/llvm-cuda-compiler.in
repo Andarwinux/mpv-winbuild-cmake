@@ -1,0 +1,4 @@
+#!/bin/bash
+PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/clang
+
+"$PROG" $@ -Wno-unused-command-line-argument --cuda-feature=+ptx87 -O3 -ffast-math -ffp-model=aggressive -funroll-loops @llvm_mllvm@ @polly@

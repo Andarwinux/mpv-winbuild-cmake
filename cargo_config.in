@@ -1,0 +1,16 @@
+[net]
+git-fetch-with-cli = true
+
+[target.@TARGET_CPU@-pc-windows-gnullvm]
+linker = "@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-clang++"
+ar = "@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-ar"
+rustflags = ["-Ctarget-cpu=@GCC_ARCH@", "-Ccontrol-flow-guard=yes", "-Cforce-frame-pointers=no", "-Cllvm-args=-fp-contract=fast", "-Zmerge-functions=aliases", "-Zcombine-cgu=yes", "-Zfunction-sections=yes", "-Zno-unique-section-names=yes", "-Zhas-thread-local=yes", "-Ztls-model=local-exec", "-Zthreads=@CPU_COUNT@"]
+
+[profile.release]
+panic = "abort"
+strip = true
+opt-level = 3
+codegen-units = 1
+
+[build]
+rustflags = ["-Zthreads=@CPU_COUNT@"]

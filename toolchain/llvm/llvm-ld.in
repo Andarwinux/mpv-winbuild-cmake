@@ -1,0 +1,35 @@
+#!/bin/bash
+PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/ld.lld
+POLICY="cache_size_bytes=1g:prune_interval=1m"
+FLAGS="-m @ld_m_flag@"
+FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info"
+
+if [ "$CONF" == "1" ]; then
+    SKIP_OPT="-O0 --lto-O0 --lto-CGO0 -mllvm -import-instr-limit=0 --no-guard-cf --build-id=none"
+else
+    FLAGS+=" --thinlto-cache-dir=@MINGW_INSTALL_PREFIX@/thinlto --thinlto-cache-policy=$POLICY"
+    FLAGS+=" -O3 --lto-O3 --lto-CGO3 -mllvm -import-instr-limit=30 -s -Xlink=-release -Xlink=-opt:lldtailmerge -Xlink=-cetcompat"
+    if [ "$GC" != "0" ]; then
+        FLAGS+=" --gc-sections --icf=all"
+    fi
+    if [ "$PDB" == "1" ]; then
+        FLAGS+=" --pdb="
+    fi
+    if [ "$LTO" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
+        FLAGS+=" @llvm_mllvm@ @polly@"
+        if [ "@TARGET_CPU@" == "aarch64" ]; then
+            FLAGS+=" -mllvm -enable-gvn-sink=false -mllvm -polly=false"
+        fi
+    fi
+    if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
+        export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/lld-%m.profraw" #enable profraw output only when CONF!=1
+        export LLD_IN_TEST=1 #https://github.com/llvm/llvm-project/issues/52861
+    fi
+    if [ "@GCC_ARCH_HAS_AVX@" == "ON" ]; then
+        FLAGS+=" -mllvm -x86-use-vzeroupper=false"
+    fi
+    FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
+    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/ucrtmath.a"
+fi
+
+"$PROG" $FLAGS_INIT "$@" $FLAGS $SKIP_OPT

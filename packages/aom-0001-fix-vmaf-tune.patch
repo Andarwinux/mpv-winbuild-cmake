@@ -1,0 +1,69 @@
+From 2cc03cc5c7ef4ca6bb2f78ad045f5f228d6bc664 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Fri, 15 Nov 2024 00:00:00 +0000
+Subject: [PATCH] fix vmaf tune
+
+---
+ aom_dsp/vmaf.c     | 9 +++++++--
+ av1/av1_cx_iface.c | 4 ++--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/aom_dsp/vmaf.c b/aom_dsp/vmaf.c
+index 239b62b3..5c5e1fd4 100644
+--- a/aom_dsp/vmaf.c
++++ b/aom_dsp/vmaf.c
+@@ -17,6 +17,7 @@
+ #include <string.h>
+ #ifdef _WIN32
+ #include <process.h>
++#include <windows.h>
+ #else
+ #include <unistd.h>
+ #endif
+@@ -34,7 +35,7 @@ void aom_init_vmaf_model(VmafModel **vmaf_model, const char *model_path) {
+   model_cfg.flags = VMAF_MODEL_FLAG_DISABLE_CLIP;
+   model_cfg.name = "vmaf";
+ 
+-  if (vmaf_model_load_from_path(vmaf_model, &model_cfg, model_path)) {
++  if (vmaf_model_load(vmaf_model, &model_cfg, model_path)) {
+     vmaf_fatal_error("Failed to load VMAF model.");
+   }
+ }
+@@ -74,7 +75,11 @@ void aom_init_vmaf_context(VmafContext **vmaf_context, VmafModel *vmaf_model,
+   // TODO(sdeng): make them CLI arguments.
+   VmafConfiguration cfg;
+   cfg.log_level = VMAF_LOG_LEVEL_NONE;
+-  cfg.n_threads = 0;
++  #ifdef _WIN32
++  cfg.n_threads = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
++  #else
++  cfg.n_threads = 0:
++  #endif
+   cfg.n_subsample = 0;
+   cfg.cpumask = 0;
+ 
+diff --git a/av1/av1_cx_iface.c b/av1/av1_cx_iface.c
+index b7747b09..66dd72a5 100644
+--- a/av1/av1_cx_iface.c
++++ b/av1/av1_cx_iface.c
+@@ -235,7 +235,7 @@ static const struct av1_extracfg default_extra_cfg = {
+   0,              // gf_min_pyr_height
+   5,              // gf_max_pyr_height
+   AOM_TUNE_PSNR,  // tuning
+-  "/usr/local/share/model/vmaf_v0.6.1.json",  // VMAF model path
++  "vmaf_4k_v0.6.1neg",  // VMAF model path
+   ".",                                        // partition info path
+   0,                                          // enable rate guide deltaq
+   "./rate_map.txt",                           // rate distribution input
+@@ -387,7 +387,7 @@ static const struct av1_extracfg default_extra_cfg = {
+   0,              // gf_min_pyr_height
+   5,              // gf_max_pyr_height
+   AOM_TUNE_PSNR,  // tuning
+-  "/usr/local/share/model/vmaf_v0.6.1.json",  // VMAF model path
++  "vmaf_4k_v0.6.1neg",  // VMAF model path
+   ".",                                        // partition info path
+   0,                                          // enable rate guide deltaq
+   "./rate_map.txt",                           // rate distribution input
+-- 
+2.47.0
+

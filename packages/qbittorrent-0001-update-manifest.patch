@@ -1,0 +1,37 @@
+From 75dda1b05472f14928b2ac0510780177145dd645 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Fri, 25 Oct 2024 00:00:00 +0000
+Subject: [PATCH] update manifest
+
+---
+ src/qbittorrent.exe.manifest | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/qbittorrent.exe.manifest b/src/qbittorrent.exe.manifest
+index 1725117f..0cf71a3b 100644
+--- a/src/qbittorrent.exe.manifest
++++ b/src/qbittorrent.exe.manifest
+@@ -37,9 +37,15 @@
+   </compatibility>
+ 
+   <!-- Enable long paths that exceed MAX_PATH in length -->
+-  <asmv3:application>
+-    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+-      <longPathAware>true</longPathAware>
+-    </asmv3:windowsSettings>
+-  </asmv3:application>
++  <application xmlns="urn:schemas-microsoft-com:asm.v3">
++    <windowsSettings>
++        <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">True/PM</dpiAware>
++        <disableWindowFiltering xmlns="http://schemas.microsoft.com/SMI/2011/WindowsSettings">True</disableWindowFiltering>
++        <printerDriverIsolation xmlns="http://schemas.microsoft.com/SMI/2011/WindowsSettings">True</printerDriverIsolation>
++        <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">True</longPathAware>
++        <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2,PerMonitor</dpiAwareness>
++        <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">UTF-8</activeCodePage>
++        <heapType xmlns="http://schemas.microsoft.com/SMI/2020/WindowsSettings">SegmentHeap</heapType>
++    </windowsSettings>
++  </application>
+ </assembly>
+-- 
+2.47.0
+

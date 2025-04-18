@@ -33,6 +33,13 @@ These packages need to be installed first before compiling mpv:
 * Use [apt-fast](https://github.com/ilikenwf/apt-fast) if apt-get is too slow.
 * It is advised to use bash over dash. Set `sudo ln -sf /bin/bash /bin/sh`. Revert back by `sudo ln -sf /bin/dash /bin/sh`.
 * To update package installed by pip, run `pip3 install <package> --upgrade`.
+* Distributions clang is usually problematic, it is highly recommended to install Fuchsia Clang as an alternative:
+
+ ```
+go install go.chromium.org/luci/cipd/client/cmd/...@latest
+cipd install fuchsia/third_party/clang/linux-amd64 latest -root /usr/local/fuchsia-clang
+PATH="/usr/local/fuchsia-clang/bin:$PATH"
+```
 
 ## Compiling with Clang
 

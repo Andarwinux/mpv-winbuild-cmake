@@ -141,7 +141,7 @@ add_custom_target(download
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${download}
 )
 
-add_custom_target(package-fullclean
+add_custom_target(fullclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${fullclean}
     COMMENT "Remove all build and stamp files, reset git HEAD"
 )

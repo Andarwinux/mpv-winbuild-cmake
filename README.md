@@ -91,8 +91,12 @@ After that, build mpv as usual:
 | -------------------------- | ----------- |
 | ninja package              | compile a package |
 | ninja clean                | remove all stamp files in all packages. |
+| ninja fullclean            | remove all stamp and build files in all packages |
 | ninja download             | Download all packages' sources at once without compiling. |
 | ninja update               | Update all git repos. When a package pulls new changes, all of its stamp files will be deleted and will be forced rebuild. If there is no change, it will not remove the stamp files and no rebuild occur. Use this instead of `ninja clean` if you don't want to rebuild everything in the next run. |
+| ninja toolchains-fullclean  | remove all stamp and build files in all toolchain packages |
+| ninja toolchains-download   | Download all toolchain packages' sources at once without compiling. |
+| ninja toolchains-update     | Update all toolchain git repos. When a package pulls new changes, all of its stamp files will be deleted and will be forced rebuild. If there is no change, it will not remove the stamp files and no rebuild occur. Use this instead of `ninja clean` if you don't want to rebuild everything in the next run. |
 | ninja package-fullclean    | Remove all stamp files of a package. |
 | ninja package-removebuild  | Remove 'build' directory of a package. |
 | ninja package-removeprefix | Remove 'prefix' directory. |

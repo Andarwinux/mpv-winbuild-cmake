@@ -48,16 +48,16 @@ list(TRANSFORM repo APPEND "-force-update" OUTPUT_VARIABLE update)
 list(TRANSFORM ep APPEND "-download" OUTPUT_VARIABLE download)
 list(TRANSFORM ep APPEND "-fullclean" OUTPUT_VARIABLE fullclean)
 
-add_custom_target(toolchain-update
+add_custom_target(toolchains-update
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${update}
     COMMENT "Updating git repo"
 )
 
-add_custom_target(toolchain-download
+add_custom_target(toolchains-download
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${download}
 )
 
-add_custom_target(toolchain-fullclean
+add_custom_target(toolchains-fullclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${fullclean}
     COMMENT "Remove all build and stamp files, reset git HEAD"
 )

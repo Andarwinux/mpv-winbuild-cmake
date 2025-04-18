@@ -13,13 +13,13 @@ This thing’s primary use is to build Windows binaries of apps.
 
 These packages need to be installed first before compiling mpv:
 
-    pacman -S git gyp mercurial ninja cmake meson ragel yasm nasm asciidoc enca gperf unzip p7zip clang lld libc++ libc++abi python-pip curl mimalloc ccache
+    pacman -S git gyp mercurial ninja cmake meson ragel yasm nasm asciidoc enca gperf unzip p7zip clang lld libc++ libc++abi python-pip curl mimalloc ccache go
     
     pip3 install mako jsonschema
 
 ### Ubuntu Linux / WSL (Windows 10)
 
-    apt-get install build-essential checkinstall bison flex gettext git mercurial ninja-build gyp cmake yasm nasm automake pkgconf libtool libtool-bin clang lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev gperf ragel texinfo autopoint re2c asciidoc python3-pip docbook2x unzip p7zip-full curl mimalloc ccache
+    apt-get install build-essential checkinstall bison flex gettext git mercurial ninja-build gyp cmake yasm nasm automake pkgconf libtool libtool-bin clang lld libc++1 libc++abi1 libgmp-dev libmpfr-dev libmpc-dev libgcrypt-dev gperf ragel texinfo autopoint re2c asciidoc python3-pip docbook2x unzip p7zip-full curl mimalloc ccache golang
 
     pip3 install meson mako jsonschema
 

@@ -1,3 +1,11 @@
+string(TOLOWER "${CMAKE_HOST_SYSTEM_PROCESSOR}" host_arch)
+if(host_arch STREQUAL "x86_64" OR host_arch STREQUAL "amd64")
+    set(cipd_rust_arch "amd64")
+    set(cipd_rust_std_arch "x86_64")
+elseif(host_arch STREQUAL "aarch64" OR host_arch STREQUAL "arm64")
+    set(cipd_rust_arch "arm64")
+    set(cipd_rust_std_arch "aarch64")
+endif()
 ExternalProject_Add(rustup
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
@@ -5,8 +13,8 @@ ExternalProject_Add(rustup
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ${EXEC} GOBIN=${CMAKE_INSTALL_PREFIX}/bin go install go.chromium.org/luci/cipd/client/cmd/...@latest
           COMMAND ${EXEC} cipd init -force ${RUSTUP_LOCATION}
-          COMMAND ${EXEC} cipd install fuchsia/third_party/rust/host/linux-amd64 latest -root ${RUSTUP_LOCATION} -force
-          COMMAND ${EXEC} cipd install fuchsia/third_party/rust/target/x86_64-unknown-linux-gnu latest -root ${RUSTUP_LOCATION} -force
+          COMMAND ${EXEC} cipd install fuchsia/third_party/rust/host/linux-${cipd_rust_arch} latest -root ${RUSTUP_LOCATION} -force
+          COMMAND ${EXEC} cipd install fuchsia/third_party/rust/target/${cipd_rust_std_arch}-unknown-linux-gnu latest -root ${RUSTUP_LOCATION} -force
     INSTALL_COMMAND ${EXEC} LD_PRELOAD= cargo install cargo-c --profile=release-strip --features=vendored-openssl --locked
     LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

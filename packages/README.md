@@ -5,7 +5,7 @@ These files determine how to build a package and also hold patches to fix the bu
 # Add a new package
 
 ## Before you start, please refer to the CMake ExternalProject [documentation](https://cmake.org/cmake/help/latest/module/ExternalProject.html).
-You may notice there are some options in the files here that are not documented by CMake, because they were added via a local [patch](/cmake-0001-ExternalProject-changes.patch).
+You may notice there are some options in the files here that are not documented by CMake, because they were added via a local [patch](/packages/cmake-0001-ExternalProject-changes.patch).
 CMake's implementation of the Git download method does not meet advanced needs such as [sparse checkout](https://git-scm.com/docs/git-sparse-checkout).
 
 ## To add a new package, first consider how to download it.

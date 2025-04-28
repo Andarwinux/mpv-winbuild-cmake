@@ -12,8 +12,7 @@ ExternalProject_Add(fontconfig
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig-*.patch
-    CONFIGURE_COMMAND ${EXEC} sed -i [['s/both_libraries/library/g']] <SOURCE_DIR>/src/meson.build
-    COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/subprojects
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/subprojects
     COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Diconv=enabled

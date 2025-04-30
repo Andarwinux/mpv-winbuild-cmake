@@ -23,6 +23,7 @@ ExternalProject_Add(openssl
         no-autoload-config
         ${openssl_target}
         no-ssl3-method
+        no-makedepend
         enable-brotli
         no-whirlpool
         no-filenames
@@ -47,6 +48,7 @@ ExternalProject_Add(openssl
         no-srtp
         no-seed
         no-aria
+        no-fips
         no-err
         no-dso
         no-dsa

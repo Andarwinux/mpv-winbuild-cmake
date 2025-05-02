@@ -9,7 +9,7 @@ ExternalProject_Add(libdvdread
     COMMAND ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
         --with-libdvdcss
-    BUILD_COMMAND ${MAKE}
+    BUILD_COMMAND ${MAKE} HIDE=1
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

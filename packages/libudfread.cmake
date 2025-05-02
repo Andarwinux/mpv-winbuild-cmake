@@ -4,11 +4,10 @@ ExternalProject_Add(libudfread
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${autoreshit}
-    COMMAND ${EXEC} CONF=1 ./configure
-        ${autoshit_confuck_args}
-    BUILD_COMMAND ${MAKE}
-    INSTALL_COMMAND ${MAKE} install
+    CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+        ${meson_conf_args}
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

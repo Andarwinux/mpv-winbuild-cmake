@@ -37,7 +37,6 @@ ExternalProject_Add(mpv
     COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         --force-fallback-for=luajit
-        --prefer-static
         -Db_lto=true
         -Db_lto_mode=thin
         -Dlibmpv=false
@@ -68,8 +67,7 @@ ExternalProject_Add(mpv
     COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR>/libmpv <SOURCE_DIR>
         ${meson_conf_args}
         --force-fallback-for=luajit
-        --default-library=shared
-        --prefer-static
+        -Ddefault_library=shared
         -Db_lto=true
         -Db_lto_mode=thin
         -Dlibmpv=true

@@ -48,6 +48,10 @@ set(cmake_conf_args
 set(meson_conf_args
     --cross-file=${MESON_CROSS}
     --native-file=${MESON_NATIVE}
+    -Dbuildtype=release
+    -Ddefault_library=static
+    -Ddefault_both_libraries=static
+    -Dprefer_static=true
 )
 set(autoshit_confuck_args
     --host=${TARGET_ARCH}

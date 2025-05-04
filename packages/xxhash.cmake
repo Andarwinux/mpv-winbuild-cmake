@@ -6,7 +6,7 @@ ExternalProject_Add(xxhash
     GIT_TAG dev
     UPDATE_COMMAND ""
     GIT_REMOTE_NAME origin
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/cmake_unofficial -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/build/cmake -B<BINARY_DIR>
         ${cmake_conf_args}
         ${xxhash_dispatch}
         -DXXHASH_BUILD_XXHSUM=OFF

@@ -29,7 +29,7 @@ if(TARGET_CPU STREQUAL "x86_64")
     endif()
 elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
-    set(openssl_target "mingw-arm64")
+    set(openssl_target "mingwarm64")
     set(libvpx_target "arm64-win64-gcc")
     set(novzeroupper
         COMMAND true

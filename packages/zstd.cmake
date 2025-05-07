@@ -7,18 +7,16 @@ ExternalProject_Add(zstd
     UPDATE_COMMAND ""
     GIT_REMOTE_NAME origin
     GIT_TAG dev
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/build/cmake -B<BINARY_DIR>
-        ${cmake_conf_args}
-        -DZSTD_BUILD_CONTRIB=OFF
-        -DZSTD_BUILD_TESTS=OFF
-        -DZSTD_LEGACY_SUPPORT=OFF
-        -DZSTD_BUILD_PROGRAMS=OFF
-        -DZSTD_PROGRAMS_LINK_SHARED=OFF
-        -DZSTD_BUILD_SHARED=OFF
-        -DZSTD_BUILD_STATIC=ON
-        -DZSTD_MULTITHREAD_SUPPORT=ON
+    CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>/build/meson
+        ${meson_conf_args}
+        -Dlegacy_level=0
+        -Ddebug_level=0
+        -Dbin_programs=false
+        -Dzlib=disabled
+        -Dlzma=disabled
+        -Dlz4=disabled
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
+    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

@@ -11,7 +11,7 @@ ExternalProject_Add(qbittorrent
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
-    GIT_TAG v5_0_x
+    GIT_TAG v5_1_x
     UPDATE_COMMAND ""
     PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/qbittorrent-*.patch
     CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>

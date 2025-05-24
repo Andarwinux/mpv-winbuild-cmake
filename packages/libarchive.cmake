@@ -38,6 +38,7 @@ ExternalProject_Add(libarchive
         -DENABLE_TEST=OFF
         -DWINDOWS_VERSION=WIN10
         -DPOSIX_REGEX_LIB=OFF
+        -DCMAKE_INSTALL_LIBDIR=lib
         "-DCMAKE_C_FLAGS='-lxml2 -lbz2 -llzo2 -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lws2_32 -lgdi32 -lcrypt32 -liconv -lbcrypt'"
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

@@ -6,6 +6,8 @@ ExternalProject_Add(ngtcp2
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests"
     GIT_PROGRESS TRUE
+    GIT_SUBMODULES ""
+    GIT_CONFIG "submodule.recurse=false"
     GIT_TAG main
     GIT_REMOTE_NAME origin
     UPDATE_COMMAND ""

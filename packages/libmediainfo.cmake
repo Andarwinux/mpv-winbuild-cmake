@@ -14,6 +14,7 @@ ExternalProject_Add(libmediainfo
         -DBUILD_ZENLIB=OFF
         -DCURL_FOUND=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON
+        "-DCMAKE_CXX_FLAGS='-DFMT_HEADER_ONLY'"
     BUILD_COMMAND ${EXEC} EXCEP=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmediainfo.dll ${MINGW_INSTALL_PREFIX}/bin/libmediainfo.dll
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
@@ -31,6 +32,7 @@ ExternalProject_Add(libmediainfo-static
         -DBUILD_ZENLIB=OFF
         -DCURL_FOUND=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON
+        "-DCMAKE_CXX_FLAGS='-DFMT_HEADER_ONLY'"
     BUILD_COMMAND ${EXEC} EXCEP=1 ninja -C <BINARY_DIR>
           COMMAND ${EXEC} sed -i [['s/-lpthread//g']] <BINARY_DIR>/libmediainfo.pc
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

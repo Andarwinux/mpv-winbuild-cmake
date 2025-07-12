@@ -10,6 +10,8 @@ ExternalProject_Add(libjpeg
         ${cmake_conf_args}
         -DENABLE_STATIC=ON
         -DENABLE_SHARED=OFF
+        -DWITH_TESTS=OFF
+        -DWITH_TOOLS=OFF
         -DWITH_TURBOJPEG=OFF
     BUILD_COMMAND ${EXEC} UNWIND=1 ninja -C <BINARY_DIR> libjpeg.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR> --component lib & ${CMAKE_COMMAND} --install <BINARY_DIR> --component include

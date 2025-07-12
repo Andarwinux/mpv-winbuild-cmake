@@ -25,9 +25,9 @@ ExternalProject_Add(mimalloc-host
         -DMI_BUILD_SHARED=OFF
         -DMI_BUILD_STATIC=OFF
         -DMI_SKIP_COLLECT_ON_EXIT=ON
-        "-DCMAKE_C_FLAGS='-DMI_DEFAULT_ALLOW_LARGE_OS_PAGES=1 -DMI_DEFAULT_ARENA_EAGER_COMMIT=1 -DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
-        "-DCMAKE_CXX_FLAGS='-DMI_DEFAULT_ALLOW_LARGE_OS_PAGES=1 -DMI_DEFAULT_ARENA_EAGER_COMMIT=1 -DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
-        "-DCMAKE_ASM_FLAGS='-DMI_DEFAULT_ALLOW_LARGE_OS_PAGES=1 -DMI_DEFAULT_ARENA_EAGER_COMMIT=1 -DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_ASM_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
     COMMAND ${EXEC} CONF=1 PKG_CONFIG_LIBDIR= ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/shared
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
@@ -50,9 +50,9 @@ ExternalProject_Add(mimalloc-host
         -DMI_SKIP_COLLECT_ON_EXIT=ON
         -DMI_USE_LIBATOMIC=OFF
         -DCMAKE_PLATFORM_NO_VERSIONED_SONAME=ON
-        "-DCMAKE_C_FLAGS='-DMI_DEFAULT_ALLOW_LARGE_OS_PAGES=1 -DMI_DEFAULT_ARENA_EAGER_COMMIT=1 -DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
-        "-DCMAKE_CXX_FLAGS='-DMI_DEFAULT_ALLOW_LARGE_OS_PAGES=1 -DMI_DEFAULT_ARENA_EAGER_COMMIT=1 -DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
-        "-DCMAKE_ASM_FLAGS='-DMI_DEFAULT_ALLOW_LARGE_OS_PAGES=1 -DMI_DEFAULT_ARENA_EAGER_COMMIT=1 -DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
+        "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
+        "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
+        "-DCMAKE_ASM_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
         "-DCMAKE_SHARED_LINKER_FLAGS='-Wl,-s ${tc_ldflags}'"
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
           COMMAND ${EXEC} ninja -C <BINARY_DIR>/shared

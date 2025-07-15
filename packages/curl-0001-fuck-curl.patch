@@ -1,4 +1,4 @@
-From 584b21ef10a100a77c84161b73200ba8269bbb3e Mon Sep 17 00:00:00 2001
+From 4ba9fd3cd0ef39a4b7be765b5729e0465eea1f7f Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 11 Mar 2025 00:00:00 +0000
 Subject: [PATCH] fuck curl
@@ -8,18 +8,18 @@ Subject: [PATCH] fuck curl
  1 file changed, 2 insertions(+)
 
 diff --git a/src/tool_cfgable.c b/src/tool_cfgable.c
-index 93ba139..b021628 100644
+index 975ef2a..b4ddca8 100644
 --- a/src/tool_cfgable.c
 +++ b/src/tool_cfgable.c
-@@ -48,6 +48,8 @@ void config_init(struct OperationConfig *config)
+@@ -50,6 +50,8 @@ struct OperationConfig *config_alloc(struct GlobalConfig *global)
    config->file_clobber_mode = CLOBBER_DEFAULT;
    config->upload_flags = CURLULFLAG_SEEN;
    curlx_dyn_init(&config->postdata, MAX_FILE2MEMORY);
 +  config->native_ca_store = TRUE;
 +  config->proxy_native_ca_store = TRUE;
+   return config;
  }
  
- static void free_config_fields(struct OperationConfig *config)
 -- 
-2.48.1
+2.50.1
 

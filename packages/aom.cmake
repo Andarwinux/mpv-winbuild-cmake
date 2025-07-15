@@ -21,8 +21,6 @@ ExternalProject_Add(aom
         -DCONFIG_UNIT_TESTS=0
         -DCONFIG_AV1_DECODER=0
         #-DCONFIG_TUNE_VMAF=1
-        -DENABLE_SVE=OFF
-        -DENABLE_SVE2=OFF
     ${aom_vpx_sse2avx}
     ${novzeroupper} <SOURCE_DIR>/third_party/x86inc/x86inc.asm
     BUILD_COMMAND ${EXEC} UNWIND=1 ninja -C <BINARY_DIR>

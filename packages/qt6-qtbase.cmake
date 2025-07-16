@@ -53,6 +53,7 @@ ExternalProject_Add(qt6-qtbase
     COMMAND ${EXEC} ninja -C <BINARY_DIR>/qthost install
     COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${qt_target_features}
         -DBUILD_WITH_PCH=ON
         -DCMAKE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}/qt6
         -DCMAKE_PREFIX_PATH=${MINGW_INSTALL_PREFIX}
@@ -61,35 +62,6 @@ ExternalProject_Add(qt6-qtbase
         -DQT_BUILD_EXAMPLES=OFF
         -DQT_BUILD_TESTS_BY_DEFAULT=OFF
         -DQT_BUILD_TESTS=OFF
-        -DQT_FEATURE_brotli=ON
-        -DQT_FEATURE_cpp_winrt=ON
-        -DQT_FEATURE_cxx20=ON
-        -DQT_FEATURE_egl=OFF
-        -DQT_FEATURE_networklistmanager=OFF
-        -DQT_FEATURE_testlib=OFF
-        -DQT_FEATURE_intelcet=OFF
-        -DQT_FEATURE_fontconfig=OFF
-        -DQT_FEATURE_stack_protector=OFF
-        -DQT_FEATURE_openssl=ON
-        -DQT_FEATURE_pkg_config=ON
-        -DQT_FEATURE_sql_mysql=OFF
-        -DQT_FEATURE_sql_odbc=ON
-        -DQT_FEATURE_sql_psql=OFF
-        -DQT_FEATURE_static_runtime=ON
-        -DQT_FEATURE_system_freetype=ON
-        -DQT_FEATURE_harfbuzz=ON
-        -DQT_FEATURE_system_harfbuzz=OFF
-        -DQT_FEATURE_imageformat_jpeg=OFF
-        -DQT_FEATURE_jpeg=OFF
-        -DQT_FEATURE_system_openssl=ON
-        -DQT_FEATURE_openssl_linked=ON
-        -DQT_FEATURE_openssl_runtime=OFF
-        -DQT_FEATURE_system_png=ON
-        -DQT_FEATURE_system_sqlite=OFF
-        -DQT_FEATURE_system_webp=ON
-        -DQT_FEATURE_system_zlib=ON
-        -DQT_FEATURE_vulkan=ON
-        -DQT_FEATURE_zstd=ON
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DQT_INSTALL_EXAMPLES_SOURCES_BY_DEFAULT=OFF
         -DQT_UNITY_BUILD=OFF

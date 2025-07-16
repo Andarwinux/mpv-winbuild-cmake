@@ -63,3 +63,35 @@ set(autoreshit
     COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>
     COMMAND ${EXEC} autoreconf -fi
 )
+set(qt_target_features
+    -DQT_FEATURE_brotli=ON
+    -DQT_FEATURE_cpp_winrt=ON
+    -DQT_FEATURE_cxx20=ON
+    -DQT_FEATURE_egl=OFF
+    -DQT_FEATURE_fontconfig=OFF
+    -DQT_FEATURE_harfbuzz=ON
+    -DQT_FEATURE_imageformat_jpeg=OFF
+    -DQT_FEATURE_intelcet=OFF
+    -DQT_FEATURE_jpeg=OFF
+    -DQT_FEATURE_libcpp_hardening=OFF
+    -DQT_FEATURE_networklistmanager=OFF
+    -DQT_FEATURE_openssl_linked=ON
+    -DQT_FEATURE_openssl_runtime=OFF
+    -DQT_FEATURE_openssl=ON
+    -DQT_FEATURE_pkg_config=ON
+    -DQT_FEATURE_sql_mysql=OFF
+    -DQT_FEATURE_sql_odbc=ON
+    -DQT_FEATURE_sql_psql=OFF
+    -DQT_FEATURE_stack_protector=OFF
+    -DQT_FEATURE_static_runtime=ON
+    -DQT_FEATURE_system_freetype=ON
+    -DQT_FEATURE_system_harfbuzz=OFF
+    -DQT_FEATURE_system_openssl=ON
+    -DQT_FEATURE_system_png=ON
+    -DQT_FEATURE_system_sqlite=OFF
+    -DQT_FEATURE_system_webp=ON
+    -DQT_FEATURE_system_zlib=ON
+    -DQT_FEATURE_testlib=OFF
+    -DQT_FEATURE_vulkan=ON
+    -DQT_FEATURE_zstd=ON
+)

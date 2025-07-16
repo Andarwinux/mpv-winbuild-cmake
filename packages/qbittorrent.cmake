@@ -24,6 +24,8 @@ ExternalProject_Add(qbittorrent
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DTESTING=OFF
         -DSTACKTRACE=OFF
+        -DQT_FEATURE_imageformat_jpeg=OFF
+        -DQT_FEATURE_jpeg=OFF
         "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
     BUILD_COMMAND ${EXEC} EXCEP=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/qbittorrent.exe ${MINGW_INSTALL_PREFIX}/bin/qbittorrent.exe

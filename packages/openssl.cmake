@@ -48,7 +48,7 @@ ExternalProject_Add(openssl
         no-fips
         no-err
         no-dso
-        no-dsa
+        #no-dsa
         no-srp
         no-rc2
         no-rc4

@@ -6,7 +6,7 @@ ExternalProject_Add(qt6-qtsvg
     GIT_CLONE_FLAGS "--depth=1 --no-single-branch --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
-    GIT_TAG 6.8
+    GIT_TAG dev
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
@@ -26,13 +26,15 @@ ExternalProject_Add(qt6-qtsvg
         -DQT_FEATURE_networklistmanager=OFF
         -DQT_FEATURE_intelcet=OFF
         -DQT_FEATURE_fontconfig=OFF
+        -DQT_FEATURE_stack_protector=OFF
         -DQT_FEATURE_openssl=ON
         -DQT_FEATURE_pkg_config=ON
         -DQT_FEATURE_static_runtime=ON
         -DQT_FEATURE_system_freetype=ON
         -DQT_FEATURE_harfbuzz=ON
         -DQT_FEATURE_system_harfbuzz=OFF
-        -DQT_FEATURE_system_jpeg=ON
+        -DQT_FEATURE_imageformat_jpeg=OFF
+        -DQT_FEATURE_jpeg=OFF
         -DQT_FEATURE_system_openssl=ON
         -DQT_FEATURE_system_png=ON
         -DQT_FEATURE_system_webp=ON

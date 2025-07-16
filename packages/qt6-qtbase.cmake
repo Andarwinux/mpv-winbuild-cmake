@@ -5,7 +5,6 @@ ExternalProject_Add(qt6-qtbase
         zlib
         zstd
         vulkan
-        libjpeg
         libpng
         openssl
         bzip2
@@ -15,7 +14,7 @@ ExternalProject_Add(qt6-qtbase
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !examples"
-    GIT_TAG 6.8
+    GIT_TAG dev
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     COMMAND ${EXEC} CONF=1 PKG_CONFIG_LIBDIR= PKG_CONFIG=pkgconf ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/qthost
@@ -70,6 +69,7 @@ ExternalProject_Add(qt6-qtbase
         -DQT_FEATURE_testlib=OFF
         -DQT_FEATURE_intelcet=OFF
         -DQT_FEATURE_fontconfig=OFF
+        -DQT_FEATURE_stack_protector=OFF
         -DQT_FEATURE_openssl=ON
         -DQT_FEATURE_pkg_config=ON
         -DQT_FEATURE_sql_mysql=OFF
@@ -79,8 +79,11 @@ ExternalProject_Add(qt6-qtbase
         -DQT_FEATURE_system_freetype=ON
         -DQT_FEATURE_harfbuzz=ON
         -DQT_FEATURE_system_harfbuzz=OFF
-        -DQT_FEATURE_system_jpeg=ON
+        -DQT_FEATURE_imageformat_jpeg=OFF
+        -DQT_FEATURE_jpeg=OFF
         -DQT_FEATURE_system_openssl=ON
+        -DQT_FEATURE_openssl_linked=ON
+        -DQT_FEATURE_openssl_runtime=OFF
         -DQT_FEATURE_system_png=ON
         -DQT_FEATURE_system_sqlite=OFF
         -DQT_FEATURE_system_webp=ON

@@ -7,7 +7,7 @@ ExternalProject_Add(qt6-qttools
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !examples"
     GIT_REMOTE_NAME origin
-    GIT_TAG 6.8
+    GIT_TAG dev
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""

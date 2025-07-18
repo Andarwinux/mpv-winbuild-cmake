@@ -8,7 +8,7 @@ ExternalProject_Add(llvm
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !*/test !*/docs !*/unittests !*/examples !*/benchmarks !/lldb !/mlir !/clang-tools-extra !/mlir !/flang !openmp !libclc !bolt !cross-project-tests !offload !llvm-libgcc !third-party !flang-rt lld/docs/CMakeLists.txt clang/examples/CMakeLists.txt polly/test/CMakeLists.txt polly/docs/CMakeLists.txt polly/unittests/CMakeLists.txt"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !*/test !*/docs !*/unittests !*/examples !*/benchmarks !/lldb !/mlir !/clang-tools-extra !/mlir !/flang !openmp !libclc !bolt !cross-project-tests !offload !llvm-libgcc !third-party !flang-rt third-party/siphash lld/docs/CMakeLists.txt clang/examples/CMakeLists.txt polly/test/CMakeLists.txt polly/docs/CMakeLists.txt polly/unittests/CMakeLists.txt"
     UPDATE_COMMAND ""
     GIT_REMOTE_NAME origin
     GIT_TAG main
@@ -138,6 +138,7 @@ ExternalProject_Add(llvm
         -DLLVM_TOOL_LLVM_GSYMUTIL_BUILD=OFF
         -DLLVM_TOOL_LLVM_IFS_BUILD=OFF
         -DLLVM_TOOL_LLVM_ISEL_FUZZER_BUILD=OFF
+        -DLLVM_TOOL_LLVM_IR2VEC_BUILD=OFF
         -DLLVM_TOOL_LLVM_ITANIUM_DEMANGLE_FUZZER_BUILD=OFF
         -DLLVM_TOOL_LLVM_JITLINK_BUILD=OFF
         -DLLVM_TOOL_LLVM_JITLISTENER_BUILD=OFF

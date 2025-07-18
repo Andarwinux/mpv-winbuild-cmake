@@ -98,6 +98,8 @@ list(APPEND ep
     mpv-debug-plugin
     mpv-menu-plugin
     sqlite
+    libssh2
+    aria2
     zenlib
     libmediainfo
     mediainfo

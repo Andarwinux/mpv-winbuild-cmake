@@ -18,6 +18,7 @@ ExternalProject_Add(libtorrent
         -DBOOST_BUILD_PATH=${boost_src}/tools/build
         -DCMAKE_CXX_STANDARD=20
         -Ddeprecated-functions=OFF
+        "-DCMAKE_CXX_FLAGS='-w'"
     BUILD_COMMAND ${EXEC} EXCEP=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

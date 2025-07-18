@@ -1,10 +1,10 @@
 ExternalProject_Add(sqlite
     DEPENDS
         zlib
-    URL https://www.sqlite.org/2024/sqlite-autoconf-3470200.tar.gz
-    URL_HASH SHA3_256=52cd4a2304b627abbabe1a438ba853d0f6edb8e2774fcb5773c7af11077afe94
+    URL https://www.sqlite.org/2025/sqlite-autoconf-3500300.tar.gz
+    URL_HASH SHA3_256=c3df1542703a666d3f41bb623e9bed7d6e1dc81c57f0c45e3122403f862c520d
     DOWNLOAD_DIR ${SOURCE_LOCATION}
-    CONFIGURE_COMMAND ${autoreshit}
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>
     COMMAND ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
     BUILD_COMMAND ${MAKE}

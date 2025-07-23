@@ -50,6 +50,7 @@ set(meson_conf_args
     --native-file=${MESON_NATIVE}
     -Dbuildtype=release
     -Db_ndebug=true
+    -Dcpp_rtti=false
     -Ddefault_library=static
     -Ddefault_both_libraries=static
     -Dprefer_static=true

@@ -49,6 +49,7 @@ set(meson_conf_args
     --cross-file=${MESON_CROSS}
     --native-file=${MESON_NATIVE}
     -Dbuildtype=release
+    -Db_ndebug=true
     -Ddefault_library=static
     -Ddefault_both_libraries=static
     -Dprefer_static=true

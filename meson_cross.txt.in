@@ -21,10 +21,6 @@ endian = 'little'
 [built-in options]
 prefix = '@MINGW_INSTALL_PREFIX@'
 libdir = '@MINGW_INSTALL_PREFIX@/lib'
-buildtype = 'release'
-default_library = 'static'
-default_both_libraries = 'static'
-prefer_static = true
 pkgconfig.relocatable = true
 
 [cmake]

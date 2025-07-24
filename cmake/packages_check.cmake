@@ -43,6 +43,8 @@ set(cmake_conf_args
     -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE}
     -DBUILD_SHARED_LIBS=OFF
     -DBUILD_TESTING=OFF
+    -DCMAKE_C_STANDARD=17
+    -DCMAKE_CXX_STANDARD=20
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 )
 set(meson_conf_args
@@ -50,7 +52,9 @@ set(meson_conf_args
     --native-file=${MESON_NATIVE}
     -Dbuildtype=release
     -Db_ndebug=true
+    -Dc_std=gnu17
     -Dcpp_rtti=false
+    -Dcpp_std=gnu++20
     -Ddefault_library=static
     -Ddefault_both_libraries=static
     -Dprefer_static=true

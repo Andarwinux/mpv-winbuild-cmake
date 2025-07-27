@@ -63,6 +63,7 @@ ExternalProject_Add(mpv
     CONFIGURE_COMMAND ""
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_luajit} <SOURCE_DIR>/subprojects/luajit
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_luajit_wrap}/subprojects/packagefiles/luajit <SOURCE_DIR>/subprojects/luajit
+    COMMAND ${EXEC} sed -i [['/JIT_F_OPT_DEFAULT/c\#define JIT_F_OPT_DEFAULT 0x07FF0000']] <SOURCE_DIR>/subprojects/luajit/src/lj_jit.h
     COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${mpv_conf}
         -Dlibmpv=false

@@ -2,7 +2,7 @@ ExternalProject_Add(svtav1-psy
     DEPENDS
         libdovi
         libhdr10plus
-    GIT_REPOSITORY https://github.com/psy-ex/svt-av1-psy.git
+    GIT_REPOSITORY https://github.com/BlueSwordM/svt-av1-psyex.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test !Docs"

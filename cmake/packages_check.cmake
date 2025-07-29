@@ -2,7 +2,7 @@ set(vapoursynth_pkgconfig_libs "-lVapourSynth -Wl,-delayload=VapourSynth.dll")
 set(vapoursynth_script_pkgconfig_libs "-lVSScript -Wl,-delayload=VSScript.dll")
 if(CLANG_PACKAGES_LTO)
     set(cargo_lto_rustflags "CARGO_PROFILE_RELEASE_LTO=thin
-    RUSTFLAGS='-Ctarget-cpu=${GCC_ARCH} -Cforce-frame-pointers=no -Ccontrol-flow-guard=yes -Clinker-plugin-lto=yes -Cforce-frame-pointers=no -Clto=thin -Cllvm-args=-fp-contract=fast -Zmerge-functions=aliases -Zcombine-cgu=yes -Zfunction-sections=yes -Zno-unique-section-names=yes -Zhas-thread-local=yes -Ztls-model=local-exec -Zthreads=${CPU_COUNT}'")
+    RUSTFLAGS='-Ctarget-cpu=${GCC_ARCH} -Cforce-frame-pointers=no -Ccontrol-flow-guard=yes -Clinker-plugin-lto=yes -Cforce-frame-pointers=no -Clto=thin -Cllvm-args=-fp-contract=fast -Zmerge-functions=aliases -Zfunction-sections=yes -Zno-unique-section-names=yes -Zhas-thread-local=yes -Ztls-model=local-exec -Zthreads=${CPU_COUNT}'")
 endif()
 
 if(TARGET_CPU STREQUAL "x86_64")

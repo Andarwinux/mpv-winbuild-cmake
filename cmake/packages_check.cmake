@@ -99,5 +99,6 @@ set(qt_target_features
     -DQT_FEATURE_system_zlib=ON
     -DQT_FEATURE_testlib=OFF
     -DQT_FEATURE_vulkan=ON
+    -DQT_FEATURE_winsdkicu=ON
     -DQT_FEATURE_zstd=ON
 )

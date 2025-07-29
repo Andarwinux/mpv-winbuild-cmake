@@ -17,6 +17,8 @@ ExternalProject_Add(mingw-w64-crt
     INSTALL_COMMAND ${MAKE} install
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libpowrprof.a ${MINGW_INSTALL_PREFIX}/lib/libPowrProf.a
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libiphlpapi.a ${MINGW_INSTALL_PREFIX}/lib/libIphlpapi.a
+            COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libicu.a ${MINGW_INSTALL_PREFIX}/lib/libicuin.a
+            COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libicu.a ${MINGW_INSTALL_PREFIX}/lib/libicuuc.a
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

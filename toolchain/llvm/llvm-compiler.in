@@ -4,7 +4,7 @@ FLAGS="-target @TARGET_CPU@-pc-windows-gnu"
 FLAGS+=" --sysroot @MINGW_INSTALL_PREFIX@"
 FLAGS+=" -fuse-ld=lld --ld-path=@TARGET_ARCH@-ld"
 FLAGS+=" -Wno-unused-command-line-argument -Wno-int-conversion -Wno-packed -Wno-unused-function -Wno-macro-redefined -Wno-backend-plugin -Wno-c++11-narrowing"
-FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -UHAS_80_BIT_LONG_DOUBLE -DHAS_80_BIT_LONG_DOUBLE=0 -U__USE_MINGW_ANSI_STDIO -D__USE_MINGW_ANSI_STDIO=0"
+FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -UHAS_80_BIT_LONG_DOUBLE -DHAS_80_BIT_LONG_DOUBLE=0 -U__USE_MINGW_ANSI_STDIO -D__USE_MINGW_ANSI_STDIO=0 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"
 FLAGS+=" -Xclang -fno-pch-timestamp -Xclang -mlong-double-64 -fno-split-lto-unit -fno-auto-import -fno-temp-file"
 FLAGS+=" -fno-builtin-sin -fno-builtin-sinf -fno-builtin-cos -fno-builtin-cosf -fno-builtin-sinl -fno-builtin-cosl"
 

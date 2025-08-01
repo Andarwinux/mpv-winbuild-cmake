@@ -11,7 +11,7 @@ ExternalProject_Add(qt6-qttools
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} PKG_CONFIG_LIBDIR= PKG_CONFIG=pkgconf ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} PKG_CONFIG_LIBDIR= PKG_CONFIG=pkg-config ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         -GNinja
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/qt6
         -DCMAKE_BUILD_TYPE=Release
@@ -22,42 +22,62 @@ ExternalProject_Add(qt6-qttools
         -DCMAKE_CXX_COMPILER_WORKS=1
         -DBUILD_WITH_PCH=ON
         -DINPUT_opengl=no
-        -DQT_FEATURE_opengl_dynamic=OFF
         -DQT_BUILD_BENCHMARKS=OFF
-        -DQT_BUILD_EXAMPLES=OFF
+        -DQT_BUILD_DOCS=OFF
         -DQT_BUILD_EXAMPLES_BY_DEFAULT=OFF
+        -DQT_BUILD_EXAMPLES=OFF
         -DQT_BUILD_TESTS_BY_DEFAULT=OFF
         -DQT_BUILD_TESTS=OFF
-        -DQT_FEATURE_gui=OFF
-        -DQT_FEATURE_opengl=OFF
-        -DQT_FEATURE_opengles2=OFF
-        -DQT_FEATURE_opengl_desktop=OFF
-        -DQT_FEATURE_egl=OFF
-        -DQT_INSTALL_EXAMPLES_SOURCES_BY_DEFAULT=OFF
-        -DQT_UNITY_BUILD=OFF
-        -DQT_USE_CCACHE=OFF
-        -DQT_FEATURE_clang=OFF
-        -DQT_FEATURE_clang-rtti=OFF
-        -DQT_FEATURE_qdoc=OFF
-        -DQT_FEATURE_clangcpp=OFF
-        -DQT_FEATURE_qev=OFF
+        -DQT_FEATURE_accessibility=OFF
         -DQT_FEATURE_assistant=OFF
+        -DQT_FEATURE_backtrace=OFF
+        -DQT_FEATURE_clang-rtti=OFF
+        -DQT_FEATURE_clang=OFF
+        -DQT_FEATURE_clangcpp=OFF
         -DQT_FEATURE_designer=OFF
         -DQT_FEATURE_distancefieldgenerator=OFF
+        -DQT_FEATURE_egl=OFF
+        -DQT_FEATURE_glib=OFF
+        -DQT_FEATURE_glibc_fortify_source=OFF
+        -DQT_FEATURE_gssapi=OFF
+        -DQT_FEATURE_gui=OFF
+        -DQT_FEATURE_gui=OFF
+        -DQT_FEATURE_icu=OFF
+        -DQT_FEATURE_intelcet=OFF
         -DQT_FEATURE_kmap2qmap=OFF
+        -DQT_FEATURE_libcpp_hardening=OFF
+        -DQT_FEATURE_linguist=ON
+        -DQT_FEATURE_network=OFF
+        -DQT_FEATURE_opengl_desktop=OFF
+        -DQT_FEATURE_opengl_dynamic=OFF
+        -DQT_FEATURE_opengl=OFF
+        -DQT_FEATURE_opengles2=OFF
+        -DQT_FEATURE_openssl=OFF
         -DQT_FEATURE_pixeltool=OFF
         -DQT_FEATURE_qdbus=OFF
+        -DQT_FEATURE_qdoc=OFF
         -DQT_FEATURE_qev=OFF
         -DQT_FEATURE_qtattributionsscanner=OFF
         -DQT_FEATURE_qtdiag=OFF
         -DQT_FEATURE_qtplugininfo=OFF
-        -DQT_FEATURE_linguist=ON
+        -DQT_FEATURE_sql=OFF
+        -DQT_FEATURE_stack_protector=OFF
+        -DQT_FEATURE_testlib=OFF
+        -DQT_FEATURE_trivial_auto_var_init_pattern=OFF
+        -DQT_FEATURE_xcb_xlib=OFF
+        -DQT_FEATURE_xcb=OFF
+        -DQT_FEATURE_xkbcommon=OFF
+        -DQT_FEATURE_xml=OFF
+        -DQT_FEATURE_zstd=OFF
+        -DQT_INSTALL_EXAMPLES_SOURCES_BY_DEFAULT=OFF
+        -DQT_UNITY_BUILD=OFF
+        -DQT_USE_CCACHE=OFF
         -DCMAKE_PREFIX_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DCMAKE_FIND_ROOT_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY
-        "-DCMAKE_C_FLAGS='-Wno-unused-command-line-argument -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
-        "-DCMAKE_CXX_FLAGS='-Wno-unused-command-line-argument -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
-        "-DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=lld -Wl,-Bsymbolic,--build-id=fast,-s,-O3,--icf=all,--gc-sections,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments'"
+        "-DCMAKE_C_FLAGS='-Wno-unused-command-line-argument -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
+        "-DCMAKE_CXX_FLAGS='-Wno-unused-command-line-argument -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
+        "-DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=lld -Wl,-Bsymbolic,--build-id=none,-s,-O3,--icf=all,--gc-sections,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments'"
     BUILD_COMMAND ${EXEC} EXCEP=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

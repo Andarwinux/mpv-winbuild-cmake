@@ -15,8 +15,8 @@ ExternalProject_Add(libzimg
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_graphengine} graphengine
     COMMAND ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
-    BUILD_COMMAND ${MAKE} EXCEP=1
-    INSTALL_COMMAND ${MAKE} install
+    BUILD_COMMAND ${MAKE} EXCEP=1 install-libLTLIBRARIES install-includeHEADERS install-pkgconfigDATA
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

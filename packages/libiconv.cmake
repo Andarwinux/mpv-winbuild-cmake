@@ -11,8 +11,8 @@ ExternalProject_Add(libiconv
         ${build}
         --disable-nls
         --enable-extra-encodings
-    BUILD_COMMAND ${MAKE}
-    INSTALL_COMMAND ${MAKE} install
+    BUILD_COMMAND ${MAKE} install-lib
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

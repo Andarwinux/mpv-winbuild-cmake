@@ -23,7 +23,7 @@ ExternalProject_Add(aom
         #-DCONFIG_TUNE_VMAF=1
     ${aom_vpx_sse2avx}
     ${novzeroupper} <SOURCE_DIR>/third_party/x86inc/x86inc.asm
-    BUILD_COMMAND ${EXEC} UNWIND=1 ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} UNWIND=1 ninja -C <BINARY_DIR> libaom.a aom.pc
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

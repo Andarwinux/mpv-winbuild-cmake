@@ -17,7 +17,7 @@ ExternalProject_Add(libdovi
         --prefix ${MINGW_INSTALL_PREFIX}
         --target ${TARGET_CPU}-pc-windows-gnullvm
         -Zbuild-std=std,panic_abort
-        -Zbuild-std-features=sysroot/system-llvm-libunwind,sysroot/panic_immediate_abort,sysroot/backtrace-trace-only
+        -Zbuild-std-features=sysroot/system-llvm-libunwind,sysroot/panic_immediate_abort
         --release
         --library-type staticlib
     INSTALL_COMMAND ${EXEC} llvm-ar t ${MINGW_INSTALL_PREFIX}/lib/libdovi.a | grep '^compiler_builtins.*\.o$' | xargs -I {} llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libdovi.a {}

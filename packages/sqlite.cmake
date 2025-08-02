@@ -7,8 +7,8 @@ ExternalProject_Add(sqlite
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>
     COMMAND ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
-    BUILD_COMMAND ${MAKE}
-    INSTALL_COMMAND ${MAKE} install
+    BUILD_COMMAND ${MAKE} install-lib install-headers install-pc
+    INSTALL_COMMAND ${MAKE} ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

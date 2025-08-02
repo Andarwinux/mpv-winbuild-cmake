@@ -2,7 +2,7 @@ ExternalProject_Add(llvm-host-compiler-rt-builtin
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR ${LLVM_SRC}
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/compiler-rt/lib/builtins -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR>/compiler-rt/lib/builtins -B<BINARY_DIR>
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/lib/clang/${clang_version}
@@ -24,8 +24,8 @@ ExternalProject_Add(llvm-host-compiler-rt-builtin
         "-DCMAKE_C_FLAGS='${tc_cflags}'"
         "-DCMAKE_CXX_FLAGS='${tc_cflags}'"
         "-DCMAKE_ASM_FLAGS='${tc_cflags}'"
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
+    BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>
+    INSTALL_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

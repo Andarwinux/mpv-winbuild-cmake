@@ -3,7 +3,7 @@ ExternalProject_Add(llvm-host-libcxx
     UPDATE_COMMAND ""
     SOURCE_DIR ${LLVM_SRC}
     LIST_SEPARATOR ^^
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/runtimes -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR>/runtimes -B<BINARY_DIR>
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
@@ -41,8 +41,8 @@ ExternalProject_Add(llvm-host-libcxx
         "-DCMAKE_C_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_ASM_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
+    BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>
+    INSTALL_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

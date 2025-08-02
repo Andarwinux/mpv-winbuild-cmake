@@ -6,6 +6,12 @@ linker = "@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-clang++"
 ar = "@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-ar"
 rustflags = ["-Ctarget-cpu=@GCC_ARCH@", "-Ccontrol-flow-guard=yes", "-Cforce-frame-pointers=no", "-Cllvm-args=-fp-contract=fast", "-Zmerge-functions=aliases", "-Zcombine-cgu=yes", "-Zfunction-sections=yes", "-Zno-unique-section-names=yes", "-Zhas-thread-local=yes", "-Ztls-model=local-exec", "-Zthreads=@CPU_COUNT@"]
 
+[target.x86_64-unknown-linux-gnu]
+linker = "clang++"
+
+[target.aarch64-unknown-linux-gnu]
+linker = "clang++"
+
 [profile.release]
 panic = "abort"
 strip = true

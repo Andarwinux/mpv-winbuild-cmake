@@ -106,7 +106,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/meson_native.txt.in ${CMAKE_CURRENT_B
 set(MESON_NATIVE ${CMAKE_CURRENT_BINARY_DIR}/meson_native.txt)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cargo_config.in ${RUSTUP_LOCATION}/config.toml @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/exec.in ${CMAKE_CURRENT_BINARY_DIR}/exec @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/exec_host.in ${CMAKE_CURRENT_BINARY_DIR}/exec_host @ONLY)
 set(EXEC ${CMAKE_CURRENT_BINARY_DIR}/exec)
+set(EXEC_HOST ${CMAKE_CURRENT_BINARY_DIR}/exec_host)
 set(MAKE ${EXEC} make -j${MAKEJOBS})
 
 if(TARGET_CPU STREQUAL "x86_64")

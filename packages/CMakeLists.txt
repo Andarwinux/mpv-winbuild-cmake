@@ -149,8 +149,8 @@ add_custom_target(fullclean
 )
 
 add_custom_target(cargo-clean
-    COMMAND ${EXEC} LD_PRELOAD= cargo install --git https://github.com/matthiaskrgr/cargo-cache.git --no-default-features --features ci-autoclean cargo-cache
-    COMMAND ${EXEC} cargo-cache
+    COMMAND ${EXEC_HOST} LD_PRELOAD= CC=clang CXX=clang++ AR=llvm-ar "CFLAGS='-O3 -march=native -fno-ident -fno-plt -fno-semantic-interposition -ffp-contract=fast -fno-math-errno'" "CXXFLAGS='-O3 -march=native -fno-ident -fno-plt -fno-semantic-interposition -ffp-contract=fast -fno-math-errno'" "RUSTFLAGS='-Ctarget-cpu=native -Copt-level=3 -Cllvm-args=-fp-contract=fast -Clink-arg=-Wl,-Bsymbolic,--build-id=none,-O3,--lto-O3,--lto-CGO3,--icf=all,--gc-sections,-znow,-zrodynamic,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments,-zkeep-text-section-prefix,-zstart-stop-visibility=hidden'" cargo install --git https://github.com/matthiaskrgr/cargo-cache.git --no-default-features --features ci-autoclean cargo-cache
+    COMMAND ${EXEC_HOST} cargo-cache
     COMMAND du -sh ${RUSTUP_LOCATION}
     USES_TERMINAL
 )

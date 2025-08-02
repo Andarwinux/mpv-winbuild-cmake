@@ -9,8 +9,8 @@ ExternalProject_Add(liblc3
     CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Db_lto=false
-    BUILD_COMMAND ${EXEC} HIDE=1 ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

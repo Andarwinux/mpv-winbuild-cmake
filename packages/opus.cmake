@@ -22,9 +22,8 @@ ExternalProject_Add(opus
         -Dextra-programs=disabled
         -Dtests=disabled
         -Ddocs=disabled
-    BUILD_COMMAND ${EXEC} HIDE=1 ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
-            COMMAND ${CMAKE_COMMAND} -E rm -rf ${src_opus_dnn}/models
+    BUILD_COMMAND ${EXEC} HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E rm -rf ${src_opus_dnn}/models
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

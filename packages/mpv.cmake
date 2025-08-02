@@ -75,8 +75,8 @@ ExternalProject_Add(mpv
         -Dlibmpv=true
         -Dcplayer=false
     BUILD_COMMAND ${EXEC} PDB=1 EXCEP=1 HIDE=1 ninja -C <BINARY_DIR>
-          COMMAND ${EXEC} PDB=1 EXCEP=1 ninja -C <BINARY_DIR>/libmpv
-    INSTALL_COMMAND ${EXEC} PDB=1 EXCEP=1 meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
+          COMMAND ${EXEC} PDB=1 EXCEP=1 meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

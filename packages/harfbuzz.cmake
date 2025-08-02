@@ -27,8 +27,8 @@ ExternalProject_Add(harfbuzz
         -Dbenchmark=disabled
         "-Dc_args='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
         "-Dcpp_args='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

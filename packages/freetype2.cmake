@@ -20,8 +20,8 @@ ExternalProject_Add(freetype2
         -Dzlib=enabled
         -Dbzip2=enabled
         -Dpng=enabled
-    BUILD_COMMAND ${EXEC} UNWIND=1 ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} UNWIND=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

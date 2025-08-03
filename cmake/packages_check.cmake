@@ -50,6 +50,7 @@ set(cmake_conf_args
 set(meson_conf_args
     --cross-file=${MESON_CROSS}
     --native-file=${MESON_NATIVE}
+    --wrap-mode=nofallback
     -Dbuildtype=release
     -Db_ndebug=true
     -Dc_std=gnu17

@@ -17,7 +17,6 @@ ExternalProject_Add(harfbuzz
         -Dfreetype=enabled
         -Dgdi=enabled
         -Ddirectwrite=enabled
-        -Dkbts=enabled
         -Dicu=disabled
         -Dglib=disabled
         -Dgobject=disabled

@@ -8,7 +8,7 @@ if [ "$CONF" == "1" ]; then
     SKIP_OPT="-O0 --lto-O0 --lto-CGO0 -mllvm -import-instr-limit=0 --no-guard-cf --build-id=none"
 else
     FLAGS+=" --thinlto-cache-dir=@MINGW_INSTALL_PREFIX@/thinlto --thinlto-cache-policy=$POLICY"
-    FLAGS+=" -O3 --lto-O3 --lto-CGO3 -mllvm -import-instr-limit=30 -s -Xlink=-release -Xlink=-opt:lldtailmerge -Xlink=-cetcompat"
+    FLAGS+=" -O3 --lto-O3 --lto-CGO3 -mllvm -import-instr-limit=30 -s -Xlink=-release -Xlink=-opt:lldtailmerge -Xlink=-cetcompat -Xlink=-debug:ghash"
     if [ "$GC" != "0" ]; then
         FLAGS+=" --gc-sections --icf=all"
     fi

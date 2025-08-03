@@ -6,9 +6,9 @@ ExternalProject_Add(llvm-host-compiler-rt-builtin
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}/lib/clang/${clang_version}
-        -DCMAKE_C_COMPILER=clang
-        -DCMAKE_CXX_COMPILER=clang++
-        -DCMAKE_ASM_COMPILER=clang
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_ASM_COMPILER=${CMAKE_C_COMPILER}
         -DCMAKE_C_COMPILER_WORKS=ON
         -DCMAKE_CXX_COMPILER_WORKS=ON
         -DCMAKE_ASM_COMPILER_WORKS=ON

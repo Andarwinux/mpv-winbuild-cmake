@@ -17,7 +17,7 @@ ExternalProject_Add(qt6-qtbase
     GIT_TAG dev
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
-    COMMAND ${EXEC} CONF=1 PKG_CONFIG_LIBDIR= PKG_CONFIG=pkg-config ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/qthost
+    COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/qthost
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS=OFF
@@ -62,8 +62,8 @@ ExternalProject_Add(qt6-qtbase
         -DQT_INSTALL_EXAMPLES_SOURCES_BY_DEFAULT=OFF
         -DQT_UNITY_BUILD=ON
         -DQT_USE_CCACHE=OFF
-        "-DCMAKE_C_FLAGS='-Wno-unused-command-line-argument -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
-        "-DCMAKE_CXX_FLAGS='-Wno-unused-command-line-argument -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
+        "-DCMAKE_C_FLAGS='-Wno-unused-command-line-argument -g0 -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
+        "-DCMAKE_CXX_FLAGS='-Wno-unused-command-line-argument -g0 -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
         "-DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=lld -Wl,-Bsymbolic,--build-id=none,-s,-O3,--icf=all,--gc-sections,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments'"
     COMMAND ${EXEC} ninja -C <BINARY_DIR>/qthost install
     COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>

@@ -5,7 +5,7 @@ ExternalProject_Add(sleef
     GIT_PROGRESS TRUE
     GIT_RESET c73b89fd6661230586196ba0ce29f7444cc5a2e8
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} PKG_CONFIG_LIBDIR= PKG_CONFIG=pkg-config CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/host
+    CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/host
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS=OFF
@@ -34,6 +34,8 @@ ExternalProject_Add(sleef
         -DLIB_MPFR=''
         -DLIBFFTW3=''
         -DLIBGMP=''
+        "-DCMAKE_C_FLAGS='-g0'"
+        "-DCMALE_CXX_FLAGS='-g0'"
     COMMAND ${EXEC} ninja -C <BINARY_DIR>/host libsleef.a libsleefdft.a
     COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}

@@ -61,7 +61,7 @@ ExternalProject_Add(openssl
         #no-dh
         no-bf
         zlib
-    BUILD_COMMAND ${MAKE} build_sw
+    BUILD_COMMAND ${MAKE} FULL_DBG=1 build_sw
     INSTALL_COMMAND ${MAKE} install_sw
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -129,7 +129,7 @@ ExternalProject_Add(ffmpeg
         --nvcc=nvcc
         --extra-libs=-lc++
     ${novzeroupper} <SOURCE_DIR>/libavutil/x86/x86inc.asm
-    BUILD_COMMAND ${MAKE}
+    BUILD_COMMAND ${MAKE} FULL_DBG=1
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -56,8 +56,15 @@ else
     if [ "$HIDE" == "1" ]; then
         FLAGS+=" -fvisibility-from-dllstorageclass -fvisibility-dllexport=hidden"
     fi
-    if [ "$NO_DEBUG" != "1" ]; then
-        FLAGS+=" -gline-tables-only -fdebug-info-for-profiling"
+    if [ "$NO_DBG" != "1" ]; then
+        FLAGS+=" -fdebug-info-for-profiling"
+        if [ "$FULL_DBG" == "1" ]; then
+            FLAGS+=" -g3"
+        else
+            FLAGS+=" -gline-tables-only"
+        fi
+    else
+        FLAGS+= "-g0"
     fi
     if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
         export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw"

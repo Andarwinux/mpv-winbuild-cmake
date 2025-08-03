@@ -74,8 +74,8 @@ ExternalProject_Add(mpv
         -Dluajit:default_library=static
         -Dlibmpv=true
         -Dcplayer=false
-    BUILD_COMMAND ${EXEC} PDB=1 EXCEP=1 HIDE=1 ninja -C <BINARY_DIR>
-          COMMAND ${EXEC} PDB=1 EXCEP=1 meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PDB=1 EXCEP=1 HIDE=1 FULL_DBG=1 ninja -C <BINARY_DIR>
+          COMMAND ${EXEC} PDB=1 EXCEP=1 FULL_DBG=1 meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
@@ -90,7 +90,7 @@ ExternalProject_Add_Step(mpv build-legacy
         -Dlibmpv=false
         -Dcplayer=true
         -Dwin32-subsystem=windows
-    COMMAND ${EXEC} PDB=1 EXCEP=1 HIDE=1 ninja -C <BINARY_DIR>/legacy mpv.exe
+    COMMAND ${EXEC} PDB=1 EXCEP=1 HIDE=1 FULL_DBG=1 ninja -C <BINARY_DIR>/legacy mpv.exe
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/legacy/mpv.exe ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv-legacy.exe
 )
 else()

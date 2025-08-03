@@ -8,7 +8,7 @@ ExternalProject_Add(libdovi
     GIT_TAG main
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND ${EXEC}
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR>
         LD_PRELOAD=
         CARGO_BUILD_TARGET_DIR=<BINARY_DIR>
         ${cargo_lto_rustflags}

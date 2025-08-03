@@ -21,7 +21,8 @@ ExternalProject_Add(fontconfig
         -Dtests=disabled
         -Dtools=disabled
         -Dcache-build=disabled
-    BUILD_COMMAND ${EXEC} HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+        -Dtemplate-dir=''
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

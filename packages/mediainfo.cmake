@@ -10,7 +10,7 @@ ExternalProject_Add(mediainfo
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>
     COMMAND ${EXEC} cd Project/GNU/CLI && autoreconf -fi && ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
-    BUILD_COMMAND ${MAKE} -C Project/GNU/CLI
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> -C Project/GNU/CLI
     INSTALL_COMMAND ${MAKE} install -C Project/GNU/CLI
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

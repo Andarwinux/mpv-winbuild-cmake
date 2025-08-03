@@ -40,7 +40,7 @@ ExternalProject_Add(libarchive
         -DPOSIX_REGEX_LIB=OFF
         -DCMAKE_INSTALL_LIBDIR=lib
         "-DCMAKE_C_FLAGS='-lxml2 -lbz2 -llzo2 -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lws2_32 -lgdi32 -lcrypt32 -liconv -lbcrypt'"
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -26,7 +26,7 @@ ExternalProject_Add(libass
         -Dfuzz=disabled
         -Dcheckasm=disabled
     ${novzeroupper} <SOURCE_DIR>/libass/x86/x86inc.asm
-    BUILD_COMMAND ${EXEC} FULL_DBG=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> FULL_DBG=1 meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -78,7 +78,7 @@ ExternalProject_Add(qt6-qttools
         "-DCMAKE_C_FLAGS='-Wno-unused-command-line-argument -g0 -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
         "-DCMAKE_CXX_FLAGS='-Wno-unused-command-line-argument -g0 -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
         "-DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=lld -Wl,-Bsymbolic,--build-id=none,-s,-O3,--icf=all,--gc-sections,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments'"
-    BUILD_COMMAND ${EXEC} EXCEP=1 ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

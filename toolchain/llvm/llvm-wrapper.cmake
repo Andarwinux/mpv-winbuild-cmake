@@ -59,13 +59,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/llvm/llvm-cuda-compiler.in
                FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
                @ONLY)
 
-if(NASM AND GCC_ARCH_HAS_AVX)
+if(GCC_ARCH_HAS_AVX)
+    set(sse2avx 1)
+else()
+    set(sse2avx 0)
+endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nasm.in
                ${CMAKE_INSTALL_PREFIX}/bin/nasm
                FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
                @ONLY)
-else()
-    file(REMOVE ${CMAKE_INSTALL_PREFIX}/bin/nasm)
-endif()
 
 cleanup(llvm-wrapper install)

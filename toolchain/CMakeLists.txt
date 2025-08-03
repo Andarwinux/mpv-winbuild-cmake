@@ -1,6 +1,7 @@
 set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download patch configure build install)
 include(${PROJECT_SOURCE_DIR}/cmake/toolchain_check.cmake)
 list(APPEND ep
+    placeholder
     llvm-wrapper
     mingw-w64
     mingw-w64-headers
@@ -30,6 +31,7 @@ foreach(package IN LISTS ep)
         set(SOURCE_LOCATION "${SINGLE_SOURCE_LOCATION}/${package}")
     endif()
     if(package MATCHES "llvm")
+        cmake_path(RELATIVE_PATH SINGLE_SOURCE_LOCATION BASE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/toolchain/placeholder-prefix/src/" OUTPUT_VARIABLE PKG_TO_SRC)
         include(${CMAKE_CURRENT_SOURCE_DIR}/llvm/${package}.cmake)
     elseif(package MATCHES "mingw-w64")
         include(${CMAKE_CURRENT_SOURCE_DIR}/mingw-w64/${package}.cmake)

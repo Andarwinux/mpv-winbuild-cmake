@@ -71,7 +71,7 @@ ExternalProject_Add(meson-package
     CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Dfeature_a=disabled
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
@@ -95,7 +95,7 @@ ExternalProject_Add(cmake-package
     CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DFEATURE_A=OFF
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
@@ -115,7 +115,7 @@ ExternalProject_Add(shit-package
     COMMAND ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
         --disable-doc
-    BUILD_COMMAND ${MAKE}
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR>
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

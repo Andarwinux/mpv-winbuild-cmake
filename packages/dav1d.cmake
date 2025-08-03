@@ -12,7 +12,7 @@ ExternalProject_Add(dav1d
         -Denable_tests=false
         -Dxxhash_muxer=enabled
     ${novzeroupper} <SOURCE_DIR>/src/ext/x86/x86inc.asm
-    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

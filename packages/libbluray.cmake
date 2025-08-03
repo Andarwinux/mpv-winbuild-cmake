@@ -19,7 +19,7 @@ ExternalProject_Add(libbluray
         -Dfreetype=enabled
         -Dlibxml2=enabled
         "-Dc_args='-Ddec_init=libbluray_dec_init'"
-    BUILD_COMMAND ${EXEC} HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ${EXEC} sed -i [['s/-lbluray/-lbluray -lgdi32/']] ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/libbluray.pc
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

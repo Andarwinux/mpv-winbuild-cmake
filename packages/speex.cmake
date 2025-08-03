@@ -11,7 +11,7 @@ ExternalProject_Add(speex
         -Dtest-binaries=disabled
         -Dtools=disabled
         "-Dc_args='-Dlsp_to_lpc=speex_lsp_to_lpc -Dlpc_to_lsp=speex_lpc_to_lsp'"
-    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -1,7 +1,6 @@
 #!/bin/bash
 cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DGCC_ARCH=native \
--DSINGLE_SOURCE_LOCATION=../src_packages \
 -DCOMPILER_TOOLCHAIN=clang \
 -DLLVM_ENABLE_LTO=Thin \
 -DENABLE_CCACHE=ON \

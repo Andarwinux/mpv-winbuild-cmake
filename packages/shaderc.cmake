@@ -36,7 +36,7 @@ ExternalProject_Add(shaderc
         -DDISABLE_RTTI=ON
         -DDISABLE_EXCEPTIONS=ON
         -DMINGW_COMPILER_PREFIX=${TARGET_ARCH}
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libshaderc_combined.a shaderc_combined-pkg-config
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR> libshaderc_combined.a shaderc_combined-pkg-config
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/libshaderc/include/shaderc ${MINGW_INSTALL_PREFIX}/include/shaderc
             COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libshaderc/libshaderc_combined.a ${MINGW_INSTALL_PREFIX}/lib/libshaderc_combined.a
             COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/shaderc_combined.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/shaderc.pc

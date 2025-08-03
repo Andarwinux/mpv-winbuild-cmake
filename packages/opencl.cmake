@@ -15,7 +15,7 @@ ExternalProject_Add(opencl
         -DOPENCL_ICD_LOADER_PIC=ON
         -DOPENCL_ICD_LOADER_BUILD_TESTING=OFF
         -DENABLE_OPENCL_LAYERINFO=OFF
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/OpenCL.a ${MINGW_INSTALL_PREFIX}/lib/libOpenCL.a
             COMMAND bash -c "echo 'Libs.private: -lole32 -lshlwapi -lcfgmgr32' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/OpenCL.pc"

@@ -10,24 +10,17 @@ ExternalProject_Add(harfbuzz
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
-        ${meson_conf_args}
-        -Dunity=on
-        -Dunity_size=1024
-        -Dfreetype=enabled
-        -Dgdi=enabled
-        -Ddirectwrite=enabled
-        -Dicu=disabled
-        -Dglib=disabled
-        -Dgobject=disabled
-        -Dtests=disabled
-        -Dutilities=disabled
-        -Ddocs=disabled
-        -Dbenchmark=disabled
-        "-Dc_args='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
-        "-Dcpp_args='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
-    BUILD_COMMAND ${EXEC} FULL_DBG=1 meson install -C <BINARY_DIR> --only-changed --tags devel
-    INSTALL_COMMAND ""
+    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+        ${cmake_conf_args}
+        -DHB_HAVE_FREETYPE=ON
+        -DHB_HAVE_GDI=ON
+        -DHB_HAVE_DIRECTWRITE=ON
+        -DHB_HAVE_UNISCRIBE=ON
+        -DHB_BUILD_SUBSET=OFF
+        "-DCMAKE_C_FLAGS='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
+        "-DCMAKE_CXX_FLAGS='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> FULL_DBG=1 ninja -C <BINARY_DIR>
+    INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

@@ -20,7 +20,7 @@ ExternalProject_Add(aria2
         --with-sqlite3
         --with-wintls
         --with-libz
-    BUILD_COMMAND ${MAKE} EXCEP=1
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

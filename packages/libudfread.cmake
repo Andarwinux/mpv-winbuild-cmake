@@ -6,7 +6,7 @@ ExternalProject_Add(libudfread
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
-    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

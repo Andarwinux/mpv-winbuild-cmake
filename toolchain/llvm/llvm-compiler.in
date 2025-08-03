@@ -7,6 +7,8 @@ FLAGS+=" -Wno-unused-command-line-argument -Wno-int-conversion -Wno-packed -Wno-
 FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -UHAS_80_BIT_LONG_DOUBLE -DHAS_80_BIT_LONG_DOUBLE=0 -U__USE_MINGW_ANSI_STDIO -D__USE_MINGW_ANSI_STDIO=0 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"
 FLAGS+=" -Xclang -fno-pch-timestamp -Xclang -mlong-double-64 -fno-split-lto-unit -fno-auto-import -fno-temp-file"
 FLAGS+=" -fno-builtin-sin -fno-builtin-sinf -fno-builtin-cos -fno-builtin-cosf -fno-builtin-sinl -fno-builtin-cosl"
+FLAGS+=" -ffile-prefix-map=@MINGW_INSTALL_PREFIX@=@TARGET_ARCH@ -fno-file-reproducible"
+FLAGS+=" -gcodeview -gcodeview-ghash -gno-codeview-command-line"
 
 if [ "@TARGET_CPU@" == "aarch64" ]; then
     ARCH_FLAGS="-mcpu=@GCC_ARCH@"
@@ -17,7 +19,7 @@ fi
 if [ "$CONF" == "1" ]; then
     SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
 else
-    FLAGS+=" -mguard=cf -gcodeview -gcodeview-ghash -gno-codeview-command-line -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize"
+    FLAGS+=" -mguard=cf -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize"
     if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$NOCCACHE" != "1" ]; then
         CCACHE="ccache"
     fi
@@ -78,6 +80,10 @@ fi
 
 if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$PGO" != "0" ]; then
     PGO_FLAGS="-fprofile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64"
+fi
+
+if [ -n "$PACKAGE" ] && [ -n "$BINARY_DIR" ]; then
+    FLAGS+="  -ffile-compilation-dir=. -Wa,-fdebug-compilation-dir=. -ffile-prefix-map=$BINARY_DIR/=build/$PACKAGE/ -ffile-prefix-map=@PKG_TO_SRC@=soucre/ -ffile-prefix-map=@SINGLE_SOURCE_LOCATION@/=soucre/"
 fi
 
 filtered_args=()

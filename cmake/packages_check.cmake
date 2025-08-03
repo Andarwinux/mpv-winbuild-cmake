@@ -2,7 +2,7 @@ set(vapoursynth_pkgconfig_libs "-lVapourSynth -Wl,-delayload=VapourSynth.dll")
 set(vapoursynth_script_pkgconfig_libs "-lVSScript -Wl,-delayload=VSScript.dll")
 if(CLANG_PACKAGES_LTO)
     set(cargo_lto_rustflags "CARGO_PROFILE_RELEASE_LTO=thin
-    RUSTFLAGS='-Ctarget-cpu=${GCC_ARCH} -Ccontrol-flow-guard=yes -Clinker-plugin-lto=yes -Cforce-frame-pointers=no -Clto=thin -Cllvm-args=-fp-contract=fast -Zmerge-functions=aliases -Zfunction-sections=yes -Zno-unique-section-names=yes -Zhas-thread-local=yes -Ztls-model=local-exec -Zthreads=${CPU_COUNT}'")
+    RUSTFLAGS='-Ctarget-cpu=${GCC_ARCH} -Ccontrol-flow-guard=yes -Clinker-plugin-lto=yes -Cforce-frame-pointers=no -Clto=thin -Cllvm-args=-fp-contract=fast -Zmerge-functions=aliases -Zfunction-sections=yes -Zno-unique-section-names=yes -Zhas-thread-local=yes -Ztls-model=local-exec -Zthreads=${CPU_COUNT} --remap-path-prefix=${PROJECT_BINARY_DIR}=build --remap-path-prefix=${PROJECT_BINARY_DIR}/toolchain=toolchain --remap-path-prefix=${PROJECT_BINARY_DIR}/packages=packages --remap-path-prefix=${CMAKE_INSTALL_PREFIX}=${CMAKE_INSTALL_PREFIX_NAME} --remap-path-prefix=${MINGW_INSTALL_PREFIX}=${TARGET_ARCH} --remap-path-prefix=${SINGLE_SOURCE_LOCATION}=${SINGLE_SOURCE_LOCATION_NAME} --remap-path-prefix=${RUSTUP_LOCATION}=rust -Zremap-cwd-prefix='")
 endif()
 
 if(TARGET_CPU STREQUAL "x86_64")
@@ -77,6 +77,7 @@ set(qt_target_features
     -DQT_FEATURE_openssl_runtime=OFF
     -DQT_FEATURE_openssl=ON
     -DQT_FEATURE_pkg_config=ON
+    -DQT_FEATURE_relocatable=ON
     -DQT_FEATURE_sql_mysql=OFF
     -DQT_FEATURE_sql_odbc=ON
     -DQT_FEATURE_sql_psql=OFF
@@ -94,4 +95,11 @@ set(qt_target_features
     -DQT_FEATURE_vulkan=ON
     -DQT_FEATURE_winsdkicu=ON
     -DQT_FEATURE_zstd=ON
+)
+
+set(trim_path
+    COMMAND ${EXEC} sed -i
+    -e 's|${MINGW_INSTALL_PREFIX}|${TARGET_ARCH}|g'
+    -e 's|${SINGLE_SOURCE_LOCATION}|soucre|g'
+    -e 's|${PROJECT_BINARY_DIR}|build|g'
 )

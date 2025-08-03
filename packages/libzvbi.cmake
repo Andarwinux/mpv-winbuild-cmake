@@ -22,7 +22,7 @@ ExternalProject_Add(libzvbi
         --disable-proxy
         --disable-examples
         --disable-tests
-    BUILD_COMMAND ${MAKE} UNWIND=1
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> UNWIND=1
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

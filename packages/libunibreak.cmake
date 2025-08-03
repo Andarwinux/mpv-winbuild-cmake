@@ -7,7 +7,7 @@ ExternalProject_Add(libunibreak
     CONFIGURE_COMMAND ${autoreshit}
     COMMAND ${EXEC} CONF=1 ./configure
         ${autoshit_confuck_args}
-    BUILD_COMMAND ${MAKE}
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR>
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

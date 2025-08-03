@@ -13,7 +13,7 @@ ExternalProject_Add(libjpeg
         -DWITH_TESTS=OFF
         -DWITH_TOOLS=OFF
         -DWITH_TURBOJPEG=OFF
-    BUILD_COMMAND ${EXEC} UNWIND=1 ninja -C <BINARY_DIR> libjpeg.a
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> UNWIND=1 ninja -C <BINARY_DIR> libjpeg.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR> --component lib & ${CMAKE_COMMAND} --install <BINARY_DIR> --component include
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

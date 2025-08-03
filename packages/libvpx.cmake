@@ -24,7 +24,8 @@ ExternalProject_Add(libvpx
     COMMAND ${EXEC} sed -i [['/extralibs/d']] <BINARY_DIR>/libs-${libvpx_target}.mk
     ${aom_vpx_sse2avx}
     ${novzeroupper} <SOURCE_DIR>/third_party/x86inc/x86inc.asm
-    BUILD_COMMAND ${MAKE} UNWIND=1
+    ${trim_path} <BINARY_DIR>/vpx_config.c
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> UNWIND=1
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

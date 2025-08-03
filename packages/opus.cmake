@@ -22,7 +22,7 @@ ExternalProject_Add(opus
         -Dextra-programs=disabled
         -Dtests=disabled
         -Ddocs=disabled
-    BUILD_COMMAND ${EXEC} HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> HIDE=1 meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ${CMAKE_COMMAND} -E rm -rf ${src_opus_dnn}/models
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

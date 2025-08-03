@@ -44,7 +44,7 @@ ExternalProject_Add(x265
         -DEXTRA_LIB=ON
     ${novzeroupper} <SOURCE_DIR>/source/common/x86/x86inc.asm
     ${x265_sse2avx}
-    BUILD_COMMAND ${EXEC} RTTI=1 ninja -C <BINARY_DIR>/12b & ${EXEC} RTTI=1 ninja -C <BINARY_DIR>/10b & ${EXEC} RTTI=1 ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> RTTI=1 ninja -C <BINARY_DIR>/12b & ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> RTTI=1 ninja -C <BINARY_DIR>/10b & ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> RTTI=1 ninja -C <BINARY_DIR>
     COMMAND ${EXEC} mv <BINARY_DIR>/12b/libx265.a <BINARY_DIR>/libx26512.a & mv <BINARY_DIR>/10b/libx265.a <BINARY_DIR>/libx26510.a
     COMMAND bash -c "cd <BINARY_DIR> && echo -e 'create libx265.a\naddlib libx265.a\naddlib libx26510.a\naddlib libx26512.a\nsave\nend' | ${EXEC} ${TARGET_ARCH}-ar -M"
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

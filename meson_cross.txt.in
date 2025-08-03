@@ -30,7 +30,7 @@ cpp_std = 'gnu++20'
 default_library = 'static'
 default_both_libraries = 'static'
 prefer_static = true
-pkgconfig.relocatable = true
+pkgconfig.relocatable = false
 
 [cmake]
 CMAKE_TOOLCHAIN_FILE = '@TOOLCHAIN_FILE@'

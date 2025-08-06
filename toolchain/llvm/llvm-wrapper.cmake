@@ -37,16 +37,20 @@ ExternalProject_Add(llvm-wrapper
 )
 
 foreach(loc llvmbin bin)
-    foreach(compiler clang++ g++ c++ cc clang gcc as)
-        if(compiler STREQUAL "g++" OR compiler STREQUAL "c++" OR compiler STREQUAL "clang++")
-            set(clang_compiler "clang++")
+    foreach(clang_compiler clang++ clang)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/llvm/llvm-compiler.in
+            ${CMAKE_INSTALL_PREFIX}/${loc}/${TARGET_ARCH}-${clang_compiler}
+            FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+            @ONLY
+        )
+        if(clang_compiler STREQUAL "clang++")
+            set(compiler c++ g++)
         else()
-            set(clang_compiler "clang")
+            set(compiler cc as gcc)
         endif()
-            configure_file(${CMAKE_CURRENT_SOURCE_DIR}/llvm/llvm-compiler.in
-                           ${CMAKE_INSTALL_PREFIX}/${loc}/${TARGET_ARCH}-${compiler}
-                           FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-                           @ONLY)
+        foreach(name ${compiler})
+            file(CREATE_LINK ${CMAKE_INSTALL_PREFIX}/${loc}/${TARGET_ARCH}-${clang_compiler} ${CMAKE_INSTALL_PREFIX}/${loc}/${TARGET_ARCH}-${name} SYMBOLIC)
+        endforeach()
     endforeach()
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/llvm/llvm-ld.in
                    ${CMAKE_INSTALL_PREFIX}/${loc}/${TARGET_ARCH}-ld

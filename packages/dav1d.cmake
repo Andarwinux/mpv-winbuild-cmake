@@ -11,6 +11,7 @@ ExternalProject_Add(dav1d
         -Denable_tools=false
         -Denable_tests=false
         -Dxxhash_muxer=enabled
+        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
     ${novzeroupper} <SOURCE_DIR>/src/ext/x86/x86inc.asm
     BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""

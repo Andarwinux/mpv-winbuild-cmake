@@ -70,8 +70,6 @@ list(APPEND ep
     shaderc
     glad
     fast_float
-    libdovi
-    libhdr10plus
     svtav1
     svtav1-psy
     libplacebo
@@ -146,13 +144,6 @@ add_custom_target(download
 add_custom_target(fullclean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target ${fullclean}
     COMMENT "Remove all build and stamp files, reset git HEAD"
-)
-
-add_custom_target(cargo-clean
-    COMMAND ${EXEC_HOST} LD_PRELOAD= CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} AR=${CMAKE_C_COMPILER_AR} "CFLAGS='-O3 -march=native -fno-ident -fno-plt -fno-semantic-interposition -ffp-contract=fast -fno-math-errno'" "CXXFLAGS='-O3 -march=native -fno-ident -fno-plt -fno-semantic-interposition -ffp-contract=fast -fno-math-errno'" "RUSTFLAGS='-Ctarget-cpu=native -Copt-level=3 -Clink-arg=-fuse-ld=lld -Cllvm-args=-fp-contract=fast -Clink-arg=-Wl,-Bsymbolic,--build-id=none,-O3,--lto-O3,--lto-CGO3,--icf=all,--gc-sections,-znow,-zrodynamic,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments,-zkeep-text-section-prefix,-zstart-stop-visibility=hidden'" cargo install --git https://github.com/matthiaskrgr/cargo-cache.git --no-default-features --features ci-autoclean cargo-cache
-    COMMAND ${EXEC_HOST} cargo-cache
-    COMMAND du -sh ${RUSTUP_LOCATION}
-    USES_TERMINAL
 )
 
 add_custom_target(ccache-recomp

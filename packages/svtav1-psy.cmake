@@ -1,7 +1,4 @@
 ExternalProject_Add(svtav1-psy
-    DEPENDS
-        libdovi
-        libhdr10plus
     GIT_REPOSITORY https://github.com/BlueSwordM/svt-av1-psyex.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -16,12 +13,9 @@ ExternalProject_Add(svtav1-psy
         -DBUILD_ENC=ON
         -DSVT_AV1_LTO=OFF
         -DBUILD_APPS=ON
-        -DLIBDOVI_FOUND=ON
-        -DLIBHDR10PLUS_RS_FOUND=ON
         -DC_FLAG_mno_avx=OFF
         -DCXX_FLAG_mno_avx=OFF
         -DCMAKE_OUTPUT_DIRECTORY=<BINARY_DIR>
-        "-DCMAKE_EXE_LINKER_FLAGS='-lntdll -luserenv -lws2_32'"
     ${novzeroupper} <SOURCE_DIR>/Source/Lib/ASM_SSE2/x86inc.asm
     BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/SvtAv1EncApp.exe ${MINGW_INSTALL_PREFIX}/bin/SvtAv1EncApp-PSY.exe

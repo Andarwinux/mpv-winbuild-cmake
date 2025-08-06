@@ -2,7 +2,6 @@
 cmake -DTARGET_ARCH=aarch64-w64-mingw32 \
 -DGCC_ARCH=cortex-x3 \
 -DSINGLE_SOURCE_LOCATION="/build/src_packages" \
--DRUSTUP_LOCATION="/build/install_rustup" \
 -DCMAKE_INSTALL_PREFIX="/build/install" \
 -DMINGW_INSTALL_PREFIX="/build_aarch64/install/aarch64-w64-mingw32" \
 -DCOMPILER_TOOLCHAIN=clang \

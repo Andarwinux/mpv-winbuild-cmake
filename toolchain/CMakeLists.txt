@@ -8,7 +8,6 @@ list(APPEND ep
     mingw-w64-crt
     mingw-w64-gendef
     cppwinrt
-    rustup
     zlib-host
     libxml2-host
     zstd-host

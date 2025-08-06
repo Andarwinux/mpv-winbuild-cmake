@@ -45,7 +45,6 @@ Example:
     -DCMAKE_INSTALL_PREFIX="$PWD/clang_root" \
     -DGCC_ARCH=x86-64-v3 \
     -DSINGLE_SOURCE_LOCATION="$PWD/src_packages" \
-    -DRUSTUP_LOCATION="$PWD/install_rustup" \
     -G Ninja -B build_x86_64_v3 -S mpv-winbuild-cmake
 
 The cmake command will create `clang_root` as clang sysroot where llvm tools installed. `build_x86_64` is build directory to compiling packages.
@@ -53,7 +52,6 @@ The cmake command will create `clang_root` as clang sysroot where llvm tools ins
     cd build_x86_64
     ninja toolchains-download # download llvm
     ninja llvm       # build LLVM (take around ~2 hours)
-    ninja rustup     # build rust toolchain
     ninja llvm-clang # build clang on specified target
     ninja download   # download packages
     ninja fullclean && ninja download # workaround to avoid problems
@@ -64,7 +62,6 @@ If you want add another target (ex. `aarch64-w64-mingw32`), change `TARGET_ARCH`
     cmake -DTARGET_ARCH=aarch64-w64-mingw32 \
     -DCMAKE_INSTALL_PREFIX="$PWD/clang_root" \
     -DSINGLE_SOURCE_LOCATION="$PWD/src_packages" \
-    -DRUSTUP_LOCATION="$PWD/install_rustup" \
     -G Ninja -B build_aarch64 -S mpv-winbuild-cmake
     cd build_aarch64
     ninja llvm-clang # same as above
@@ -94,7 +91,6 @@ After that, build mpv as usual:
 | CMAKE_INSTALL_PREFIX         | location of the host toolchain installation                                                                                 | `${CMAKE_CURRENT_BINARY_DIR}/install`          |
 | SINGLE_SOURCE_LOCATION       | location of the packages source                                                                                             | `${CMAKE_CURRENT_BINARY_DIR}/src_packages`     |
 | MINGW_INSTALL_PREFIX         | location of the MinGW sysroot                                                                                               | `${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}`       |
-| RUSTUP_LOCATION              | location of the rust toolchain installation                                                                                 | `${CMAKE_CURRENT_BINARY_DIR}/install_rustup`   |
 | ENABLE_CCACHE                | ccache integration                                                                                                          | OFF                                            |
 | CCACHE_MAXSIZE               | ccache size                                                                                                                 | 500M                                           |
 | MALLOC                       | malloc for LD_PRELOAD                                                                                                       | /usr/lib/libmimalloc.so /usr/lib/libjemalloc.so|

@@ -13,7 +13,7 @@ ExternalProject_Add(mingw-w64-crt
         --enable-wildcard
         --enable-cfguard
         ${crt_lib}
-    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> LTO=0 PGO=0 GC=0 UNWIND=1 FULL_DBG=1
+    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> LTO=0 PGO=0 GC=0 UNWIND=1 FULL_DBG=1 NOCCACHE=1
     INSTALL_COMMAND ${MAKE} install
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libpowrprof.a ${MINGW_INSTALL_PREFIX}/lib/libPowrProf.a
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libiphlpapi.a ${MINGW_INSTALL_PREFIX}/lib/libIphlpapi.a

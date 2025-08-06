@@ -11,6 +11,8 @@ ExternalProject_Add(qt6-qtsvg
     CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${qt_target_features}
+        ${qt_force_skip_check}
+        ${qt_unity}
         -DBUILD_WITH_PCH=ON
         -DCMAKE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}/qt6
         -DCMAKE_PREFIX_PATH=${MINGW_INSTALL_PREFIX}/qt6
@@ -21,11 +23,11 @@ ExternalProject_Add(qt6-qtsvg
         -DQT_BUILD_TESTS=OFF
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DQT_INSTALL_EXAMPLES_SOURCES_BY_DEFAULT=OFF
-        -DQT_UNITY_BUILD=OFF
         -DTEST_opensslv30=TRUE
-        "-DCMAKE_C_FLAGS='-lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
-        "-DCMAKE_CXX_FLAGS='-lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 ninja -C <BINARY_DIR>
+        -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
+        "-DCMAKE_C_FLAGS='-w -lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
+        "-DCMAKE_CXX_FLAGS='-w -lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
+    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 ${qt_disable_ccache} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

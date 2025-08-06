@@ -17,6 +17,7 @@ ExternalProject_Add(qbittorrent
     CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${qt_target_features}
+        ${qt_force_skip_check}
         -DBOOST_ROOT=${boost_src}
         -DBoost_INCLUDE_DIR=${boost_src}
         -DBOOST_BUILD_PATH=${boost_src}/tools/build

@@ -12,6 +12,7 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \
+-DQT_DISABLE_CCACHE=ON \
 -G Ninja \
 -B /build
 ./utils/download.sh

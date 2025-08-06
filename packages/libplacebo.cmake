@@ -2,13 +2,12 @@ get_property(src_glad TARGET glad PROPERTY _EP_SOURCE_DIR)
 get_property(src_fast_float TARGET fast_float PROPERTY _EP_SOURCE_DIR)
 ExternalProject_Add(libplacebo
     DEPENDS
-        vulkan
+        fast_float
+        glad
+        lcms2
         shaderc
         spirv-cross
-        lcms2
-        glad
-        fast_float
-        libdovi
+        vulkan
         xxhash
     GIT_REPOSITORY https://github.com/haasn/libplacebo.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -25,8 +24,16 @@ ExternalProject_Add(libplacebo
     COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Dd3d11=enabled
-        -Dvulkan-registry='${MINGW_INSTALL_PREFIX}/share/vulkan/registry/vk.xml'
         -Ddemos=false
+        -Ddovi=enabled
+        -Dgl-proc-addr=enabled
+        -Dlcms=enabled
+        -Dlibdovi=disabled
+        -Dopengl=enabled
+        -Dshaderc=enabled
+        -Dvk-proc-addr=enabled
+        -Dvulkan-registry='${MINGW_INSTALL_PREFIX}/share/vulkan/registry/vk.xml'
+        -Dvulkan=enabled
         "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
     BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> HIDE=1 FULL_DBG=1 meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""

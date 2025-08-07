@@ -6,7 +6,9 @@ ExternalProject_Add(x265
     GIT_TAG master
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/12b
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
+    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/12b
         ${cmake_conf_args}
         -DENABLE_CLI=OFF
         -DENABLE_HDR10_PLUS=ON
@@ -19,7 +21,7 @@ ExternalProject_Add(x265
         -DMAIN12=ON
         -DLINKED_10BIT=ON
         -DEXTRA_LIB=ON
-    COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/10b
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/10b
         ${cmake_conf_args}
         -DENABLE_CLI=OFF
         -DENABLE_HDR10_PLUS=ON
@@ -31,7 +33,7 @@ ExternalProject_Add(x265
         -DENABLE_SCC_EXT=ON
         -DLINKED_12BIT=ON
         -DEXTRA_LIB=ON
-    COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>
         ${cmake_conf_args}
         -DENABLE_CLI=OFF
         -DENABLE_HDR10_PLUS=ON
@@ -44,7 +46,11 @@ ExternalProject_Add(x265
         -DEXTRA_LIB=ON
     ${novzeroupper} <SOURCE_DIR>/source/common/x86/x86inc.asm
     ${x265_sse2avx}
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> RTTI=1 ninja -C <BINARY_DIR>/12b & ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> RTTI=1 ninja -C <BINARY_DIR>/10b & ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> RTTI=1 ninja -C <BINARY_DIR>
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_RTTI_ALLOWED=set:1
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>/12b & ${EXEC} ninja -C <BINARY_DIR>/10b & ${EXEC} ninja -C <BINARY_DIR>
     COMMAND ${EXEC} mv <BINARY_DIR>/12b/libx265.a <BINARY_DIR>/libx26512.a & mv <BINARY_DIR>/10b/libx265.a <BINARY_DIR>/libx26510.a
     COMMAND bash -c "cd <BINARY_DIR> && echo -e 'create libx265.a\naddlib libx265.a\naddlib libx26510.a\naddlib libx26512.a\nsave\nend' | ${EXEC} ${TARGET_ARCH}-ar -M"
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

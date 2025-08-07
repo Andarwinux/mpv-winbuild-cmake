@@ -14,7 +14,9 @@ ExternalProject_Add(qbittorrent
     GIT_TAG v5_1_x
     UPDATE_COMMAND ""
     PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/qbittorrent-*.patch
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
+    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${qt_target_features}
         ${qt_force_skip_check}
@@ -27,7 +29,11 @@ ExternalProject_Add(qbittorrent
         -DTESTING=OFF
         -DSTACKTRACE=OFF
         "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 ninja -C <BINARY_DIR>
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_EXCEPTIONS_ALLOWED=set:1
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/qbittorrent.exe ${MINGW_INSTALL_PREFIX}/bin/qbittorrent.exe
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

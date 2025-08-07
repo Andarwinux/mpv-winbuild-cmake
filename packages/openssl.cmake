@@ -11,7 +11,9 @@ ExternalProject_Add(openssl
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} CONF=1 <SOURCE_DIR>/Configure
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
+    CONFIGURE_COMMAND ${EXEC} <SOURCE_DIR>/Configure
         --cross-compile-prefix=${TARGET_ARCH}-
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=lib
@@ -61,7 +63,11 @@ ExternalProject_Add(openssl
         #no-dh
         no-bf
         zlib
-    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> FULL_DBG=1 MODULESDIR= ENGINESDIR= OPENSSLDIR= build_sw
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _FULL_DEBUGINFO=set:1
+    BUILD_COMMAND ${MAKE} MODULESDIR= ENGINESDIR= OPENSSLDIR= build_sw
     INSTALL_COMMAND ${MAKE} install_sw
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

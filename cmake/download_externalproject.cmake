@@ -1,4 +1,4 @@
-set(version "v3.31.6")
+set(version "master")
 
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory cmake

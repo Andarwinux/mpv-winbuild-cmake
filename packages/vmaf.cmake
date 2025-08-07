@@ -5,16 +5,22 @@ ExternalProject_Add(vmaf
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !resource !matlab !libvmaf/tools libvmaf/tools/meson.build"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ""
     COMMAND ${EXEC} echo > <SOURCE_DIR>/libvmaf/tools/meson.build
-    COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>/libvmaf
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>/libvmaf
         ${meson_conf_args}
         -Dbuilt_in_models=true
         -Denable_tests=false
         -Denable_docs=false
         -Denable_avx512=true
         -Denable_float=true
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_EXCEPTIONS_ALLOWED=set:1
+    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

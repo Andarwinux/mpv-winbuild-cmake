@@ -5,6 +5,8 @@ ExternalProject_Add(sleef
     GIT_PROGRESS TRUE
     GIT_RESET c73b89fd6661230586196ba0ce29f7444cc5a2e8
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/host
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
@@ -37,7 +39,7 @@ ExternalProject_Add(sleef
         "-DCMAKE_C_FLAGS='-g0'"
         "-DCMALE_CXX_FLAGS='-g0'"
     COMMAND ${EXEC} ninja -C <BINARY_DIR>/host libsleef.a libsleefdft.a
-    COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DNATIVE_BUILD_DIR=<BINARY_DIR>/host
         -DSLEEF_SHOW_CONFIG=ON
@@ -63,7 +65,12 @@ ExternalProject_Add(sleef
         -DLIB_MPFR=''
         -DLIBFFTW3=''
         -DLIBGMP=''
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> UNWIND=1 HIDE=1 ninja -C <BINARY_DIR> libsleef.a libsleefdft.a
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_UNWIND_ALLOWED=set:1
+        _FORCE_HIDE_DLLEXPORT=set:1
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libsleef.a libsleefdft.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${EXEC} "echo 'Cflags: -DSLEEF_STATIC_LIBS -DIMPORT_IS_EXPORT -DSLEEF_ALWAYS_INLINE' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} "echo 'Libs: -lsleef -lsleefdft' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"

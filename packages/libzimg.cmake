@@ -9,13 +9,19 @@ ExternalProject_Add(libzimg
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['s/Windows.h/windows.h/g']] <SOURCE_DIR>/src/zimg/common/arm/cpuinfo_arm.cpp
-    COMMAND ${autoreshit}
+    ${autoreshit}
     COMMAND ${CMAKE_COMMAND} -E rm -rf graphengine
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_graphengine} graphengine
-    COMMAND ${EXEC} CONF=1 ./configure
+    COMMAND ${EXEC} ./configure
         ${autoshit_confuck_args}
-    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 install-libLTLIBRARIES install-includeHEADERS install-pkgconfigDATA
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_EXCEPTIONS_ALLOWED=set:1
+    BUILD_COMMAND ${MAKE} install-libLTLIBRARIES install-includeHEADERS install-pkgconfigDATA
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

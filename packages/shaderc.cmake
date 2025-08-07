@@ -13,12 +13,14 @@ ExternalProject_Add(shaderc
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ""
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_glslang} <SOURCE_DIR>/third_party/glslang
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_spirv-headers} <SOURCE_DIR>/third_party/spirv-headers
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_spirv-tools} <SOURCE_DIR>/third_party/spirv-tools
     COMMAND ${EXEC} echo > ${src_spirv-tools}/test/CMakeLists.txt
-    COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DSHADERC_SKIP_TESTS=ON
         -DSHADERC_SKIP_SPVC=ON
@@ -36,7 +38,10 @@ ExternalProject_Add(shaderc
         -DDISABLE_RTTI=ON
         -DDISABLE_EXCEPTIONS=ON
         -DMINGW_COMPILER_PREFIX=${TARGET_ARCH}
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR> libshaderc_combined.a shaderc_combined-pkg-config
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libshaderc_combined.a shaderc_combined-pkg-config
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/libshaderc/include/shaderc ${MINGW_INSTALL_PREFIX}/include/shaderc
             COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libshaderc/libshaderc_combined.a ${MINGW_INSTALL_PREFIX}/lib/libshaderc_combined.a
             COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/shaderc_combined.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/shaderc.pc

@@ -7,7 +7,9 @@ ExternalProject_Add(spirv-cross
     GIT_REMOTE_NAME origin
     GIT_TAG main
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
+    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DSPIRV_CROSS_SHARED=OFF
         -DSPIRV_CROSS_CLI=OFF
@@ -17,7 +19,10 @@ ExternalProject_Add(spirv-cross
         -DSPIRV_CROSS_ENABLE_UTIL=OFF
         -DSPIRV_CROSS_ENABLE_TESTS=OFF
         -DSPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS=ON
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
           COMMAND bash -c "cd <BINARY_DIR> && echo -e 'create libspirv-cross-c-shared.a\naddlib libspirv-cross-c.a\naddlib libspirv-cross-core.a\naddlib libspirv-cross-glsl.a\naddlib libspirv-cross-hlsl.a\nsave\nend' | ${EXEC} ${TARGET_ARCH}-ar -M"
           COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libspirv-cross-c-shared.a <BINARY_DIR>/libspirv-cross-c.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

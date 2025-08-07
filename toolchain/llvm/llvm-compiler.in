@@ -16,17 +16,17 @@ else
     ARCH_FLAGS="-march=@GCC_ARCH@"
 fi
 
-if [ "$CONF" == "1" ]; then
+if [ "$_IS_CONFIGURE" == "1" ]; then
     SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
 else
     FLAGS+=" -mguard=cf -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize"
-    if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$NOCCACHE" != "1" ]; then
+    if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$_NOCCACHE" != "1" ]; then
         CCACHE="ccache"
     fi
-    if [ "$GC" != "0" ]; then
+    if [ "$_GC_ENABLED" != "0" ]; then
         FLAGS+=" -ffunction-sections"
     fi
-    if [ "$LTO" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
+    if [ "$_LTO_ENABLED" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
         LTO_FLAGS="-flto=thin -fwhole-program-vtables"
         if [ "@LLD_LTO_ALL_THREADS@" == "ON" ] && [ "$LTO_JOB" != "1" ]; then
             LTO_FLAGS+=" -flto-jobs=@CPU_COUNT@"
@@ -37,12 +37,12 @@ else
             FLAGS+=" -mllvm -enable-gvn-sink=false"
         fi
     fi
-    if [ "$EXCEP" != "1" ]; then
+    if [ "$_IS_EXCEPTIONS_ALLOWED" != "1" ]; then
         FLAGS+=" -fno-exceptions"
-        if [ "$RTTI" != "1" ]; then
+        if [ "$_IS_RTTI_ALLOWED" != "1" ]; then
             FLAGS+=" -fno-rtti"
         fi
-        if [ "$UNWIND" != "1" ]; then
+        if [ "$_IS_UNWIND_ALLOWED" != "1" ]; then
             FLAGS+=" -fno-unwind-tables -fno-asynchronous-unwind-tables"
         fi
     fi
@@ -52,15 +52,15 @@ else
             FLAGS+=" -mno-gather"
         fi
     fi
-    if [ "$LE_TLS" != "0" ]; then
+    if [ "$_LOCAL_EXEC_TLS" != "0" ]; then
         FLAGS+=" -ftls-model=local-exec"
     fi
-    if [ "$HIDE" == "1" ]; then
+    if [ "$_FORCE_HIDE_DLLEXPORT" == "1" ]; then
         FLAGS+=" -fvisibility-from-dllstorageclass -fvisibility-dllexport=hidden"
     fi
-    if [ "$NO_DBG" != "1" ]; then
+    if [ "$_NO_DEBUGINFO" != "1" ]; then
         FLAGS+=" -fdebug-info-for-profiling"
-        if [ "$FULL_DBG" == "1" ]; then
+        if [ "$_FULL_DEBUGINFO" == "1" ]; then
             FLAGS+=" -g3"
         else
             FLAGS+=" -gline-tables-only"
@@ -71,19 +71,19 @@ else
     if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
         export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw"
     fi
-    if [ "@CLANG_PACKAGES_PGO@" == "USE" ] && [ "$PGO" != "0" ]; then
+    if [ "@CLANG_PACKAGES_PGO@" == "USE" ] && [ "$_PGO_ENABLED" != "0" ]; then
         PGO_FLAGS="-fprofile-use=@CLANG_PACKAGES_PROFDATA_FILE@"
     fi
     FLAGS+=" @CLANG_FLAGS@ $EXTRA_CFLAGS"
     FLAGS_INIT="$EXTRA_CFLAGS_INIT"
 fi
 
-if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$PGO" != "0" ]; then
+if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$_PGO_ENABLED" != "0" ]; then
     PGO_FLAGS="-fprofile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64"
 fi
 
-if [ -n "$PACKAGE" ] && [ -n "$BINARY_DIR" ]; then
-    FLAGS+="  -ffile-compilation-dir=. -Wa,-fdebug-compilation-dir=. -ffile-prefix-map=$BINARY_DIR/=build/$PACKAGE/ -ffile-prefix-map=@PKG_TO_SRC@=soucre/ -ffile-prefix-map=@SINGLE_SOURCE_LOCATION@/=soucre/"
+if [ -n "$_PACKAGE_NAME" ] && [ -n "$_BINARY_DIR" ]; then
+    FLAGS+="  -ffile-compilation-dir=. -Wa,-fdebug-compilation-dir=. -ffile-prefix-map=$_BINARY_DIR/=build/$_PACKAGE_NAME/ -ffile-prefix-map=@PKG_TO_SRC@=soucre/ -ffile-prefix-map=@SINGLE_SOURCE_LOCATION@/=soucre/"
 fi
 
 filtered_args=()

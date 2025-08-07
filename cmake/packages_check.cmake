@@ -297,11 +297,12 @@ set(trim_path
 )
 
 if(QT_DISABLE_CCACHE)
-    set(qt_disable_ccache NOCCACHE=1)
+    set(qt_disable_ccache 1)
     set(qt_unity
         -DQT_UNITY_BUILD=ON
         -DQT_UNITY_BUILD_BATCH_SIZE=16
     )
 else()
+    set(qt_disable_ccache 0)
     set(qt_unity -DQT_UNITY_BUILD=OFF)
 endif()

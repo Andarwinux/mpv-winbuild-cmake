@@ -9,8 +9,10 @@ ExternalProject_Add(libzvbi
     GIT_REMOTE_NAME origin
     GIT_TAG main
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${autoreshit}
-    COMMAND ${EXEC} CONF=1 ./configure
+    COMMAND ${EXEC} ./configure
         ${autoshit_confuck_args}
         --enable-static
         --with-pic
@@ -22,7 +24,11 @@ ExternalProject_Add(libzvbi
         --disable-proxy
         --disable-examples
         --disable-tests
-    BUILD_COMMAND ${MAKE} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> UNWIND=1
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_UNWIND_ALLOWED=set:1
+    BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

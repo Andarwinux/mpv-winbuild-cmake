@@ -13,8 +13,10 @@ ExternalProject_Add(libarchive
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !libarchive/test libarchive/test/CMakeLists.txt"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['/^CHECK_CRYPTO/ { /OPENSSL/!d }']] <SOURCE_DIR>/CMakeLists.txt
-    COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DENABLE_ZLIB=ON
         -DENABLE_ZSTD=ON
@@ -40,7 +42,10 @@ ExternalProject_Add(libarchive
         -DPOSIX_REGEX_LIB=OFF
         -DCMAKE_INSTALL_LIBDIR=lib
         "-DCMAKE_C_FLAGS='-lxml2 -lbz2 -llzo2 -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lws2_32 -lgdi32 -lcrypt32 -liconv -lbcrypt'"
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> ninja -C <BINARY_DIR>
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

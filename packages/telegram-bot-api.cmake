@@ -9,7 +9,9 @@ ExternalProject_Add(telegram-bot-api
     GIT_REMOTE_NAME origin
     GIT_CONFIG "submodule.recurse=true"
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} PATH=$O_PATH CONF=1 ${CMAKE_COMMAND} --fresh -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
+    CONFIGURE_COMMAND ${EXEC} PATH=$O_PATH ${CMAKE_COMMAND} --fresh -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DTD_ENABLE_LTO=OFF
         -DCCACHE_FOUND=OFF
@@ -20,7 +22,7 @@ ExternalProject_Add(telegram-bot-api
         -DTD_ENABLE_DOTNET=OFF
         -DTD_ENABLE_JNI=OFF
     COMMAND ${EXEC} ninja -C <BINARY_DIR> prepare_cross_compiling
-    COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} --fresh -H<SOURCE_DIR> -B<BINARY_DIR>
+    COMMAND ${EXEC} ${CMAKE_COMMAND} --fresh -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DTD_ENABLE_LTO=OFF
         -DCCACHE_FOUND=OFF
@@ -29,7 +31,10 @@ ExternalProject_Add(telegram-bot-api
         -DTD_ENABLE_JNI=OFF
         -DCMAKE_CROSSCOMPILING=ON
         "-DCMAKE_CXX_FLAGS='-lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -liphlpapi -pthread'"
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> "FILTER_FLAGS='-Wl,--exclude-libs,ALL'" ninja -C <BINARY_DIR>
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+    BUILD_COMMAND ${EXEC} "FILTER_FLAGS='-Wl,--exclude-libs,ALL'" ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

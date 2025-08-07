@@ -11,7 +11,9 @@ ExternalProject_Add(libtorrent
     GIT_REMOTE_NAME origin
     GIT_TAG RC_2_0
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} CONF=1 ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
+    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DBOOST_ROOT=${boost_src}
         -DBoost_INCLUDE_DIR=${boost_src}
@@ -19,7 +21,11 @@ ExternalProject_Add(libtorrent
         -DCMAKE_CXX_STANDARD=20
         -Ddeprecated-functions=OFF
         "-DCMAKE_CXX_FLAGS='-w'"
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> EXCEP=1 ninja -C <BINARY_DIR>
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_EXCEPTIONS_ALLOWED=set:1
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

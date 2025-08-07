@@ -84,15 +84,17 @@ ExternalProject_Add(mpv
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    CONFIGURE_ENVIRONMENT_MODIFICATION
+        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ""
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_luajit} <SOURCE_DIR>/subprojects/luajit
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_luajit_wrap}/subprojects/packagefiles/luajit <SOURCE_DIR>/subprojects/luajit
     COMMAND ${EXEC} sed -i [['/JIT_F_OPT_DEFAULT/c\#define JIT_F_OPT_DEFAULT 0x07FF0000']] <SOURCE_DIR>/subprojects/luajit/src/lj_jit.h
-    COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${mpv_conf}
         -Dlibmpv=false
         -Dcplayer=true
-    COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR>/libmpv <SOURCE_DIR>
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/libmpv <SOURCE_DIR>
         ${mpv_conf}
         -Ddefault_library=shared
         -Dluajit:default_library=static
@@ -100,8 +102,14 @@ ExternalProject_Add(mpv
         -Dcplayer=false
     ${trim_path} <BINARY_DIR>/config.h
     ${trim_path} <BINARY_DIR>/libmpv/config.h
-    BUILD_COMMAND ${EXEC} PACKAGE=${package} BINARY_DIR=<BINARY_DIR> PDB=1 EXCEP=1 HIDE=1 FULL_DBG=1 ninja -C <BINARY_DIR>
-          COMMAND ${EXEC} PDB=1 EXCEP=1 FULL_DBG=1 meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
+    BUILD_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
+        _IS_EXCEPTIONS_ALLOWED=set:1
+        _FULL_DEBUGINFO=set:1
+        _PDB_GENERATE=set:1
+    BUILD_COMMAND ${EXEC} _FORCE_HIDE_DLLEXPORT=1 ninja -C <BINARY_DIR>
+          COMMAND ${EXEC} meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
@@ -111,13 +119,13 @@ set(copy-binary-dep build-legacy)
 ExternalProject_Add_Step(mpv build-legacy
     DEPENDEES install
     LOG 1
-    COMMAND ${EXEC} CONF=1 meson setup --reconfigure <BINARY_DIR>/legacy <SOURCE_DIR>
+    COMMAND ${EXEC} _IS_CONFIGURE=1 meson setup --reconfigure <BINARY_DIR>/legacy <SOURCE_DIR>
         ${mpv_conf}
         -Dlibmpv=false
         -Dcplayer=true
         -Dwin32-subsystem=windows
     ${trim_path} <BINARY_DIR>/legacy/config.h
-    COMMAND ${EXEC} PDB=1 EXCEP=1 HIDE=1 FULL_DBG=1 ninja -C <BINARY_DIR>/legacy mpv.exe
+    COMMAND ${EXEC} _PDB_GENERATE=1 _IS_EXCEPTIONS_ALLOWED=1 _FORCE_HIDE_DLLEXPORT=1 _FULL_DEBUGINFO=1 ninja -C <BINARY_DIR>/legacy mpv.exe
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/legacy/mpv.exe ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv-legacy.exe
 )
 else()

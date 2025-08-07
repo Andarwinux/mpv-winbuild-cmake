@@ -15,6 +15,7 @@ ExternalProject_Add(libsdl2
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${libsdl2_force_skip_check}
         -DSDL_VULKAN=ON
         -DSDL_LIBICONV=ON
         -DSDL_SYSTEM_ICONV=ON

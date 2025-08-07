@@ -18,6 +18,7 @@ ExternalProject_Add(libarchive
     CONFIGURE_COMMAND ${EXEC} sed -i [['/^CHECK_CRYPTO/ { /OPENSSL/!d }']] <SOURCE_DIR>/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${libarchive_force_skip_check}
         -DENABLE_ZLIB=ON
         -DENABLE_ZSTD=ON
         -DENABLE_OPENSSL=ON

@@ -769,3 +769,54 @@ set(lzo_force_skip_check
     -Dmfx_HAVE_UTIME_H=ON
     -Dmfx_HAVE_VSNPRINTF=ON
 )
+
+set(bzip_force_skip_check
+    -DHAVE_FCNTL_H=ON
+    -DHAVE_INTTYPES_H=ON
+    -DHAVE_LIMITS_H=ON
+    -DHAVE_SIZEOF_SSIZE_T=ON
+    -DHAVE_STDDEF_H=ON
+    -DHAVE_STDINT_H=ON
+    -DHAVE_SYS_TIME_H=ON
+    -DHAVE_SYS_TYPES_H=ON
+    -DHAVE_TIME_H=ON
+    -DHAVE_UNISTD_H=ON
+    -DHAVE__EXIT=ON
+    -DC_FLAG__Waddress=ON
+    -DC_FLAG__Wall=ON
+    -DC_FLAG__Wattributes=ON
+    -DC_FLAG__Wcast_align=ON
+    -DC_FLAG__Wconversion=ON
+    -DC_FLAG__Wdeclaration_after_statement=ON
+    -DC_FLAG__Wdiv_by_zero=ON
+    -DC_FLAG__Wempty_body=ON
+    -DC_FLAG__Wendif_labels=ON
+    -DC_FLAG__Wextra=ON
+    -DC_FLAG__Wfloat_equal=ON
+    -DC_FLAG__Wformat_nonliteral=ON
+    -DC_FLAG__Wformat_security=ON
+    -DC_FLAG__Wheader_guard=ON
+    -DC_FLAG__Winline=ON
+    -DC_FLAG__Wlanguage_extension_token=ON
+    -DC_FLAG__Wmissing_declarations=ON
+    -DC_FLAG__Wmissing_field_initializers=ON
+    -DC_FLAG__Wmissing_noreturn=ON
+    -DC_FLAG__Wmissing_prototypes=ON
+    -DC_FLAG__Wmissing_variable_declarations=ON
+    -DC_FLAG__Wnested_externs=ON
+    -DC_FLAG__Wno_format_nonliteral=ON
+    -DC_FLAG__Wpointer_arith=ON
+    -DC_FLAG__Wpragmas=ON
+    -DC_FLAG__Wredundant_decls=ON
+    -DC_FLAG__Wshadow=ON
+    -DC_FLAG__Wshorten_64_to_32=ON
+    -DC_FLAG__Wsign_conversion=ON
+    -DC_FLAG__Wstrict_prototypes=ON
+    -DC_FLAG__Wundef=ON
+    -DC_FLAG__Wunreachable_code=ON
+    -DC_FLAG__Wunreachable_code_break=ON
+    -DC_FLAG__Wunused_macros=ON
+    -DC_FLAG__Wunused_parameter=ON
+    -DC_FLAG__Wvla=ON
+    -DC_FLAG__Wwrite_strings=ON
+)

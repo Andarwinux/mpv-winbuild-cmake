@@ -10,6 +10,7 @@ ExternalProject_Add(bzip2
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${bzip_force_skip_check}
         -DENABLE_LIB_ONLY=ON
         -DENABLE_SHARED_LIB=OFF
         -DENABLE_STATIC_LIB=ON

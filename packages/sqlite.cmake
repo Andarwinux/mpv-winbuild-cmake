@@ -13,7 +13,7 @@ ExternalProject_Add(sqlite
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${MAKE} install-lib install-headers install-pc
-    INSTALL_COMMAND ${MAKE} ""
+    INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

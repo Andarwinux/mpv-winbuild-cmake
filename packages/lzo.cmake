@@ -11,6 +11,7 @@ ExternalProject_Add(lzo
     COMMAND ${EXEC} sed -i [['/install.*CMAKE_INSTALL_FULL_DOCDIR/d']] <SOURCE_DIR>/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${lzo_force_skip_check}
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

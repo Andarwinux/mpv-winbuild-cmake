@@ -10,6 +10,7 @@ ExternalProject_Add(nghttp2
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${nghttp2_force_skip_check}
         -DBUILD_STATIC_LIBS=ON
         -DENABLE_APP=OFF
         -DENABLE_FAILMALLOC=OFF

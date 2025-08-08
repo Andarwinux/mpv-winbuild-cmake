@@ -855,3 +855,47 @@ set(nghttp2_force_skip_check
     -DHAVE_SYS_SOCKET_H=OFF
     -DHAVE_SYSLOG_H=OFF
 )
+
+set(xz_force_skip_check
+    -DHAVE_COMPILER_OPTION_-Waggregate-return=ON
+    -DHAVE_COMPILER_OPTION_-Wall=ON
+    -DHAVE_COMPILER_OPTION_-Warray-bounds-pointer-arithmetic=ON
+    -DHAVE_COMPILER_OPTION_-Wassign-enum=ON
+    -DHAVE_COMPILER_OPTION_-Wbad-function-cast=ON
+    -DHAVE_COMPILER_OPTION_-Wc11-extensions=ON
+    -DHAVE_COMPILER_OPTION_-Wc2x-compat=ON
+    -DHAVE_COMPILER_OPTION_-Wc2x-extensions=ON
+    -DHAVE_COMPILER_OPTION_-Wc99-compat=ON
+    -DHAVE_COMPILER_OPTION_-Wconditional-uninitialized=ON
+    -DHAVE_COMPILER_OPTION_-Wdate-time=ON
+    -DHAVE_COMPILER_OPTION_-Wdocumentation=ON
+    -DHAVE_COMPILER_OPTION_-Wduplicate-enum=ON
+    -DHAVE_COMPILER_OPTION_-Wempty-translation-unit=ON
+    -DHAVE_COMPILER_OPTION_-Wextra=ON
+    -DHAVE_COMPILER_OPTION_-Wflexible-array-extensions=ON
+    -DHAVE_COMPILER_OPTION_-Wfloat-conversion=ON
+    -DHAVE_COMPILER_OPTION_-Wfloat-equal=ON
+    -DHAVE_COMPILER_OPTION_-Wformat_2=ON
+    -DHAVE_COMPILER_OPTION_-Wimplicit-fallthrough=ON
+    -DHAVE_COMPILER_OPTION_-Winit-self=ON
+    -DHAVE_COMPILER_OPTION_-Wmissing-declarations=ON
+    -DHAVE_COMPILER_OPTION_-Wmissing-include-dirs=ON
+    -DHAVE_COMPILER_OPTION_-Wmissing-prototypes=ON
+    -DHAVE_COMPILER_OPTION_-Wmissing-variable-declarations=ON
+    -DHAVE_COMPILER_OPTION_-Wnewline-eof=ON
+    -DHAVE_COMPILER_OPTION_-Wold-style-definition=ON
+    -DHAVE_COMPILER_OPTION_-Wpointer-arith=ON
+    -DHAVE_COMPILER_OPTION_-Wpre-c2x-compat=ON
+    -DHAVE_COMPILER_OPTION_-Wredundant-decls=ON
+    -DHAVE_COMPILER_OPTION_-Wshadow=ON
+    -DHAVE_COMPILER_OPTION_-Wshift-sign-overflow=ON
+    -DHAVE_COMPILER_OPTION_-Wsign-conversion=ON
+    -DHAVE_COMPILER_OPTION_-Wstrict-overflow_3=ON
+    -DHAVE_COMPILER_OPTION_-Wstrict-prototypes=ON
+    -DHAVE_COMPILER_OPTION_-Wstring-conversion=ON
+    -DHAVE_COMPILER_OPTION_-Wundef=ON
+    -DHAVE_COMPILER_OPTION_-Wvla=ON
+    -DHAVE_COMPILER_OPTION_-Wwrite-strings=ON
+    -DHAVE_LOONGARCH_CRC32=OFF
+    -DHAVE_LINUX_LANDLOCK=OFF
+)

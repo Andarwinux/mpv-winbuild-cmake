@@ -8,6 +8,7 @@ ExternalProject_Add(xz
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${xz_force_skip_check}
         -DXZ_THREADS=yes
         -DXZ_TOOL_LZMAINFO=OFF
         -DXZ_TOOL_LZMADEC=OFF

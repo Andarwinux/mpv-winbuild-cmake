@@ -1,6 +1,6 @@
-From 4ba9fd3cd0ef39a4b7be765b5729e0465eea1f7f Mon Sep 17 00:00:00 2001
+From b5fa759a7cd810676c22670480663b7b7b17b2fa Mon Sep 17 00:00:00 2001
 From: _ <>
-Date: Tue, 11 Mar 2025 00:00:00 +0000
+Date: Fri, 8 Aug 2025 00:00:00 +0000
 Subject: [PATCH] fuck curl
 
 ---
@@ -8,18 +8,18 @@ Subject: [PATCH] fuck curl
  1 file changed, 2 insertions(+)
 
 diff --git a/src/tool_cfgable.c b/src/tool_cfgable.c
-index 975ef2a..b4ddca8 100644
+index 015ee26..11357d8 100644
 --- a/src/tool_cfgable.c
 +++ b/src/tool_cfgable.c
-@@ -50,6 +50,8 @@ struct OperationConfig *config_alloc(struct GlobalConfig *global)
-   config->file_clobber_mode = CLOBBER_DEFAULT;
-   config->upload_flags = CURLULFLAG_SEEN;
-   curlx_dyn_init(&config->postdata, MAX_FILE2MEMORY);
-+  config->native_ca_store = TRUE;
-+  config->proxy_native_ca_store = TRUE;
-   return config;
- }
+@@ -40,6 +40,8 @@ struct OperationConfig *config_alloc(void)
+   if(!config)
+     return NULL;
  
++  config->proxy_native_ca_store = TRUE;
++  config->native_ca_store = TRUE;
+   config->use_httpget = FALSE;
+   config->create_dirs = FALSE;
+   config->maxredirs = DEFAULT_MAXREDIRS;
 -- 
 2.50.1
 

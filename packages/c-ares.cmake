@@ -10,6 +10,7 @@ ExternalProject_Add(c-ares
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${c-ares_force_skip_check}
         -DCARES_BUILD_TOOLS=OFF
         -DCARES_BUILD_TESTS=OFF
         -DCARES_SHARED=OFF

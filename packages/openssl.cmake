@@ -11,6 +11,7 @@ ExternalProject_Add(openssl
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
+    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} <SOURCE_DIR>/Configure
@@ -69,7 +70,7 @@ ExternalProject_Add(openssl
         _FULL_DEBUGINFO=set:1
     BUILD_COMMAND ${MAKE} MODULESDIR= ENGINESDIR= OPENSSLDIR= build_sw
     INSTALL_COMMAND ${MAKE} install_sw
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(openssl)

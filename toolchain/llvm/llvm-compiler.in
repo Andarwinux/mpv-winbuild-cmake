@@ -26,7 +26,7 @@ else
     if [ "$_GC_ENABLED" != "0" ]; then
         FLAGS+=" -ffunction-sections"
     fi
-    if [ "$_LTO_ENABLED" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
+    if [ "$_LTO_ENABLED" != "0" ]; then
         LTO_FLAGS="-flto=thin -fwhole-program-vtables"
         if [ "@LLD_LTO_ALL_THREADS@" == "ON" ] && [ "$LTO_JOB" != "1" ]; then
             LTO_FLAGS+=" -flto-jobs=@CPU_COUNT@"

@@ -94,7 +94,6 @@ After that, build mpv as usual:
 | ENABLE_CCACHE                | ccache integration                                                                                                          | OFF                                            |
 | CCACHE_MAXSIZE               | ccache size                                                                                                                 | 500M                                           |
 | MALLOC                       | malloc for LD_PRELOAD                                                                                                       | /usr/lib/libmimalloc.so /usr/lib/libjemalloc.so|
-| CLANG_PACKAGES_LTO           | ThinLTO for packages                                                                                                        | ON                                             |
 | CLANG_PACKAGES_PGO           | IRPGO for packages                                                                                                          | OFF                                            |
 |                              | GEN: build packages with profile instrumentation                                                                            |                                                |
 |                              | USE: build packages with profdata                                                                                           |                                                |

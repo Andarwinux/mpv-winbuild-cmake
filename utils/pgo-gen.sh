@@ -4,7 +4,6 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DCOMPILER_TOOLCHAIN=clang \
 -DLLVM_ENABLE_LTO=OFF \
 -DENABLE_CCACHE=OFF \
--DCLANG_PACKAGES_LTO=ON \
 -DCLANG_PACKAGES_PGO=GEN \
 -DCLANG_FLAGS="-mprefer-vector-width=512 -mno-gather" \
 -DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather" \

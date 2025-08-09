@@ -15,7 +15,7 @@ else
     if [ "$_PDB_GENERATE" == "1" ]; then
         FLAGS+=" --pdb="
     fi
-    if [ "$_LTO_ENABLED" != "0" ] && [ "@CLANG_PACKAGES_LTO@" == "ON" ]; then
+    if [ "$_LTO_ENABLED" != "0" ]; then
         FLAGS+=" @llvm_mllvm@ @polly@"
         if [ "@TARGET_CPU@" == "aarch64" ]; then
             FLAGS+=" -mllvm -enable-gvn-sink=false -mllvm -polly=false"

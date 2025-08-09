@@ -73,6 +73,8 @@ ExternalProject_Add(qt6-qtbase
         -DQT_UNITY_BUILD_BATCH_SIZE=128
         -DQT_USE_CCACHE=OFF
         -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
+        "-DCMAKE_REQUIRED_FLAGS='-O0'"
+        "-DCMAKE_REQUIRED_LINK_OPTIONS='-Wl,-O0,--icf=none,--no-gc-sections'"
         "-DCMAKE_C_FLAGS='-Wno-unused-command-line-argument -w -g0 -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
         "-DCMAKE_CXX_FLAGS='-Wno-unused-command-line-argument -w -g0 -fno-ident -fno-temp-file -fno-plt -Wa,--crel,--allow-experimental-crel -march=native -O3 -fno-semantic-interposition -fvisibility=hidden -fno-math-errno -fno-signed-zeros -fno-trapping-math -falign-functions=32 -ffp-contract=fast -ftls-model=local-exec -Xclang -fno-pch-timestamp'"
         "-DCMAKE_EXE_LINKER_FLAGS='-fuse-ld=lld -Wl,-Bsymbolic,--build-id=none,-s,-O3,--icf=all,--gc-sections,-zpack-relative-relocs,-zcommon-page-size=2097152,-zmax-page-size=2097152,-zseparate-loadable-segments'"

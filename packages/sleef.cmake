@@ -1,7 +1,7 @@
 ExternalProject_Add(sleef
     GIT_REPOSITORY https://github.com/shibatch/sleef.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_RESET c73b89fd6661230586196ba0ce29f7444cc5a2e8
     UPDATE_COMMAND ""

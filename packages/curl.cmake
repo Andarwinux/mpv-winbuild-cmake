@@ -15,7 +15,7 @@ ExternalProject_Add(curl
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !docs"
-    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/curl-*.patch
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/curl-*.patch
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

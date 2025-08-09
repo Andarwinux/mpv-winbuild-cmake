@@ -11,7 +11,7 @@ ExternalProject_Add(openssl
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
-    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} <SOURCE_DIR>/Configure

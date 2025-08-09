@@ -13,7 +13,7 @@ ExternalProject_Add(qbittorrent
     GIT_REMOTE_NAME origin
     GIT_TAG v5_1_x
     UPDATE_COMMAND ""
-    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/qbittorrent-*.patch
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/qbittorrent-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>

@@ -17,13 +17,13 @@ function(cleanup _name _last_step)
     if(_git_repository)
         if(EXISTS ${source_dir}/.git)
             if(_build_in_source)
-                set(remove_cmd ${EXEC} git -C <SOURCE_DIR> clean -ffxd)
+                set(remove_cmd ${EXEC} ${GIT_EXECUTABLE} -C <SOURCE_DIR> clean -ffxd)
             else()
-                set(remove_cmd ${EXEC} find <BINARY_DIR> -mindepth 1 -delete & ${EXEC} git -C <SOURCE_DIR> clean -ffxd)
+                set(remove_cmd ${EXEC} find <BINARY_DIR> -mindepth 1 -delete & ${EXEC} ${GIT_EXECUTABLE} -C <SOURCE_DIR> clean -ffxd)
             endif()
-            set(COMMAND_FORCE_UPDATE COMMAND bash -c "git -C <SOURCE_DIR> am --abort 2> /dev/null || true"
+            set(COMMAND_FORCE_UPDATE COMMAND bash -c "${GIT_EXECUTABLE} -C <SOURCE_DIR> am --abort 2> /dev/null || true"
                                      COMMAND ${stamp_dir}/reset_head.sh
-                                     COMMAND bash -c "git -C <SOURCE_DIR> restore .")
+                                     COMMAND bash -c "${GIT_EXECUTABLE} -C <SOURCE_DIR> restore .")
         else()
             if(_build_in_source)
                 set(remove_cmd ${EXEC} true)
@@ -94,15 +94,15 @@ function(force_rebuild_git _name)
 file(WRITE ${stamp_dir}/reset_head.sh
 "#!/bin/bash
 set -e
-if [[ ! -f \"${stamp_dir}/${_name}-patch\"  || \"${stamp_dir}/${_name}-download\" -nt \"${stamp_dir}/${_name}-patch\" || ! -f \"${stamp_dir}/HEAD\" || \"$(cat ${stamp_dir}/HEAD)\" != \"$(git -C ${source_dir} rev-parse @{u})\" ]]; then
-    git -C ${source_dir} reset --hard ${reset} -q
+if [[ ! -f \"${stamp_dir}/${_name}-patch\"  || \"${stamp_dir}/${_name}-download\" -nt \"${stamp_dir}/${_name}-patch\" || ! -f \"${stamp_dir}/HEAD\" || \"$(cat ${stamp_dir}/HEAD)\" != \"$(${GIT_EXECUTABLE} -C ${source_dir} rev-parse @{u})\" ]]; then
+    ${GIT_EXECUTABLE} -C ${source_dir} reset --hard ${reset} -q
     if [[ -z \"${git_reset}\" ]]; then
         find \"${stamp_dir}\" -type f  ! -iname '*.cmake' -size 0c -delete
         echo \"Removing ${_name} stamp files.\"
-        git -C ${source_dir} rev-parse HEAD > ${stamp_dir}/HEAD
+        ${GIT_EXECUTABLE} -C ${source_dir} rev-parse HEAD > ${stamp_dir}/HEAD
     fi
 else
-    git -C ${source_dir} reset --hard -q
+    ${GIT_EXECUTABLE} -C ${source_dir} reset --hard -q
 fi")
 file(CHMOD ${stamp_dir}/reset_head.sh 
 PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
@@ -112,8 +112,8 @@ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_
         EXCLUDE_FROM_MAIN TRUE
         INDEPENDENT TRUE
         WORKING_DIRECTORY <SOURCE_DIR>
-        COMMAND bash -c "git am --abort 2> /dev/null || true"
-        COMMAND bash -c "git fetch ${shallow_fetch} --prune --prune-tags --atomic --filter=tree:0 ${git_remote_name} ${git_tag}"
+        COMMAND bash -c "${GIT_EXECUTABLE} am --abort 2> /dev/null || true"
+        COMMAND bash -c "${GIT_EXECUTABLE} fetch ${shallow_fetch} --prune --prune-tags --atomic --filter=tree:0 ${git_remote_name} ${git_tag}"
         COMMAND ${stamp_dir}/reset_head.sh
     )
     ExternalProject_Add_StepTargets(${_name} force-update)
@@ -122,7 +122,7 @@ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_
         DEPENDERS patch
         INDEPENDENT TRUE
         WORKING_DIRECTORY <SOURCE_DIR>
-        COMMAND bash -c "git rev-parse HEAD > ${stamp_dir}/HEAD"
+        COMMAND bash -c "${GIT_EXECUTABLE} rev-parse HEAD > ${stamp_dir}/HEAD"
         LOG 1
     )
 

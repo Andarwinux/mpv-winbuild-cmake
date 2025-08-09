@@ -11,7 +11,7 @@ ExternalProject_Add(fontconfig
     GIT_TAG main
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
-    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig-*.patch
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/subprojects

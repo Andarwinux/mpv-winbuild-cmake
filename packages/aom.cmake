@@ -8,7 +8,7 @@ ExternalProject_Add(aom
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !examples"
     GIT_REMOTE_NAME origin
     GIT_TAG main
-    #PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/aom-*.patch
+    #PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/aom-*.patch
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

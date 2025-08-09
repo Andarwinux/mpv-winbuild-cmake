@@ -52,6 +52,7 @@ set(autoshit_confuck_args
     --prefix=${MINGW_INSTALL_PREFIX}
     --disable-shared
     --enable-static
+    --disable-dependency-tracking
 )
 set(autoreshit
     COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>

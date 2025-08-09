@@ -1,8 +1,5 @@
-get_property(src_luajit TARGET luajit PROPERTY _EP_SOURCE_DIR)
-get_property(src_luajit_wrap TARGET luajit-wrap PROPERTY _EP_SOURCE_DIR)
 set(mpv_conf
         ${meson_conf_args}
-        --force-fallback-for=luajit
         -Db_lto=true
         -Db_lto_mode=thin
         -Dbuild-date=true
@@ -27,10 +24,6 @@ set(mpv_conf
         -Dlibavdevice=enabled
         -Dlibbluray=enabled
         -Dlua=luajit
-        -Dluajit:amalgam=true
-        -Dluajit:lua52compat=true
-        -Dluajit:luajit=false
-        -Dluajit:sysmalloc=true
         -Dmanpage-build=disabled
         -Dopenal=enabled
         -Drubberband=enabled
@@ -86,18 +79,13 @@ ExternalProject_Add(mpv
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ""
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_luajit} <SOURCE_DIR>/subprojects/luajit
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_luajit_wrap}/subprojects/packagefiles/luajit <SOURCE_DIR>/subprojects/luajit
-    COMMAND ${EXEC} sed -i [['/JIT_F_OPT_DEFAULT/c\#define JIT_F_OPT_DEFAULT 0x07FF0000']] <SOURCE_DIR>/subprojects/luajit/src/lj_jit.h
-    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+    CONFIGURE_COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${mpv_conf}
         -Dlibmpv=false
         -Dcplayer=true
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/libmpv <SOURCE_DIR>
         ${mpv_conf}
         -Ddefault_library=shared
-        -Dluajit:default_library=static
         -Dlibmpv=true
         -Dcplayer=false
     ${trim_path} <BINARY_DIR>/config.h

@@ -43,7 +43,7 @@ Example:
 
     cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
     -DCMAKE_INSTALL_PREFIX="$PWD/clang_root" \
-    -DGCC_ARCH=x86-64-v3 \
+    -DMARCH=x86-64-v3 \
     -DSINGLE_SOURCE_LOCATION="$PWD/src_packages" \
     -G Ninja -B build_x86_64_v3 -S mpv-winbuild-cmake
 
@@ -66,7 +66,7 @@ If you want add another target (ex. `aarch64-w64-mingw32`), change `TARGET_ARCH`
     cd build_aarch64
     ninja llvm-clang # same as above
 
-If you've changed `GCC_ARCH` option, you need to run:
+If you've changed `MARCH` option, you need to run:
 
     ninja rebuild_cache
 
@@ -87,7 +87,7 @@ After that, build mpv as usual:
 | Options                      | Description                                                                                                                 | Default                                        |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- |------------------------------------------------|
 | TARGET_ARCH                  | the target to build. available: x86_64-w64-mingw32, aarch64-w64-mingw32                                                     | x86_64-w64-mingw32                             |
-| GCC_ARCH                     | for a specific microarchitecture. For x86_64, this means -march, for aarch64, this means -mcpu                              | x86_64:x86-64-v3 aarch64:cortex-a76            |
+| MARCH                     | for a specific microarchitecture. For x86_64, this means -march, for aarch64, this means -mcpu                              | x86_64:x86-64-v3 aarch64:cortex-a76            |
 | CMAKE_INSTALL_PREFIX         | location of the host toolchain installation                                                                                 | `${CMAKE_CURRENT_BINARY_DIR}/install`          |
 | SINGLE_SOURCE_LOCATION       | location of the packages source                                                                                             | `${CMAKE_CURRENT_BINARY_DIR}/src_packages`     |
 | MINGW_INSTALL_PREFIX         | location of the MinGW sysroot                                                                                               | `${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}`       |

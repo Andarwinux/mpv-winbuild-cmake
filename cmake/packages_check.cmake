@@ -7,7 +7,7 @@ if(TARGET_CPU STREQUAL "x86_64")
     set(libvpx_target "x86_64-win64-gcc")
     set(xxhash_dispatch "-DDISPATCH=ON")
     set(mimalloc_macro "-D_M_X64")
-    if(GCC_ARCH_HAS_AVX)
+    if(MARCH_HAS_AVX)
         set(aom_vpx_sse2avx
             COMMAND ${EXEC} sed -i [['/%macro INIT_XMM/,/%endmacro/ s/%assign avx_enabled 0/%assign avx_enabled 1/']] <SOURCE_DIR>/third_party/x86inc/x86inc.asm
         )

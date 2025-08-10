@@ -1,6 +1,8 @@
 #!/bin/sh
 cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
--DGCC_ARCH=native \
+-DMARCH=native \
+-DMTUNE=native \
+-DMARCH_NAME=-native \
 -DCOMPILER_TOOLCHAIN=clang \
 -DLLVM_ENABLE_LTO=Thin \
 -DENABLE_CCACHE=ON \

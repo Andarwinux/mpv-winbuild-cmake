@@ -25,7 +25,7 @@ else
         export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/lld-%m.profraw" #enable profraw output only when CONF!=1
         export LLD_IN_TEST=1 #https://github.com/llvm/llvm-project/issues/52861
     fi
-    if [ "@GCC_ARCH_HAS_AVX@" == "ON" ]; then
+    if [ "@MARCH_HAS_AVX@" == "ON" ]; then
         FLAGS+=" -mllvm -x86-use-vzeroupper=false"
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"

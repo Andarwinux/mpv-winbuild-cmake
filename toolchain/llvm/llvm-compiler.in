@@ -11,9 +11,9 @@ FLAGS+=" -ffile-prefix-map=@MINGW_INSTALL_PREFIX@=@TARGET_ARCH@ -fno-file-reprod
 FLAGS+=" -gcodeview -gcodeview-ghash -gno-codeview-command-line"
 
 if [ "@TARGET_CPU@" == "aarch64" ]; then
-    ARCH_FLAGS="-mcpu=@GCC_ARCH@"
+    ARCH_FLAGS="-mcpu=@MARCH@ -mtune=@MTUNE@"
 else
-    ARCH_FLAGS="-march=@GCC_ARCH@"
+    ARCH_FLAGS="-march=@MARCH@ -mtune=@MTUNE@"
 fi
 
 if [ "$_IS_CONFIGURE" == "1" ]; then
@@ -46,9 +46,9 @@ else
             FLAGS+=" -fno-unwind-tables -fno-asynchronous-unwind-tables"
         fi
     fi
-    if [ "@GCC_ARCH_HAS_AVX@" == "ON" ]; then
+    if [ "@MARCH_HAS_AVX@" == "ON" ]; then
         FLAGS+=" -Wa,-msse2avx -mno-vzeroupper"
-        if [ "@GCC_ARCH_HAS_AVX512@" != "ON" ]; then
+        if [ "@MARCH_HAS_AVX512@" != "ON" ]; then
             FLAGS+=" -mno-gather"
         fi
     fi

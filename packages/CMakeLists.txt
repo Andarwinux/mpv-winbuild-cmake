@@ -26,7 +26,7 @@ list(APPEND ep
     libdvdread
     libdvdnav
     libiconv
-    luajit-wrap
+    meson-wrap
     luajit
     fribidi
     libxml2

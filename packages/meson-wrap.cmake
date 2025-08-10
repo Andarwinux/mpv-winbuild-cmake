@@ -1,8 +1,8 @@
-ExternalProject_Add(luajit-wrap
+ExternalProject_Add(meson-wrap
     GIT_REPOSITORY https://github.com/mesonbuild/wrapdb.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone subprojects/packagefiles/luajit"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone subprojects/packagefiles/luajit subprojects/packagefiles/mujs"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
@@ -11,5 +11,6 @@ ExternalProject_Add(luajit-wrap
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
-force_rebuild_git(luajit-wrap)
-cleanup(luajit-wrap install)
+force_rebuild_git(meson-wrap)
+cleanup(meson-wrap install)
+get_property(src_meson_wrap TARGET meson-wrap PROPERTY _EP_SOURCE_DIR)

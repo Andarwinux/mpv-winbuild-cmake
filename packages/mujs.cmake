@@ -1,33 +1,23 @@
-set(flag
-"CFLAGS='-UHAVE_READLINE' LIBREADLINE=''
-CC=${TARGET_ARCH}-gcc
-AR=${TARGET_ARCH}-ar
-RANLIB=${TARGET_ARCH}-ranlib
-OUT=<BINARY_DIR>
-prefix=${MINGW_INSTALL_PREFIX}
-host=mingw")
-
 ExternalProject_Add(mujs
+    DEPENDS
+        meson-wrap
     GIT_REPOSITORY https://github.com/ccxvii/mujs.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
-    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/mujs-*.patch
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>
+    CONFIGURE_COMMAND CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_meson_wrap}/subprojects/packagefiles/mujs <SOURCE_DIR>
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+        ${meson_conf_args}
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_UNWIND_ALLOWED=set:1
-    BUILD_COMMAND ${MAKE} ${flag}
-    INSTALL_ENVIRONMENT_MODIFICATION
-        _PACKAGE_NAME=set:${package}
-        _BINARY_DIR=set:<BINARY_DIR>
-        _IS_UNWIND_ALLOWED=set:1
-    INSTALL_COMMAND ${MAKE} ${flag} install
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel,runtime
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(mujs)

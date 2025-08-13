@@ -1,0 +1,29 @@
+import subprocess, pathlib
+
+git_head, git_upstream = subprocess.check_output(
+    ["@GIT_EXECUTABLE@", "-C", "@source_dir@", "rev-parse", "HEAD", "@{u}"],
+    text=True
+).splitlines()
+
+stamp_dir = pathlib.Path("@stamp_dir@")
+patch_file = stamp_dir / "@_name@-patch"
+download_file = stamp_dir / "@_name@-download"
+head_file = stamp_dir / "HEAD"
+
+if (
+    not patch_file.is_file()
+    or (
+        download_file.exists() and patch_file.exists() and download_file.stat().st_mtime > patch_file.stat().st_mtime
+    )
+    or not head_file.is_file()
+    or (head_file.read_text("utf-8").strip() if head_file.exists() else None) != git_upstream
+):
+    subprocess.run(["@GIT_EXECUTABLE@", "-C", "@source_dir@", "reset", "--hard", "@reset@", "-q"])
+    if not "@git_reset@":
+        for f in stamp_dir.iterdir():
+            if f.is_file() and f.suffix.lower() != ".cmake" and f.stat().st_size == 0:
+                f.unlink()
+        print("Removing @_name@ stamp files.")
+        head_file.write_text(git_head + "\n", encoding="utf-8")
+else:
+    subprocess.run(["@GIT_EXECUTABLE@", "-C", "@source_dir@", "reset", "--hard", "-q"])

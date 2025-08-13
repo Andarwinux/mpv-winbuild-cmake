@@ -22,7 +22,7 @@ function(cleanup _name _last_step)
                 set(remove_cmd ${EXEC} find <BINARY_DIR> -mindepth 1 -delete & ${EXEC} ${GIT_EXECUTABLE} -C <SOURCE_DIR> clean -ffxd)
             endif()
             set(COMMAND_FORCE_UPDATE COMMAND bash -c "${GIT_EXECUTABLE} -C <SOURCE_DIR> am --abort 2> /dev/null || true"
-                                     COMMAND ${stamp_dir}/reset_head.sh
+                                     COMMAND python ${stamp_dir}/reset_head.py
                                      COMMAND bash -c "${GIT_EXECUTABLE} -C <SOURCE_DIR> restore .")
         else()
             if(_build_in_source)
@@ -91,21 +91,11 @@ function(force_rebuild_git _name)
         set(shallow_fetch "--depth 1")
     endif()
 
-file(WRITE ${stamp_dir}/reset_head.sh
-"#!/bin/bash
-set -e
-if [[ ! -f \"${stamp_dir}/${_name}-patch\"  || \"${stamp_dir}/${_name}-download\" -nt \"${stamp_dir}/${_name}-patch\" || ! -f \"${stamp_dir}/HEAD\" || \"$(cat ${stamp_dir}/HEAD)\" != \"$(${GIT_EXECUTABLE} -C ${source_dir} rev-parse @{u})\" ]]; then
-    ${GIT_EXECUTABLE} -C ${source_dir} reset --hard ${reset} -q
-    if [[ -z \"${git_reset}\" ]]; then
-        find \"${stamp_dir}\" -type f  ! -iname '*.cmake' -size 0c -delete
-        echo \"Removing ${_name} stamp files.\"
-        ${GIT_EXECUTABLE} -C ${source_dir} rev-parse HEAD > ${stamp_dir}/HEAD
-    fi
-else
-    ${GIT_EXECUTABLE} -C ${source_dir} reset --hard -q
-fi")
-file(CHMOD ${stamp_dir}/reset_head.sh 
-PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+    configure_file(${PROJECT_SOURCE_DIR}/scripts/reset_head.py.in
+                   ${stamp_dir}/reset_head.py
+                   FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+                   @ONLY
+    )
 
     ExternalProject_Add_Step(${_name} force-update
         ALWAYS TRUE
@@ -114,7 +104,7 @@ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_
         WORKING_DIRECTORY <SOURCE_DIR>
         COMMAND bash -c "${GIT_EXECUTABLE} am --abort 2> /dev/null || true"
         COMMAND bash -c "${GIT_EXECUTABLE} fetch ${shallow_fetch} --prune --prune-tags --atomic --filter=tree:0 ${git_remote_name} ${git_tag}"
-        COMMAND ${stamp_dir}/reset_head.sh
+        COMMAND python ${stamp_dir}/reset_head.py
     )
     ExternalProject_Add_StepTargets(${_name} force-update)
 

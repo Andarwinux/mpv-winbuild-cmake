@@ -112,7 +112,6 @@ ExternalProject_Add(ffmpeg
         --enable-cuvid
         --enable-nvdec
         --enable-nvenc
-        --disable-ptx-compression
         --enable-openal
         --enable-opengl
         --disable-doc

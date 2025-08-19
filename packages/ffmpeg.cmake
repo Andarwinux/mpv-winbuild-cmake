@@ -45,7 +45,6 @@ ExternalProject_Add(ffmpeg
         liblc3
         libvidstab
         frei0r
-        vvenc
         codec2
     GIT_REPOSITORY https://github.com/Andarwinux/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -92,7 +91,6 @@ ExternalProject_Add(ffmpeg
         --enable-libx265
         --enable-libaom
         --enable-libsvtav1
-        --enable-libvvenc
         --enable-libdav1d
         --enable-libzimg
         --enable-openssl

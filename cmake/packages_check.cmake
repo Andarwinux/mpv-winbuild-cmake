@@ -18,17 +18,41 @@ if(TARGET_CPU STREQUAL "x86_64")
         set(novzeroupper
             COMMAND ${EXEC} sed -i [['s/%define vzeroupper_required .*/%define vzeroupper_required 0/']]
         )
+        set(libjxl_disable_sse
+            -DJPEGXL_ENABLE_HWY_SSE2=OFF
+            -DJPEGXL_ENABLE_HWY_SSE4=OFF
+        )
     else()
         set(novzeroupper
             COMMAND true
         )
     endif()
+    set(libjxl_force_skip_check
+        -DCXX_MAVX2_SUPPORTED=ON
+        -DCXX_MF16C_SUPPORTED=ON
+        -DCXX_MAVX512F_SUPPORTED=ON
+        -DCXX_MAVX512DQ_SUPPORTED=ON
+        -DCXX_MAVX512CD_SUPPORTED=ON
+        -DCXX_MAVX512BW_SUPPORTED=ON
+        -DCXX_MAVX512VL_SUPPORTED=ON
+        -DCXX_SVE_SUPPORTED=OFF
+    )
 elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
     set(libvpx_target "arm64-win64-gcc")
     set(novzeroupper
         COMMAND true
+    )
+    set(libjxl_force_skip_check
+        -DCXX_MAVX2_SUPPORTED=OFF
+        -DCXX_MF16C_SUPPORTED=OFF
+        -DCXX_MAVX512F_SUPPORTED=OFF
+        -DCXX_MAVX512DQ_SUPPORTED=OFF
+        -DCXX_MAVX512CD_SUPPORTED=OFF
+        -DCXX_MAVX512BW_SUPPORTED=OFF
+        -DCXX_MAVX512VL_SUPPORTED=OFF
+        -DCXX_SVE_SUPPORTED=ON
     )
 endif()
 
@@ -899,4 +923,19 @@ set(xz_force_skip_check
     -DHAVE_COMPILER_OPTION_-Wwrite-strings=ON
     -DHAVE_LOONGARCH_CRC32=OFF
     -DHAVE_LINUX_LANDLOCK=OFF
+)
+
+set(libjxl_force_skip_check
+    ${libjxl_force_skip_check}
+    -DCXX_MACRO_PREFIX_MAP=OFF
+    -DCXX_NO_RTTI_SUPPORTED=ON
+    -DCXX_FUZZERS_SUPPORTED=OFF
+    -DCMAKE_CXX_LINK_PIE_SUPPORTED=OFF
+    -DCMAKE_CXX_LINK_NO_PIE_SUPPORTED=OFF
+    -DLIBCXX=ON
+    -DLIBSTDCXX=OFF
+    -DATOMICS_LOCK_FREE_INSTRUCTIONS=ON
+    -DCOMPILER_HAS_DEPRECATED_ATTR=ON
+    -DLINKER_SUPPORT_EXCLUDE_LIBS=OFF
+    -DJXL_HWY_DISABLED_TARGETS_FORCED=OFF
 )

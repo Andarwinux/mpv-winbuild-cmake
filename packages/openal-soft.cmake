@@ -10,6 +10,7 @@ ExternalProject_Add(openal-soft
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${openal_force_skip_check}
         -DLIBTYPE=STATIC
         -DALSOFT_UTILS=OFF
         -DALSOFT_EXAMPLES=OFF

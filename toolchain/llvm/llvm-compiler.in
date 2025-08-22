@@ -19,7 +19,7 @@ fi
 if [ "$_IS_CONFIGURE" == "1" ]; then
     SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
 else
-    FLAGS+=" -mguard=cf -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize"
+    FLAGS+=" -mguard=cf -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize -ftrivial-auto-var-init=zero -ftrivial-auto-var-init-max-size=256"
     if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$_NOCCACHE" != "1" ]; then
         CCACHE="ccache"
     fi

@@ -2,7 +2,7 @@
 PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/ld.lld
 POLICY="cache_size_bytes=1g:prune_interval=1m"
 FLAGS="-m @ld_m_flag@"
-FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info -s -Xlink=-debug:ghash"
+FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info -s -Xlink=-debug:none,nodwarf,nosymtab"
 
 if [ "$_IS_CONFIGURE" == "1" ]; then
     SKIP_OPT="-O0 --lto-O0 --lto-CGO0 -mllvm -import-instr-limit=0 --no-guard-cf --build-id=none"
@@ -13,7 +13,7 @@ else
         FLAGS+=" --gc-sections --icf=all"
     fi
     if [ "$_PDB_GENERATE" == "1" ]; then
-        FLAGS+=" --pdb="
+        FLAGS+=" -Xlink=-debug:ghash,nodwarf,nosymtab --pdb="
     fi
     if [ "$_LTO_ENABLED" != "0" ]; then
         FLAGS+=" @llvm_mllvm@ @polly@"

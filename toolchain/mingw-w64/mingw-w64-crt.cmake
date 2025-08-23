@@ -20,9 +20,9 @@ ExternalProject_Add(mingw-w64-crt
         _BINARY_DIR=set:<BINARY_DIR>
         _LTO_ENABLED=set:0
         _PGO_ENABLED=set:0
-        _GC_ENABLED=set:0
+        _CODEVIEW_ENABLED=set:0
+        _NO_DEBUGINFO=set:1
         _IS_UNWIND_ALLOWED=set:1
-        _FULL_DEBUGINFO=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${MAKE}
     INSTALL_COMMAND ${MAKE} install

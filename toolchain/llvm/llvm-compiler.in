@@ -8,12 +8,18 @@ FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -UHAS_80_BIT_LONG_DOUBLE
 FLAGS+=" -Xclang -fno-pch-timestamp -Xclang -mlong-double-64 -fno-split-lto-unit -fno-auto-import -fno-temp-file"
 FLAGS+=" -fno-builtin-sin -fno-builtin-sinf -fno-builtin-cos -fno-builtin-cosf -fno-builtin-sinl -fno-builtin-cosl"
 FLAGS+=" -ffile-prefix-map=@MINGW_INSTALL_PREFIX@=@TARGET_ARCH@ -fno-file-reproducible"
-FLAGS+=" -gcodeview -gcodeview-ghash -gno-codeview-command-line"
+FLAGS+=" -gcodeview-ghash -gno-codeview-command-line"
 
 if [ "@TARGET_CPU@" == "aarch64" ]; then
     ARCH_FLAGS="-mcpu=@MARCH@ -mtune=@MTUNE@"
 else
     ARCH_FLAGS="-march=@MARCH@ -mtune=@MTUNE@"
+fi
+
+if [ "$_CODEVIEW_ENABLED" != "0" ]; then
+    FLAGS+=" -gcodeview"
+else
+    FLAGS+=" -gdwarf -gsplit-dwarf=single"
 fi
 
 if [ "$_IS_CONFIGURE" == "1" ]; then

@@ -1,9 +1,8 @@
 #!/bin/bash
-export PATH="@CMAKE_INSTALL_PREFIX@/bin:@RUSTUP_LOCATION@/bin:$PATH"
+export PATH="@CMAKE_INSTALL_PREFIX@/bin:$PATH"
 export PKG_CONFIG="pkg-config --static"
 alias pkg-config="pkg-config --static"
 export PKG_CONFIG_LIBDIR="@MINGW_INSTALL_PREFIX@/lib/pkgconfig"
-export CARGO_HOME="@RUSTUP_LOCATION@"
 export LD_PRELOAD="$LD_PRELOAD @MALLOC@"
 export MIMALLOC_LARGE_OS_PAGES=1
 export MIMALLOC_ALLOW_LARGE_OS_PAGES=1

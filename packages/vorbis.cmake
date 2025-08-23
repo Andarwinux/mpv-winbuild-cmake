@@ -5,6 +5,8 @@ ExternalProject_Add(vorbis
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
+    GIT_REMOTE_NAME origin
+    GIT_TAG main
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

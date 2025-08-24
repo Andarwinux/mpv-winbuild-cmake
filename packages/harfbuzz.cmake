@@ -14,6 +14,7 @@ ExternalProject_Add(harfbuzz
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${harfbuzz_force_skip_check}
         -DHB_HAVE_FREETYPE=ON
         -DHB_HAVE_GDI=ON
         -DHB_HAVE_DIRECTWRITE=ON

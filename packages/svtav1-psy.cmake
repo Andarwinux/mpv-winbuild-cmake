@@ -11,6 +11,7 @@ ExternalProject_Add(svtav1-psy
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${svtav1_force_skip_check}
         -DENABLE_AVX512=ON
         -DBUILD_ENC=ON
         -DSVT_AV1_LTO=OFF

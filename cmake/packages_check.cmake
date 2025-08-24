@@ -66,6 +66,28 @@ if(TARGET_CPU STREQUAL "x86_64")
         -DHAVE_CASCADE_LAKE=ON
         -DHAVE_ARM_ACLE_H=OFF
     )
+    set(svtav1_force_skip_check
+        -DHAVE_X86_PLATFORM=ON
+        -DHAVE_ARM_PLATFORM=OFF
+        -DCXX_FLAG_mavx2=ON
+        -DCXX_FLAG_mavx512bw=ON
+        -DCXX_FLAG_mavx512dq=ON
+        -DCXX_FLAG_mavx512f=ON
+        -DCXX_FLAG_mavx512vl=ON
+        -DCXX_FLAG_msse2=ON
+        -DCXX_FLAG_msse4_1=ON
+        -DCXX_FLAG_mssse3=ON
+        -DC_FLAG_mavx2=ON
+        -DC_FLAG_mavx512bw=ON
+        -DC_FLAG_mavx512dq=ON
+        -DC_FLAG_mavx512f=ON
+        -DC_FLAG_mavx512vl=ON
+        -DC_FLAG_msse2=ON
+        -DC_FLAG_msse4_1=ON
+        -DC_FLAG_mssse3=ON
+        -DC_FLAG_mxsave=ON
+        -DHAS_AVX512=ON
+    )
 elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
@@ -116,6 +138,28 @@ elseif(TARGET_CPU STREQUAL "aarch64")
         -DNEON_AVAILABLE=ON
         -DNEON_HAS_LD4=ON
         -DHAVE_ARMV8_INLINE_ASM=OFF
+    )
+    set(svtav1_force_skip_check
+        -DHAVE_X86_PLATFORM=OFF
+        -DHAVE_ARM_PLATFORM=ON
+        -DHAS_AVX512=OFF
+        -DC_FLAG_mxsave=OFF
+        -DNEON_FLAG_SUPPORTED=ON
+        -DARM_CRC32_FLAG_SUPPORTED=ON
+        -DNEON_DOTPROD_FLAG_SUPPORTED=ON
+        -DNEON_I8MM_FLAG_SUPPORTED=ON
+        -DSVE_FLAG_SUPPORTED=ON
+        -DSVE2_FLAG_SUPPORTED=ON
+        -DHAVE_SVE_HEADERS=ON
+        -DCAN_COMPILE_SVE=ON
+        -DCXX_FLAG_march_armv8_2_a_dotprod=ON
+        -DCXX_FLAG_march_armv8_2_a_dotprod_i8mm=ON
+        -DCXX_FLAG_march_armv8_2_a_dotprod_i8mm_sve=ON
+        -DCXX_FLAG_march_armv9_a_i8mm_sve2=ON
+        -DC_FLAG_march_armv8_2_a_dotprod=ON
+        -DC_FLAG_march_armv8_2_a_dotprod_i8mm=ON
+        -DC_FLAG_march_armv8_2_a_dotprod_i8mm_sve=ON
+        -DC_FLAG_march_armv9_a_i8mm_sve2=ON
     )
 endif()
 
@@ -1312,4 +1356,23 @@ set(zlib_force_skip_check
     -DHAVE_SYS_SDT_H=OFF
     -DHAVE_LINUX_AUXVEC_H=OFF
     -DHAVE_NO_PEDANTIC_MS_FORMAT=OFF
+)
+
+set(svtav1_force_skip_check
+    ${svtav1_force_skip_check}
+    -DCXX_FLAG_Wall=ON
+    -DCXX_FLAG_Wextra=ON
+    -DCXX_FLAG_Wformat=ON
+    -DCXX_FLAG_Wformat_security=ON
+    -DC_FLAG_Wall=ON
+    -DC_FLAG_Wextra=ON
+    -DC_FLAG_Wformat=ON
+    -DC_FLAG_Wformat_security=ON
+    -DC_FLAG_fno_asynchronous_unwind_tables=ON
+    -DHAVE_BUILTIN_EXPECT=ON
+    -DHAVE_STRCPY_S=ON
+    -DHAVE_STRNCPY_S=ON
+    -DHAVE_STRNLEN_S=OFF
+    -DHAVE_VALGRIND_H=OFF
+    -DHAVE_ELF_AUX_INFO=OFF
 )

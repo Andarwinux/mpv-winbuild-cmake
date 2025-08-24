@@ -11,9 +11,10 @@ ExternalProject_Add(libssh
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${libssh_force_skip_check}
         -DWITH_ZLIB=ON
+        -DWITH_ABI_BREAK=ON
         -DWITH_EXAMPLES=OFF
-        -DCMAKE_C_FLAGS='${CMAKE_C_FLAGS} -DHAVE_COMPILER__FUNC__=1'
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

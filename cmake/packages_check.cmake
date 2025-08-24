@@ -46,6 +46,12 @@ if(TARGET_CPU STREQUAL "x86_64")
         -DHAVE_SSE_INTRINSICS=ON
         -DHAVE_XMMINTRIN_H=ON
     )
+    set(libwebp_force_skip_check
+        -DWEBP_HAVE_FLAG_AVX2=ON
+        -DWEBP_HAVE_FLAG_SSE41=ON
+        -DWEBP_HAVE_FLAG_SSE2=ON
+        -DWEBP_HAVE_FLAG_NEON=OFF
+    )
 elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
@@ -71,6 +77,12 @@ elseif(TARGET_CPU STREQUAL "aarch64")
         -DHAVE_SMMINTRIN_H=OFF
         -DHAVE_SSE_INTRINSICS=OFF
         -DHAVE_XMMINTRIN_H=OFF
+    )
+    set(libwebp_force_skip_check
+        -DWEBP_HAVE_FLAG_AVX2=OFF
+        -DWEBP_HAVE_FLAG_SSE41=OFF
+        -DWEBP_HAVE_FLAG_SSE2=OFF
+        -DWEBP_HAVE_FLAG_NEON=ON
     )
 endif()
 
@@ -1227,4 +1239,22 @@ set(libssh_force_skip_check
     -DCMAKE_DISABLE_FIND_PACKAGE_NaCl=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_Argp=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=ON
+)
+
+set(libwebp_force_skip_check
+    ${libwebp_force_skip_check}
+    -DWEBP_HAVE_FLAG_MIPS32=OFF
+    -DWEBP_HAVE_FLAG_MIPS_DSP_R2=OFF
+    -DWEBP_HAVE_FLAG_MSA=OFF
+    -DHAVE_BUILTIN_BSWAP16=ON
+    -DHAVE_BUILTIN_BSWAP32=ON
+    -DHAVE_BUILTIN_BSWAP64=ON
+    -DHAVE_MATH_LIBRARY=ON
+    -DHAVE_SHLWAPI_H=ON
+    -DHAVE_UNISTD_H=ON
+    -DHAVE_WINCODEC_H=ON
+    -DHAVE_WINDOWS_H=ON
+    -DHAVE_GLUT_GLUT_H=OFF
+    -DHAVE_GL_GLUT_H=OFF
+    -DHAVE_OPENGL_GLUT_H=OFF
 )

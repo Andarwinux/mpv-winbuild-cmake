@@ -12,8 +12,10 @@ ExternalProject_Add(libwebp
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/unset/d']] <SOURCE_DIR>/cmake/cpu.cmake
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${libwebp_force_skip_check}
         -DWEBP_BUILD_ANIM_UTILS=OFF
         -DWEBP_BUILD_EXTRAS=OFF
         -DWEBP_BUILD_WEBPMUX=OFF

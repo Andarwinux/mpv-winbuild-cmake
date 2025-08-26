@@ -9,6 +9,13 @@ ExternalProject_Add(sqlite
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_meson_wrap}/subprojects/packagefiles/sqlite3 <SOURCE_DIR>
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
+        -Dall-extensions=enabled
+        -Dfts34=enabled
+        -Dfts5=enabled
+        -Dgeopoly=enabled
+        -Drbu=enabled
+        -Drtree=enabled
+        -Dsession=enabled
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

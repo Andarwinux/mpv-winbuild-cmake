@@ -13,6 +13,7 @@ ExternalProject_Add(fribidi
         -Ddocs=false
         -Dbin=false
         -Dtests=false
+        -Ddeprecated=false
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

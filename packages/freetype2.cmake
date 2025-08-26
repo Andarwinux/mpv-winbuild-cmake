@@ -19,6 +19,7 @@ ExternalProject_Add(freetype2
         ${meson_conf_args}
         -Dharfbuzz=enabled
         -Dtests=disabled
+        -Dmmap=enabled
         -Dbrotli=enabled
         -Dzlib=enabled
         -Dbzip2=enabled

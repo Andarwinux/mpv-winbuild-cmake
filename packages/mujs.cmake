@@ -11,6 +11,7 @@ ExternalProject_Add(mujs
     CONFIGURE_COMMAND CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_meson_wrap}/subprojects/packagefiles/mujs <SOURCE_DIR>
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
+        -Dprogs=enabled
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

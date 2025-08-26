@@ -12,6 +12,10 @@ ExternalProject_Add(libva
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Denable_docs=false
+        -Ddisable_drm=true
+        -Dwith_x11=no
+        -Dwith_glx=no
+        -Dwith_wayland=no
         "-Dc_args='-DSYSCONFDIR=__BASE_FILE__ -DVA_DRIVERS_PATH=__BASE_FILE__'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

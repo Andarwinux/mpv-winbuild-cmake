@@ -12,6 +12,7 @@ ExternalProject_Add(libpsl
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Dtests=false
+        -Druntime=no
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -21,6 +21,7 @@ ExternalProject_Add(opus
         -Dosce=enabled
         -Dintrinsics=enabled
         -Dfloat-approx=true
+        -Dasm=disabled
         -Dextra-programs=disabled
         -Dtests=disabled
         -Ddocs=disabled

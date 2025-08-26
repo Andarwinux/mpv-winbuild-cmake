@@ -1,7 +1,7 @@
 set(mpv_conf
         ${meson_conf_args}
-        -Db_lto=true
         -Db_lto_mode=thin
+        -Db_lto=true
         -Dbuild-date=true
         -Dcplugins=enabled
         -Dcuda-hwaccel=enabled
@@ -24,7 +24,6 @@ set(mpv_conf
         -Dlibavdevice=enabled
         -Dlibbluray=enabled
         -Dlua=luajit
-        -Dmanpage-build=disabled
         -Dopenal=enabled
         -Drubberband=enabled
         -Dsdl2-audio=enabled
@@ -36,6 +35,7 @@ set(mpv_conf
         -Dspirv-cross=enabled
         -Duchardet=enabled
         -Dvaapi-win32=enabled
+        -Dvaapi=enabled
         -Dvapoursynth=enabled
         -Dvector=enabled
         -Dvulkan=enabled

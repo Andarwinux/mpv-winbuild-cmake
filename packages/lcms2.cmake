@@ -19,6 +19,9 @@ ExternalProject_Add(lcms2
         ${meson_conf_args}
         -Dfastfloat=true
         -Dthreaded=true
+        -Djpeg=enabled
+        -Dtiff=disabled
+        -Dtests=disabled
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -12,6 +12,7 @@ ExternalProject_Add(speex
         ${meson_conf_args}
         -Dtest-binaries=disabled
         -Dtools=disabled
+        -Dauto_features=auto
         "-Dc_args='-Dlsp_to_lpc=speex_lsp_to_lpc -Dlpc_to_lsp=speex_lpc_to_lsp'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

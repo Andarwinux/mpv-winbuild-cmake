@@ -34,6 +34,7 @@ ExternalProject_Add(libplacebo
         -Dopengl=enabled
         -Dshaderc=enabled
         -Dvk-proc-addr=enabled
+        -Dxxhash=enabled
         -Dvulkan-registry='${MINGW_INSTALL_PREFIX}/share/vulkan/registry/vk.xml'
         -Dvulkan=enabled
         "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"

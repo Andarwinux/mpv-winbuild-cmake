@@ -156,3 +156,6 @@ add_custom_target(ccache-recomp
     COMMAND ${EXEC} ccache -X 22
     USES_TERMINAL
 )
+
+add_dependencies(update download)
+add_dependencies(patch download)

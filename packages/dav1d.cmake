@@ -13,6 +13,7 @@ ExternalProject_Add(dav1d
         -Denable_tools=false
         -Denable_tests=false
         -Dxxhash_muxer=enabled
+        -Dtrim_dsp=true
         "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
     ${novzeroupper} <SOURCE_DIR>/src/ext/x86/x86inc.asm
     BUILD_ENVIRONMENT_MODIFICATION

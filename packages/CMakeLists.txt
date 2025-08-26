@@ -31,6 +31,7 @@ list(APPEND ep
     fribidi
     libxml2
     brotli
+    harfbuzz_init
     freetype2
     libudfread
     libbluray

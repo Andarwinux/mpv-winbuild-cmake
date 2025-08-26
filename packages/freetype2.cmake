@@ -4,6 +4,7 @@ ExternalProject_Add(freetype2
         zlib
         brotli
         bzip2
+        harfbuzz_init
     GIT_REPOSITORY https://github.com/freetype/freetype.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -16,7 +17,7 @@ ExternalProject_Add(freetype2
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
-        -Dharfbuzz=disabled
+        -Dharfbuzz=enabled
         -Dtests=disabled
         -Dbrotli=enabled
         -Dzlib=enabled

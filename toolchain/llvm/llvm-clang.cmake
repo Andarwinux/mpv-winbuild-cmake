@@ -1,11 +1,8 @@
-# worflows for clang compilation:
-# mingw's header+crt -> compiler-rt builtins -> libcxx -> openmp
 ExternalProject_Add(llvm-clang
     DEPENDS
         llvm-libcxx
         llvm-compiler-rt-builtin
         mingw-w64-crt
-        #mingw-w64-winpthreads
         mingw-w64-gendef
         cppwinrt
     DOWNLOAD_COMMAND ""

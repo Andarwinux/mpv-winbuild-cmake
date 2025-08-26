@@ -87,7 +87,6 @@ list(APPEND ep
     codec2
     ffmpeg
     mpv
-    mpv-packaging
     ngtcp2
     nghttp3
     nghttp2

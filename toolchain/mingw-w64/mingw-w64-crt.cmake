@@ -11,6 +11,7 @@ ExternalProject_Add(mingw-w64-crt
         --host=${TARGET_ARCH}
         --prefix=${MINGW_INSTALL_PREFIX}
         --with-sysroot=${CMAKE_INSTALL_PREFIX}
+        --disable-dependency-tracking
         --with-default-msvcrt=ucrt
         --enable-wildcard
         --enable-cfguard

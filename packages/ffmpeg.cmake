@@ -58,75 +58,90 @@ ExternalProject_Add(ffmpeg
         --cross-prefix=${TARGET_ARCH}-
         --prefix=${MINGW_INSTALL_PREFIX}
         --arch=${TARGET_CPU}
-        --target-os=mingw32
+        --target-os=mingw64
         --pkg-config-flags=--static
-        --enable-cross-compile
-        --enable-runtime-cpudetect
-        --enable-hardcoded-tables
-        --enable-gpl
-        --enable-version3
-        --enable-nonfree
-        --enable-avisynth
-        --enable-vapoursynth
-        --enable-libass
-        --enable-libbluray
-        --enable-libdvdnav
-        --enable-libdvdread
-        --enable-libfreetype
-        --enable-libfribidi
-        --enable-libfontconfig
-        --enable-libharfbuzz
-        --enable-libmodplug
-        --enable-libgme
-        --enable-lcms2
-        --enable-libopus
-        --enable-libsoxr
-        --enable-libspeex
-        --enable-libvorbis
-        --enable-liblc3
-        --enable-libcodec2
-        --enable-librubberband
-        --enable-libvpx
-        --enable-libwebp
-        #--enable-libx265
-        --enable-libaom
-        --enable-libsvtav1
-        --enable-libdav1d
-        --enable-libzimg
-        --enable-openssl
-        --enable-libxml2
-        --enable-libmysofa
-        --enable-libvidstab
-        --enable-frei0r
-        --enable-libssh
-        --enable-libsrt
-        --enable-libvpl
-        --enable-libjxl
-        --enable-libplacebo
-        --enable-libshaderc
-        --enable-libaribcaption
+        --disable-autodetect
+        --disable-decoder=libaom_av1,aac_fixed,ac3_fixed
+        --disable-doc
+        --disable-encoder=ac3_fixed,mp2fixed
+        --disable-ffplay
+        --disable-ffprobe
+        --disable-inline-asm
+        --disable-schannel
+        --disable-stripping
+        --disable-symver
+        --disable-version-tracking
         --enable-amf
+        --enable-avisynth
+        --enable-bzlib
+        --enable-cross-compile
         --enable-cuda-llvm
         --enable-cuvid
+        --enable-cuvid
+        --enable-d3d11va
+        --enable-d3d12va
+        --enable-dxva2
+        --enable-ffnvcodec
+        --enable-frei0r
+        --enable-gpl
+        --enable-hardcoded-tables
+        --enable-iconv
+        --enable-lcms2
+        --enable-libaom
+        --enable-libaribcaption
+        --enable-libass
+        --enable-libbluray
+        --enable-libcodec2
+        --enable-libdav1d
+        --enable-libdvdnav
+        --enable-libdvdread
+        --enable-libfdk-aac
+        --enable-libfontconfig
+        --enable-libfreetype
+        --enable-libfribidi
+        --enable-libgme
+        --enable-libharfbuzz
+        --enable-libjxl
+        --enable-liblc3
+        --enable-libmodplug
+        --enable-libmysofa
+        --enable-libopus
+        --enable-libplacebo
+        --enable-librubberband
+        --enable-libshaderc
+        --enable-libsoxr
+        --enable-libspeex
+        --enable-libsrt
+        --enable-libssh
+        --enable-libsvtav1
+        --enable-libvidstab
+        --enable-libvorbis
+        --enable-libvpl
+        --enable-libvpx
+        --enable-libwebp
+        --enable-libxml2
+        --enable-libzimg
+        --enable-lzma
+        --enable-mediafoundation
+        --enable-nonfree
         --enable-nvdec
         --enable-nvenc
         --enable-openal
-        --enable-opengl
-        --disable-doc
-        --disable-ffplay
-        --disable-ffprobe
-        --enable-vaapi
-        --enable-libfdk-aac
         --enable-opencl
-        --disable-vdpau
-        --disable-videotoolbox
-        --disable-decoder=libaom_av1,aac_fixed,ac3_fixed
-        --disable-encoder=ac3_fixed,mp2fixed
-        --disable-stripping
-        --disable-inline-asm
+        --enable-opengl
+        --enable-openssl
+        --enable-response-files
+        --enable-runtime-cpudetect
+        --enable-sdl2
+        --enable-vaapi
+        --enable-vapoursynth
+        --enable-version3
+        --enable-vulkan
+        --enable-w32threads
+        --enable-zlib
+        --extra-libs=-lc++
         --host-cc=clang
         --nvcc=nvcc
-        --extra-libs=-lc++
     ${novzeroupper} <SOURCE_DIR>/libavutil/x86/x86inc.asm
     ${trim_path} <BINARY_DIR>/config.h
     BUILD_ENVIRONMENT_MODIFICATION

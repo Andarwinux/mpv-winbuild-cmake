@@ -8,7 +8,8 @@ ExternalProject_Add(openal-soft
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} sed -i [['s/MINGW/FALSE/g']] <SOURCE_DIR>/CMakeLists.txt
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${openal_force_skip_check}
         -DLIBTYPE=STATIC

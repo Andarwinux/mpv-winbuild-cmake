@@ -9,6 +9,8 @@ ExternalProject_Add(libvidstab
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DUSE_OMP=OFF
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP=ON
+        -DCMAKE_DISABLE_FIND_PACKAGE_OpenMP_C=ON
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

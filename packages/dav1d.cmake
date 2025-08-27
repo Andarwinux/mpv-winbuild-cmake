@@ -16,6 +16,7 @@ ExternalProject_Add(dav1d
         -Dtrim_dsp=true
         "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
     ${novzeroupper} <SOURCE_DIR>/src/ext/x86/x86inc.asm
+    COMMAND ${EXEC} sed -i [['/__USE_MINGW_ANSI_STDIO/d']] config.h
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

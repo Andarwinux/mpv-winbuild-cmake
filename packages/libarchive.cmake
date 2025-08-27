@@ -16,6 +16,7 @@ ExternalProject_Add(libarchive
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['/^CHECK_CRYPTO/ { /OPENSSL/!d }']] <SOURCE_DIR>/CMakeLists.txt
+    COMMAND ${EXEC} sed -i [['s/MINGW/FALSE/g']] <SOURCE_DIR>/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${libarchive_force_skip_check}

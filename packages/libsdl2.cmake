@@ -20,6 +20,7 @@ ExternalProject_Add(libsdl2
         -DSDL_LIBICONV=ON
         -DSDL_SYSTEM_ICONV=ON
         -DSDL_LIBSAMPLERATE=ON
+        -DSDL_LIBSAMPLERATE_SHARED=OFF
         -DSDL_MMX=OFF
         -DSDL_SSE=OFF
         -DSDL_SSE2=OFF
@@ -33,6 +34,7 @@ ExternalProject_Add(libsdl2
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
+    COMMAND ${EXEC} sed -i [['s/-lSDL2main/-lSDL2main -lsamplerate/']] ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sdl2.pc
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

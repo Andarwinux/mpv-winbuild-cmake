@@ -13,6 +13,7 @@ ExternalProject_Add(libbluray
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['/find_library/d']] <SOURCE_DIR>/meson.build
+    COMMAND ${EXEC} sed -i [['/__USE_MINGW_ANSI_STDIO/d']] <SOURCE_DIR>/meson.build
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Denable_tools=false

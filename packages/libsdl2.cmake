@@ -29,12 +29,13 @@ ExternalProject_Add(libsdl2
         -DSDL_TEST=OFF
         -DSDL_TEST_LIBRARY=OFF
         -DSDL_ASSERTIONS=0
+        -DSDL2_DISABLE_SDL2MAIN=ON
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
-    COMMAND ${EXEC} sed -i [['s/-lSDL2main/-lSDL2main -lsamplerate/']] ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sdl2.pc
+    COMMAND ${EXEC} sed -i [['s/-lSDL2/-lSDL2 -lsamplerate/']] ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sdl2.pc
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

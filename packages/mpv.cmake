@@ -81,7 +81,7 @@ ExternalProject_Add(mpv
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${mpv_conf}
-        -Dlibmpv=false
+        -Dlibmpv=true
         -Dcplayer=true
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/libmpv <SOURCE_DIR>
         ${mpv_conf}
@@ -96,8 +96,8 @@ ExternalProject_Add(mpv
         _IS_EXCEPTIONS_ALLOWED=set:1
         _FULL_DEBUGINFO=set:1
         _PDB_GENERATE=set:1
-    BUILD_COMMAND ${EXEC} _FORCE_HIDE_DLLEXPORT=1 ninja -C <BINARY_DIR>
-          COMMAND ${EXEC} meson install -C <BINARY_DIR>/libmpv --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} _FORCE_HIDE_DLLEXPORT=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+          COMMAND ${EXEC} ninja -C <BINARY_DIR>/libmpv libmpv-2.dll
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

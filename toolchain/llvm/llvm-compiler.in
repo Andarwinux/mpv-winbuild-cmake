@@ -72,7 +72,7 @@ else
             FLAGS+=" -gline-tables-only"
         fi
     else
-        FLAGS+= "-g0"
+        FLAGS+=" -g0"
     fi
     if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
         export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw"

@@ -2,7 +2,6 @@ set_property(DIRECTORY PROPERTY EP_STEP_TARGETS download patch configure build i
 include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
     xz
-    lzo
     uchardet
     sleef
     libsamplerate

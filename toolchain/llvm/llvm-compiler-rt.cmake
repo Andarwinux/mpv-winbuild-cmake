@@ -32,6 +32,7 @@ ExternalProject_Add(llvm-compiler-rt
         _LTO_ENABLED=set:0
         _PGO_ENABLED=set:0
         _IS_RTTI_ALLOWED=set:1
+        _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

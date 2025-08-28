@@ -2,26 +2,29 @@ get_property(src_graphengine TARGET graphengine PROPERTY _EP_SOURCE_DIR)
 ExternalProject_Add(libzimg
     DEPENDS
         graphengine
-    GIT_REPOSITORY https://github.com/sekrit-twc/zimg.git
+    GIT_REPOSITORY https://github.com/robxnano/zimg.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
+    GIT_REMOTE_NAME origin
+    GIT_TAG meson
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['s/Windows.h/windows.h/g']] <SOURCE_DIR>/src/zimg/common/arm/cpuinfo_arm.cpp
-    ${autoreshit}
     COMMAND ${CMAKE_COMMAND} -E rm -rf graphengine
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_graphengine} graphengine
-    COMMAND ${EXEC} ./configure
-        ${autoshit_confuck_args}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_graphengine} <SOURCE_DIR>/graphengine
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+        ${meson_conf_args}
+        -Dcpp_rtti=true
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
-    BUILD_COMMAND ${MAKE} install-libLTLIBRARIES install-includeHEADERS install-pkgconfigDATA
+        _FORCE_HIDE_DLLEXPORT=set:1
+    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -33,8 +33,10 @@ ExternalProject_Add(qbittorrent
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
+        _PDB_GENERATE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/qbittorrent.exe ${MINGW_INSTALL_PREFIX}/bin/qbittorrent.exe
+            COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/qbittorrent.pdb ${MINGW_INSTALL_PREFIX}/bin/qbittorrent.pdb
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

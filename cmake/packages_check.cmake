@@ -220,7 +220,7 @@ set(qt_target_features
     -DQT_FEATURE_sql_odbc=ON
     -DQT_FEATURE_sql_psql=OFF
     -DQT_FEATURE_stack_protector=OFF
-    -DQT_FEATURE_static_runtime=ON
+    -DQT_FEATURE_static_runtime=OFF
     -DQT_FEATURE_system_freetype=ON
     -DQT_FEATURE_system_harfbuzz=ON
     -DQT_FEATURE_system_openssl=ON

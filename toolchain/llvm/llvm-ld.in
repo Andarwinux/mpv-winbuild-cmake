@@ -1,6 +1,6 @@
 #!/bin/bash
 PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/ld.lld
-POLICY="cache_size_bytes=1g:prune_interval=1m"
+POLICY="cache_size_bytes=2g:prune_interval=1m"
 FLAGS="-m @ld_m_flag@"
 FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info -s -Xlink=-debug:none,nodwarf,nosymtab"
 

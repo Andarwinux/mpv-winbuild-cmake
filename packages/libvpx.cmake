@@ -12,13 +12,16 @@ ExternalProject_Add(libvpx
         --extra-cflags='-fno-asynchronous-unwind-tables'
         --target=${libvpx_target}
         --prefix=${MINGW_INSTALL_PREFIX}
-        --disable-examples
+        --as=yasm
+        --disable-decode-perf-tests
+        --disable-dependency-tracking
         --disable-docs
+        --disable-encode-perf-tests
+        --disable-examples
         --disable-tools
         --disable-unit-tests
-        --disable-decode-perf-tests
-        --disable-encode-perf-tests
-        --as=yasm
+        --disable-vp8
+        --disable-vp9-decoder
         --enable-debug
         --enable-vp9-highbitdepth
     COMMAND ${EXEC} sed -i [['/HAVE_PTHREAD_H/d']] <BINARY_DIR>/vpx_config.h

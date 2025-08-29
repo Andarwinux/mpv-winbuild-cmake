@@ -12,7 +12,8 @@ ExternalProject_Add(aom
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/aom_config\.c\.template/i unset(AOM_CMAKE_CONFIG)']] <SOURCE_DIR>/build/cmake/aom_configure.cmake
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DENABLE_EXAMPLES=OFF
         -DENABLE_DOCS=OFF

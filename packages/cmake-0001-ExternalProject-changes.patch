@@ -1,18 +1,15 @@
-From 6af3abf4d7d3bc3de726df2909c459cde4c206a7 Mon Sep 17 00:00:00 2001
-From: shinchiro <shinchiro@users.noreply.github.com>
-Date: Tue, 18 Mar 2025 19:21:31 +0800
-Subject: [PATCH] ExternalProject: Changes for v3.31.6
+From 7f28c0c089363423979971e6c422f22b570f0781 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sat, 30 Aug 2025 00:00:00 +0000
+Subject: [PATCH] ExternalProject: custom
 
-GIT_CLONE_FLAGS:        Support passing other flags in git clone operation
-GIT_CLONE_POST_COMMAND: Run git command after clone operation
-GIT_RESET:              Perform git reset hard on repo
 ---
  Modules/ExternalProject/gitclone.cmake.in     | 26 +++++++++++++++++++
  .../shared_internal_commands.cmake            | 15 +++++++++++
  2 files changed, 41 insertions(+)
 
 diff --git a/Modules/ExternalProject/gitclone.cmake.in b/Modules/ExternalProject/gitclone.cmake.in
-index 77d6be2c..f548bb29 100644
+index 449bcb30c7..d3ba0a4a23 100644
 --- a/Modules/ExternalProject/gitclone.cmake.in
 +++ b/Modules/ExternalProject/gitclone.cmake.in
 @@ -61,6 +61,32 @@ if(error_code)
@@ -49,7 +46,7 @@ index 77d6be2c..f548bb29 100644
  if(init_submodules)
    execute_process(
 diff --git a/Modules/ExternalProject/shared_internal_commands.cmake b/Modules/ExternalProject/shared_internal_commands.cmake
-index 149a8a73..496c6b2a 100644
+index df1290ee70..802c76ee82 100644
 --- a/Modules/ExternalProject/shared_internal_commands.cmake
 +++ b/Modules/ExternalProject/shared_internal_commands.cmake
 @@ -390,6 +390,9 @@ function(_ep_write_gitclone_script
@@ -72,7 +69,7 @@ index 149a8a73..496c6b2a 100644
    foreach(config IN LISTS git_config)
      list(APPEND git_clone_options --config \"${config}\")
    endforeach()
-@@ -969,6 +975,9 @@ function(_ep_add_download_command name)
+@@ -954,6 +960,9 @@ function(_ep_add_download_command name)
      set(git_shallow  "${_EP_GIT_SHALLOW}")
      set(git_progress "${_EP_GIT_PROGRESS}")
      set(git_config   "${_EP_GIT_CONFIG}")
@@ -82,7 +79,7 @@ index 149a8a73..496c6b2a 100644
  
      # If git supports it, make checkouts quiet when checking out a git hash.
      # This avoids the very noisy detached head message.
-@@ -1011,6 +1020,9 @@ CMP0097=${_EP_CMP0097}
+@@ -996,6 +1005,9 @@ CMP0097=${_EP_CMP0097}
        "${git_submodules}"
        "${git_shallow}"
        "${git_progress}"
@@ -92,7 +89,7 @@ index 149a8a73..496c6b2a 100644
        "${git_config}"
        ${src_name}
        ${work_dir}
-@@ -1884,6 +1896,9 @@ macro(_ep_get_add_keywords out_var)
+@@ -1869,6 +1881,9 @@ macro(_ep_get_add_keywords out_var)
      GIT_SHALLOW
      GIT_PROGRESS
      GIT_CONFIG
@@ -103,5 +100,5 @@ index 149a8a73..496c6b2a 100644
      #
      SVN_REPOSITORY
 -- 
-2.47.0
+2.51.0
 

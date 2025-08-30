@@ -11,7 +11,6 @@ ExternalProject_Add(fontconfig
     GIT_TAG main
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
-    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/subprojects
@@ -30,7 +29,7 @@ ExternalProject_Add(fontconfig
         _FORCE_HIDE_DLLEXPORT=set:1
     BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
     INSTALL_COMMAND ""
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(fontconfig)

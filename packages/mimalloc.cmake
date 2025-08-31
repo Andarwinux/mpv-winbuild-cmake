@@ -22,6 +22,7 @@ ExternalProject_Add(mimalloc
         -DCMAKE_UNITY_BUILD=ON
         -DCMAKE_UNITY_BUILD_BATCH_SIZE=0
         -DMI_OPT_ARCH=OFF
+        -DMI_NO_OPT_ARCH=ON
         -DCMAKE_SHARED_LIBRARY_PREFIX_CXX=''
         "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${mimalloc_macro}'"
         "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${mimalloc_macro}'"

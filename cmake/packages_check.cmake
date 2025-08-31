@@ -181,6 +181,7 @@ set(cmake_conf_args
     -DCMAKE_C_STANDARD=17
     -DCMAKE_CXX_STANDARD=20
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
 )
 set(meson_conf_args
     --cross-file=${MESON_CROSS}

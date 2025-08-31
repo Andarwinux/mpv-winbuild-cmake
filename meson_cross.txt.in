@@ -1,37 +1,47 @@
+[constants]
+toolchain              = '@CMAKE_INSTALL_PREFIX@/bin'
+sysroot                = '@MINGW_INSTALL_PREFIX@'
+arch                   = '@TARGET_ARCH@'
+
 [binaries]
-c = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-clang'
-cpp = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-clang++'
-as = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-clang'
-windres = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-windres'
-dlltool = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-dlltool'
-ar = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-ar'
-ranlib = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-ranlib'
-objcopy = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-objcopy'
-strip = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-strip'
-nasm = 'nasm'
-pkg-config = 'pkg-config'
-cmake = ''
+c                      = toolchain / arch + '-clang'
+cpp                    = toolchain / arch + '-clang++'
+as                     = toolchain / arch + '-clang'
+windres                = toolchain / arch + '-llvm-windres'
+dlltool                = toolchain / arch + '-llvm-dlltool'
+ar                     = toolchain / arch + '-llvm-ar'
+ranlib                 = toolchain / arch + '-llvm-ranlib'
+objcopy                = toolchain / arch + '-llvm-objcopy'
+strip                  = toolchain / arch + '-llvm-strip'
+pkg-config             = toolchain / arch + '-pkg-config'
+nasm                   = toolchain / 'nasm'
+cmake                  = ''
+
+[properties]
+sys_root               = sysroot
+pkg_config_libdir      = sysroot / 'lib/pkgconfig'
+skip_sanity_check      = true
 
 [host_machine]
-system = 'windows'
-cpu_family = '@TARGET_CPU_FAMILY@'
-cpu = '@TARGET_ARCH@'
-endian = 'little'
+system                 = 'windows'
+cpu_family             = '@TARGET_CPU_FAMILY@'
+cpu                    = '@TARGET_ARCH@'
+endian                 = 'little'
 
 [built-in options]
-prefix = '@MINGW_INSTALL_PREFIX@'
-libdir = '@MINGW_INSTALL_PREFIX@/lib'
-wrap_mode= 'nofallback'
-buildtype = 'release'
-b_ndebug = 'true'
-c_std = 'gnu17'
-cpp_rtti = false
-cpp_std = 'gnu++20'
-default_library = 'static'
+prefix                 = sysroot
+libdir                 = sysroot / 'lib'
+wrap_mode              = 'nofallback'
+buildtype              = 'release'
+b_ndebug               = 'true'
+c_std                  = 'gnu17'
+cpp_rtti               = false
+cpp_std                = 'gnu++20'
+default_library        = 'static'
 default_both_libraries = 'static'
-prefer_static = true
-pkgconfig.relocatable = false
-auto_features = 'disabled'
+prefer_static          = true
+auto_features          = 'disabled'
+python.bytecompile     = '2'
 
 [cmake]
-CMAKE_TOOLCHAIN_FILE = '@TOOLCHAIN_FILE@'
+CMAKE_TOOLCHAIN_FILE   = '@TOOLCHAIN_FILE@'

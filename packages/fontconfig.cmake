@@ -22,7 +22,9 @@ ExternalProject_Add(fontconfig
         -Dtests=disabled
         -Dtools=disabled
         -Dcache-build=disabled
-        -Dtemplate-dir=''
+        -Dadditional-fonts-dirs=fonts
+        -Dtemplate-dir=fonts
+        -Dbaseconfig-dir=fonts
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -1,3 +1,9 @@
 #!/bin/bash
 
-@NASM@ $@ -DFORCE_VEX_ENCODING=@sse2avx@ --reproducible
+FLAGS="--reproducible"
+
+if [ "$_NASM_SSE2AVX" != "0" ]; then
+    FLAGS+=" -DFORCE_VEX_ENCODING=@sse2avx@"
+fi
+
+@NASM@ $@ $FLAGS

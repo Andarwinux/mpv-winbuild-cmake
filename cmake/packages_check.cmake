@@ -22,8 +22,14 @@ if(TARGET_CPU STREQUAL "x86_64")
             -DJPEGXL_ENABLE_HWY_SSE2=OFF
             -DJPEGXL_ENABLE_HWY_SSE4=OFF
         )
+        set(ffmpeg_nosse2avx
+            COMMAND ${MAKE} libswscale/x86/ops_int.o _NASM_SSE2AVX=0
+        )
     else()
         set(novzeroupper
+            COMMAND true
+        )
+        set(ffmpeg_nosse2avx
             COMMAND true
         )
     endif()
@@ -97,6 +103,9 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(openssl_target "mingwarm64")
     set(libvpx_target "arm64-win64-gcc")
     set(novzeroupper
+        COMMAND true
+    )
+    set(ffmpeg_nosse2avx
         COMMAND true
     )
     set(libjxl_force_skip_check

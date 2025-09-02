@@ -3,7 +3,6 @@ include(${PROJECT_SOURCE_DIR}/cmake/packages_check.cmake)
 list(APPEND ep
     xz
     uchardet
-    sleef
     libsamplerate
     rubberband
     zlib

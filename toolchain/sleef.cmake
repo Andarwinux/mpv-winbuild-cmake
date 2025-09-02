@@ -1,4 +1,6 @@
 ExternalProject_Add(sleef
+    DEPENDS
+        llvm-libcxx
     GIT_REPOSITORY https://github.com/shibatch/sleef.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
@@ -38,7 +40,7 @@ ExternalProject_Add(sleef
         -DLIBGMP=''
         "-DCMAKE_C_FLAGS='-g0'"
         "-DCMALE_CXX_FLAGS='-g0'"
-    COMMAND ${EXEC} ninja -C <BINARY_DIR>/host mkunroll mkrename mkdisp mkalias mkdisp mkdispatch
+    COMMAND ${EXEC} ninja -C <BINARY_DIR>/host mkunroll mkrename mkdisp mkalias mkdisp mkdispatch mkrename_gnuabi mkmasked_gnuabi
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DNATIVE_BUILD_DIR=<BINARY_DIR>/host
@@ -52,14 +54,16 @@ ExternalProject_Add(sleef
         -DSLEEF_ENABLE_LLVM_BITCODE=OFF
         -DSLEEF_ENABLE_LTO=OFF
         -DSLEEF_BUILD_TESTS=OFF
-        -DSLEEF_DISABLE_SSE2=ON
-        -DSLEEF_DISABLE_SSE4=ON
+        -DSLEEF_DISABLE_SSE2=OFF
+        -DSLEEF_DISABLE_SSE4=OFF
+        -DSLEEF_DISABLE_LONG_DOUBLE=ON
         -DSLEEF_DISABLE_FMA4=ON
         -DSLEEF_DISABLE_FFTW=ON
         -DSLEEF_DISABLE_MPFR=ON
         -DSLEEF_DISABLE_SSL=ON
         -DSLEEF_ENABLE_TESTER=OFF
         -DSLEEF_ENABLE_TLFLOAT=OFF
+        -DENABLE_GNUABI=ON
         -DOPENSSL_FOUND=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenSSL=ON
         -DLIB_MPFR=''
@@ -71,6 +75,7 @@ ExternalProject_Add(sleef
         _IS_UNWIND_ALLOWED=set:1
         _FORCE_HIDE_DLLEXPORT=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libsleef.a libsleefdft.a
+          COMMAND ${EXEC} _LTO_ENABLED=0 ninja -C <BINARY_DIR> libsleefgnuabi.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${EXEC} "echo 'Cflags: -DSLEEF_STATIC_LIBS -DIMPORT_IS_EXPORT -DSLEEF_ALWAYS_INLINE' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} "echo 'Libs: -lsleef -lsleefdft' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"

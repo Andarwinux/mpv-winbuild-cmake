@@ -29,7 +29,7 @@ else
         FLAGS+=" -mllvm -x86-use-vzeroupper=false"
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
-    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/ucrtmath.a"
+    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/ucrtmath.a @MINGW_INSTALL_PREFIX@/lib/libsleefgnuabi.a"
 fi
 
 "$PROG" $FLAGS_INIT "$@" $FLAGS $SKIP_OPT

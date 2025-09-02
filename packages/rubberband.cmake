@@ -1,7 +1,6 @@
 ExternalProject_Add(rubberband
     DEPENDS
         libsamplerate
-        sleef
     GIT_REPOSITORY https://github.com/breakfastquay/rubberband.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"

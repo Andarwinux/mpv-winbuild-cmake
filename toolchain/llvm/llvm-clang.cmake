@@ -5,6 +5,7 @@ ExternalProject_Add(llvm-clang
         mingw-w64-crt
         mingw-w64-gendef
         cppwinrt
+        sleef
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${SOURCE_LOCATION}
     UPDATE_COMMAND ""

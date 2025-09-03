@@ -21,6 +21,7 @@ ExternalProject_Add(llvm-compiler-rt-builtin
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
+        _LTO_ENABLED=set:0
         _PGO_ENABLED=set:0
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>

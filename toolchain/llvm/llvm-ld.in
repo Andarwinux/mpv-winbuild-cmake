@@ -19,7 +19,7 @@ else
     if [ "$_LTO_ENABLED" != "0" ]; then
         FLAGS+=" @llvm_mllvm@ @polly@"
         if [ "@TARGET_CPU@" == "aarch64" ]; then
-            FLAGS+=" -mllvm -enable-gvn-sink=false -mllvm -polly=false"
+            FLAGS+=" -mllvm -polly=false"
         fi
     fi
     if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then

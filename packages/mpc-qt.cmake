@@ -1,4 +1,3 @@
-get_property(mpv_src TARGET mpv PROPERTY _EP_SOURCE_DIR)
 ExternalProject_Add(mpc-qt
     DEPENDS
         mpv

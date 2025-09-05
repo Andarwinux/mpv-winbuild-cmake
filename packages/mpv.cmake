@@ -102,6 +102,7 @@ ExternalProject_Add(mpv
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
+get_property(mpv_src TARGET mpv PROPERTY _EP_SOURCE_DIR)
 if(ENABLE_LEGACY_MPV)
 set(copy-binary-dep build-legacy)
 ExternalProject_Add_Step(mpv build-legacy
@@ -114,7 +115,7 @@ ExternalProject_Add_Step(mpv build-legacy
         -Dwin32-subsystem=windows
     ${trim_path} <BINARY_DIR>/legacy/config.h
     COMMAND ${EXEC} _PDB_GENERATE=1 _IS_EXCEPTIONS_ALLOWED=1 _FORCE_HIDE_DLLEXPORT=1 _FULL_DEBUGINFO=1 ninja -C <BINARY_DIR>/legacy mpv.exe
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/legacy/mpv.exe ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv-legacy.exe
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/legacy/mpv.exe <BINARY_DIR>/mpv-package/mpv-legacy.exe
 )
 else()
 set(copy-binary-dep install)
@@ -122,33 +123,22 @@ endif()
 
 ExternalProject_Add_Step(mpv copy-binary
     DEPENDEES ${copy-binary-dep}
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe             ${CMAKE_CURRENT_BINARY_DIR}/mpv-package/mpv.exe
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb             ${CMAKE_CURRENT_BINARY_DIR}/mpv-debug/mpv.pdb
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv-2.pdb ${CMAKE_CURRENT_BINARY_DIR}/mpv-debug/libmpv-2.pdb
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv-2.dll ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv.dll.a ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv.dll.a
-    COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include   ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe             <BINARY_DIR>/mpv-package/mpv.exe
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb             <BINARY_DIR>/mpv-debug/mpv.pdb
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv-2.pdb <BINARY_DIR>/mpv-debug/libmpv-2.pdb
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv-2.dll <BINARY_DIR>/mpv-dev/libmpv-2.dll
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv.dll.a <BINARY_DIR>/mpv-dev/libmpv.dll.a
+    COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include   <BINARY_DIR>/mpv-dev/include
     COMMENT "Copying mpv binaries"
 )
 
-set(RENAME ${CMAKE_CURRENT_BINARY_DIR}/mpv-prefix/src/rename.sh)
-file(WRITE ${RENAME}
-"#!/bin/bash
-cd $1
-GIT=$(git rev-parse --short=7 HEAD)
-mv $2 $2-git-\${GIT}")
+execute_process(COMMAND ${GIT_EXECUTABLE} -C ${mpv_src} rev-parse --short=7 HEAD OUTPUT_VARIABLE GIT OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ExternalProject_Add_Step(mpv copy-package-dir
     DEPENDEES copy-binary
-    COMMAND chmod 755 ${RENAME}
-    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/mpv-package ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}
-    COMMAND ${RENAME} <SOURCE_DIR> ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}
-
-    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/mpv-debug ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}
-    COMMAND ${RENAME} <SOURCE_DIR> ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}
-
-    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev ${CMAKE_BINARY_DIR}/mpv-dev-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}
-    COMMAND ${RENAME} <SOURCE_DIR> ${CMAKE_BINARY_DIR}/mpv-dev-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-package ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-debug ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-dev ${CMAKE_BINARY_DIR}/mpv-dev-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
     COMMENT "Moving mpv package folder"
     LOG 1
 )

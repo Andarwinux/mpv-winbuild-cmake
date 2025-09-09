@@ -8,8 +8,7 @@ ExternalProject_Add(highway
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
-        -DCMAKE_GNUtoMS=OFF
-        -DHWY_CMAKE_ARM7=OFF
+        ${highway_force_skip_check}
         -DHWY_ENABLE_CONTRIB=OFF
         -DHWY_ENABLE_EXAMPLES=OFF
         -DHWY_ENABLE_TESTS=OFF

@@ -1396,3 +1396,19 @@ set(highway_force_skip_check
     -DHAVE_ASM_HWCAP_H=OFF
     -DHAVE_SYS_AUXV_H=OFF
 )
+
+set(codec2_force_skip_check
+    -DHAVE_ATAN2=ON
+    -DHAVE_CEIL=ON
+    -DHAVE_COS=ON
+    -DHAVE_FLOOR=ON
+    -DHAVE_GETOPT=ON
+    -DHAVE_LOG10=ON
+    -DHAVE_POW=ON
+    -DHAVE_ROUND=ON
+    -DHAVE_SIN=ON
+    -DHAVE_SQRT=ON
+    -DHAVE_STDLIB_H=ON
+    -DHAVE_STRING_H=ON
+    -D_GNU_SOURCE=OFF
+)

@@ -16,6 +16,7 @@ ExternalProject_Add(codec2
     COMMAND ${EXEC} sed -i [['/^target_link_libraries.*$/d']] <SOURCE_DIR>/src/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${codec2_force_skip_check}
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

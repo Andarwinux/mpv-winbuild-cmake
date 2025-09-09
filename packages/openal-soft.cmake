@@ -21,6 +21,7 @@ ExternalProject_Add(openal-soft
         -DALSOFT_INSTALL_HRTF_DATA=OFF
         -DALSOFT_INSTALL_AMBDEC_PRESETS=OFF
         -DALSOFT_BACKEND_PIPEWIRE=OFF
+        -DALSOFT_ENABLE_MODULES=OFF
         "-DCMAKE_CXX_FLAGS='-include cstdlib'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

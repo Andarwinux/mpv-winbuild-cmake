@@ -8,8 +8,11 @@ ExternalProject_Add(libsrt
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/unset/d']] <SOURCE_DIR>/scripts/Check*.cmake
+    COMMAND ${EXEC} sed -i [['/unset/d']] <SOURCE_DIR>/scripts/Find*.cmake
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
+        ${libsrt_force_skip_check}
         -DENABLE_STDCXX_SYNC=ON
         -DENABLE_APPS=OFF
         -DENABLE_SHARED=OFF

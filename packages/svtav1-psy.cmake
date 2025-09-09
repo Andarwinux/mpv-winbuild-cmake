@@ -18,6 +18,9 @@ ExternalProject_Add(svtav1-psy
         -DBUILD_APPS=ON
         -DC_FLAG_mno_avx=OFF
         -DCXX_FLAG_mno_avx=OFF
+        "-DCMAKE_C_FLAGS='-mno-stack-arg-probe'"
+        "-DCMAKE_CXX_FLAGS='-mno-stack-arg-probe'"
+        "-DCMAKE_EXE_LINKER_FLAGS='-Xlinker --stack=1048576,1048576'"
         -DCMAKE_OUTPUT_DIRECTORY=<BINARY_DIR>
     ${novzeroupper} <SOURCE_DIR>/Source/Lib/ASM_SSE2/x86inc.asm
     BUILD_ENVIRONMENT_MODIFICATION

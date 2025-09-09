@@ -98,6 +98,13 @@ if(TARGET_CPU STREQUAL "x86_64")
         -DCHECK_CPU_ARCHITECTURE_X64=ON
         -DCHECK_CPU_ARCHITECTURE_ARM64=OFF
     )
+    set(xz_force_skip_check
+        -DHAVE_ARM64_CRC32=OFF
+        -DHAVE_USABLE_CLMUL=ON
+        -DHAVE__MM_MOVEMASK_EPI8=ON
+        -DHAVE_CPUID_H=ON
+        -DHAVE_IMMINTRIN_H=ON
+    )
 elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
@@ -177,6 +184,14 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(libsdl2_force_skip_check
         -DCHECK_CPU_ARCHITECTURE_X64=OFF
         -DCHECK_CPU_ARCHITECTURE_ARM64=ON
+    )
+    set(xz_force_skip_check
+        -DHAVE_ARM64_CRC32=ON
+        -DTUKLIB_FAST_UNALIGNED_DEFINED_BY_PREPROCESSOR=ON
+        -DHAVE_USABLE_CLMUL=OFF
+        -DHAVE__MM_MOVEMASK_EPI8=OFF
+        -DHAVE_CPUID_H=OFF
+        -DHAVE_IMMINTRIN_H=OFF
     )
 endif()
 
@@ -1178,8 +1193,16 @@ set(nghttp2_force_skip_check
 )
 
 set(xz_force_skip_check
+    ${xz_force_skip_check}
+    -DASM_I386_DEFAULT=OFF
+    -DHAVE___BUILTIN_ASSUME_ALIGNED=ON
+    -DHAVE___BUILTIN_BSWAPXX=ON
+    -DHAVE_CAP_RIGHTS_LIMIT=OFF
+    -DHAVE_CLOCK_GETTIME_LIBRT=OFF
+    -DHAVE_CLOCK_GETTIME=OFF
     -DHAVE_COMPILER_OPTION_-Waggregate-return=ON
     -DHAVE_COMPILER_OPTION_-Wall=ON
+    -DHAVE_COMPILER_OPTION_-Walloc-zero=OFF
     -DHAVE_COMPILER_OPTION_-Warray-bounds-pointer-arithmetic=ON
     -DHAVE_COMPILER_OPTION_-Wassign-enum=ON
     -DHAVE_COMPILER_OPTION_-Wbad-function-cast=ON
@@ -1191,14 +1214,17 @@ set(xz_force_skip_check
     -DHAVE_COMPILER_OPTION_-Wdate-time=ON
     -DHAVE_COMPILER_OPTION_-Wdocumentation=ON
     -DHAVE_COMPILER_OPTION_-Wduplicate-enum=ON
+    -DHAVE_COMPILER_OPTION_-Wduplicated-cond=OFF
     -DHAVE_COMPILER_OPTION_-Wempty-translation-unit=ON
     -DHAVE_COMPILER_OPTION_-Wextra=ON
     -DHAVE_COMPILER_OPTION_-Wflexible-array-extensions=ON
     -DHAVE_COMPILER_OPTION_-Wfloat-conversion=ON
     -DHAVE_COMPILER_OPTION_-Wfloat-equal=ON
     -DHAVE_COMPILER_OPTION_-Wformat_2=ON
+    -DHAVE_COMPILER_OPTION_-Wimplicit-fallthrough_5=OFF
     -DHAVE_COMPILER_OPTION_-Wimplicit-fallthrough=ON
     -DHAVE_COMPILER_OPTION_-Winit-self=ON
+    -DHAVE_COMPILER_OPTION_-Wlogical-op=OFF
     -DHAVE_COMPILER_OPTION_-Wmissing-declarations=ON
     -DHAVE_COMPILER_OPTION_-Wmissing-include-dirs=ON
     -DHAVE_COMPILER_OPTION_-Wmissing-prototypes=ON
@@ -1209,6 +1235,7 @@ set(xz_force_skip_check
     -DHAVE_COMPILER_OPTION_-Wpre-c2x-compat=ON
     -DHAVE_COMPILER_OPTION_-Wredundant-decls=ON
     -DHAVE_COMPILER_OPTION_-Wshadow=ON
+    -DHAVE_COMPILER_OPTION_-Wshift-overflow_2=OFF
     -DHAVE_COMPILER_OPTION_-Wshift-sign-overflow=ON
     -DHAVE_COMPILER_OPTION_-Wsign-conversion=ON
     -DHAVE_COMPILER_OPTION_-Wstrict-overflow_3=ON
@@ -1217,8 +1244,18 @@ set(xz_force_skip_check
     -DHAVE_COMPILER_OPTION_-Wundef=ON
     -DHAVE_COMPILER_OPTION_-Wvla=ON
     -DHAVE_COMPILER_OPTION_-Wwrite-strings=ON
-    -DHAVE_LOONGARCH_CRC32=OFF
+    -DHAVE_FUNC_ATTRIBUTE_CONSTRUCTOR=ON
+    -DHAVE_GETOPT_LONG=ON
     -DHAVE_LINUX_LANDLOCK=OFF
+    -DHAVE_LOONGARCH_CRC32=OFF
+    -DHAVE_PLEDGE=OFF
+    -DHAVE_ELF_AUX_INFO=OFF
+    -DHAVE_GETAUXVAL=OFF
+    -DHAVE_SYSCTLBYNAME=OF
+    -DTUKLIB_LARGE_FILE_SUPPORT_BY_DEFAULT=OFF
+    -DTUKLIB_LARGE_FILE_SUPPORT_WITH_FOB64=ON
+    -DCMAKE_DISABLE_FIND_PACKAGE_Gettext=ON
+    -DCMAKE_DISABLE_FIND_PACKAGE_Intl=ON
 )
 
 set(libjxl_force_skip_check

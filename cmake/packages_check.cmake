@@ -1127,6 +1127,19 @@ set(bzip_force_skip_check
     -DC_FLAG__Wunused_parameter=ON
     -DC_FLAG__Wvla=ON
     -DC_FLAG__Wwrite_strings=ON
+    -DC_FLAG__Wclobbered=OFF
+    -DC_FLAG__Wextended_offsetof=OFF
+    -DHAVE_ACCEPT4=ON
+    -DHAVE_ARPA_INET_H=OFF
+    -DHAVE_DECL_INITGROUPS=OFF
+    -DHAVE_DECL_INITGROUPS2=OFF
+    -DHAVE_MKOSTEMP=ON
+    -DHAVE_NETDB_H=OFF
+    -DHAVE_NETINET_IN_H=OFF
+    -DHAVE_PWD_H=OFF
+    -DHAVE_STRUCT_TM_TM_GMTOFF=OFF
+    -DHAVE_SYSLOG_H=OFF
+    -DHAVE_SYS_SOCKET_H=OFF
 )
 
 set(nghttp2_force_skip_check

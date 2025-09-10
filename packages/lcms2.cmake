@@ -1,7 +1,4 @@
 ExternalProject_Add(lcms2
-    DEPENDS
-        libjpeg
-        zlib
     GIT_REPOSITORY https://github.com/mm2/Little-CMS.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -19,7 +16,7 @@ ExternalProject_Add(lcms2
         ${meson_conf_args}
         -Dfastfloat=true
         -Dthreaded=true
-        -Djpeg=enabled
+        -Djpeg=disabled
         -Dtiff=disabled
         -Dtests=disabled
     BUILD_ENVIRONMENT_MODIFICATION

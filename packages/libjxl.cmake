@@ -1,10 +1,8 @@
-get_property(src_libjpeg TARGET libjpeg PROPERTY _EP_SOURCE_DIR)
 ExternalProject_Add(libjxl
     DEPENDS
         lcms2
         libpng
         zlib
-        libjpeg
         brotli
         highway
     GIT_REPOSITORY https://github.com/libjxl/libjxl.git
@@ -19,8 +17,6 @@ ExternalProject_Add(libjxl
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ""
-    COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/third_party/libjpeg-turbo
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_libjpeg} <SOURCE_DIR>/third_party/libjpeg-turbo
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${libjxl_disable_sse}

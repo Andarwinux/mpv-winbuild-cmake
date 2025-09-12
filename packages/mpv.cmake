@@ -1,50 +1,50 @@
 set(mpv_conf
-        ${meson_conf_args}
-        -Db_lto_mode=thin
-        -Db_lto=true
-        -Dbuild-date=true
-        -Dcplugins=enabled
-        -Dcuda-hwaccel=enabled
-        -Dcuda-interop=enabled
-        -Dd3d-hwaccel=enabled
-        -Dd3d11=enabled
-        -Dd3d9-hwaccel=enabled
-        -Ddirect3d=enabled
-        -Ddvdnav=enabled
-        -Degl-angle=enabled
-        -Dgl-dxinterop-d3d9=enabled
-        -Dgl-dxinterop=enabled
-        -Dgl-win32=enabled
-        -Dgl=enabled
-        -Diconv=enabled
-        -Djavascript=enabled
-        -Djpeg=enabled
-        -Dlcms2=enabled
-        -Dlibarchive=enabled
-        -Dlibavdevice=enabled
-        -Dlibbluray=enabled
-        -Dlua=luajit
-        -Dopenal=enabled
-        -Drubberband=enabled
-        -Dsdl2-audio=enabled
-        -Dsdl2-gamepad=enabled
-        -Dsdl2-video=enabled
-        -Dsdl2=enabled
-        -Dshaderc=enabled
-        -Dsixel=enabled
-        -Dspirv-cross=enabled
-        -Duchardet=enabled
-        -Dvaapi-win32=enabled
-        -Dvaapi=enabled
-        -Dvapoursynth=enabled
-        -Dvector=enabled
-        -Dvulkan=enabled
-        -Dwasapi=enabled
-        -Dwin32-smtc=enabled
-        -Dwin32-subsystem=console
-        -Dwin32-threads=enabled
-        -Dzimg=enabled
-        -Dzlib=enabled
+    ${meson_conf_args}
+    -Db_lto_mode=thin
+    -Db_lto=true
+    -Dbuild-date=true
+    -Dcplugins=enabled
+    -Dcuda-hwaccel=enabled
+    -Dcuda-interop=enabled
+    -Dd3d-hwaccel=enabled
+    -Dd3d11=enabled
+    -Dd3d9-hwaccel=enabled
+    -Ddirect3d=enabled
+    -Ddvdnav=enabled
+    -Degl-angle=enabled
+    -Dgl-dxinterop-d3d9=enabled
+    -Dgl-dxinterop=enabled
+    -Dgl-win32=enabled
+    -Dgl=enabled
+    -Diconv=enabled
+    -Djavascript=enabled
+    -Djpeg=enabled
+    -Dlcms2=enabled
+    -Dlibarchive=enabled
+    -Dlibavdevice=enabled
+    -Dlibbluray=enabled
+    -Dlua=luajit
+    -Dopenal=enabled
+    -Drubberband=enabled
+    -Dsdl2-audio=enabled
+    -Dsdl2-gamepad=enabled
+    -Dsdl2-video=enabled
+    -Dsdl2=enabled
+    -Dshaderc=enabled
+    -Dsixel=enabled
+    -Dspirv-cross=enabled
+    -Duchardet=enabled
+    -Dvaapi-win32=enabled
+    -Dvaapi=enabled
+    -Dvapoursynth=enabled
+    -Dvector=enabled
+    -Dvulkan=enabled
+    -Dwasapi=enabled
+    -Dwin32-smtc=enabled
+    -Dwin32-subsystem=console
+    -Dwin32-threads=enabled
+    -Dzimg=enabled
+    -Dzlib=enabled
 )
 ExternalProject_Add(mpv
     DEPENDS
@@ -83,13 +83,7 @@ ExternalProject_Add(mpv
         ${mpv_conf}
         -Dlibmpv=true
         -Dcplayer=true
-    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/libmpv <SOURCE_DIR>
-        ${mpv_conf}
-        -Ddefault_library=shared
-        -Dlibmpv=true
-        -Dcplayer=false
     ${trim_path} <BINARY_DIR>/config.h
-    ${trim_path} <BINARY_DIR>/libmpv/config.h
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
@@ -97,7 +91,6 @@ ExternalProject_Add(mpv
         _FULL_DEBUGINFO=set:1
         _PDB_GENERATE=set:1
     BUILD_COMMAND ${EXEC} _FORCE_HIDE_DLLEXPORT=1 meson install -C <BINARY_DIR> --only-changed --tags devel
-          COMMAND ${EXEC} ninja -C <BINARY_DIR>/libmpv libmpv-2.dll
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
@@ -123,12 +116,8 @@ endif()
 
 ExternalProject_Add_Step(mpv copy-binary
     DEPENDEES ${copy-binary-dep}
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe             <BINARY_DIR>/mpv-package/mpv.exe
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb             <BINARY_DIR>/mpv-debug/mpv.pdb
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv-2.pdb <BINARY_DIR>/mpv-debug/libmpv-2.pdb
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv-2.dll <BINARY_DIR>/mpv-dev/libmpv-2.dll
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv/libmpv.dll.a <BINARY_DIR>/mpv-dev/libmpv.dll.a
-    COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include   <BINARY_DIR>/mpv-dev/include
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe <BINARY_DIR>/mpv-package/mpv.exe
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb <BINARY_DIR>/mpv-debug/mpv.pdb
     COMMENT "Copying mpv binaries"
 )
 
@@ -138,7 +127,6 @@ ExternalProject_Add_Step(mpv copy-package-dir
     DEPENDEES copy-binary
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-package ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-debug ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-dev ${CMAKE_BINARY_DIR}/mpv-dev-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
     COMMENT "Moving mpv package folder"
     LOG 1
 )

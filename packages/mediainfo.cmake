@@ -1,6 +1,6 @@
 ExternalProject_Add(mediainfo
     DEPENDS
-        libmediainfo-static
+        libmediainfo
     GIT_REPOSITORY https://github.com/MediaArea/MediaInfo.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"

@@ -7,35 +7,7 @@ ExternalProject_Add(libmediainfo
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
-    CONFIGURE_ENVIRONMENT_MODIFICATION
-        _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/Project/CMake -B<BINARY_DIR>
-        ${cmake_conf_args}
-        -DBUILD_SHARED_LIBS=ON
-        -DBUILD_ZLIB=OFF
-        -DBUILD_ZENLIB=OFF
-        -DCURL_FOUND=OFF
-        -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON
-        -DCMAKE_DISABLE_FIND_PACKAGE_TinyXML=ON
-        "-DCMAKE_CXX_FLAGS='-DFMT_HEADER_ONLY'"
-    BUILD_ENVIRONMENT_MODIFICATION
-        _PACKAGE_NAME=set:${package}
-        _BINARY_DIR=set:<BINARY_DIR>
-        _IS_EXCEPTIONS_ALLOWED=set:1
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmediainfo.dll ${MINGW_INSTALL_PREFIX}/bin/libmediainfo.dll
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
-)
-
-get_property(source_dir TARGET libmediainfo PROPERTY _EP_SOURCE_DIR)
-
-ExternalProject_Add(libmediainfo-static
-    DEPENDS
-        libmediainfo
-    DOWNLOAD_COMMAND ""
-    CONFIGURE_ENVIRONMENT_MODIFICATION
-        _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H${source_dir}/Project/CMake -B<BINARY_DIR>
         ${cmake_conf_args}
         -DBUILD_ZLIB=OFF
         -DBUILD_ZENLIB=OFF
@@ -55,4 +27,3 @@ ExternalProject_Add(libmediainfo-static
 
 force_rebuild_git(libmediainfo)
 cleanup(libmediainfo install)
-cleanup(libmediainfo-static install)

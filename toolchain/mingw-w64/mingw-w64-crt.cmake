@@ -31,6 +31,15 @@ ExternalProject_Add(mingw-w64-crt
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libiphlpapi.a ${MINGW_INSTALL_PREFIX}/lib/libIphlpapi.a
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libicu.a ${MINGW_INSTALL_PREFIX}/lib/libicuin.a
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libicu.a ${MINGW_INSTALL_PREFIX}/lib/libicuuc.a
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-feclearexcept.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fegetenv.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fegetexceptflag.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fegetround.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-feholdexcept.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fesetenv.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fesetexceptflag.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fesetround.o
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libmingwex.a lib64_libmingwex_a-fetestexcept.o
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

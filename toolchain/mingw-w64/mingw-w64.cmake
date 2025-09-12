@@ -1,5 +1,5 @@
 ExternalProject_Add(mingw-w64
-    GIT_REPOSITORY https://github.com/mingw-w64/mingw-w64.git
+    GIT_REPOSITORY https://github.com/Andarwinux/mingw-w64.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !mingw-w64-libraries !mingw-w64-doc"

@@ -22,6 +22,7 @@ list(APPEND ep
     llvm-host-libcxx
     llvm-compiler-rt
     llvm-host-compiler-rt
+    openlibm
     sleef
     llvm-clang
 )

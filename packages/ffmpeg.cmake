@@ -14,7 +14,6 @@ ExternalProject_Add(ffmpeg
         libdvdread
         libmodplug
         libpng
-        libsoxr
         libvpx
         libwebp
         libzimg
@@ -109,7 +108,6 @@ ExternalProject_Add(ffmpeg
         --enable-libplacebo
         --enable-librubberband
         --enable-libshaderc
-        --enable-libsoxr
         --enable-libspeex
         --enable-libsrt
         --enable-libssh

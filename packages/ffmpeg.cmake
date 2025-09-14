@@ -145,6 +145,7 @@ ExternalProject_Add(ffmpeg
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
+        _IS_EXCEPTIONS_ALLOWED=set:1
         _FULL_DEBUGINFO=set:1
     BUILD_COMMAND ""
           ${ffmpeg_nosse2avx}

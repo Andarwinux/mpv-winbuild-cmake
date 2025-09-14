@@ -105,7 +105,7 @@ list(APPEND ep
     boost
     libtorrent
     qbittorrent
-    mpc-qt
+    #mpc-qt
 )
 foreach(package IN LISTS ep)
     if(NOT ${SINGLE_SOURCE_LOCATION} STREQUAL "")

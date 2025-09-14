@@ -33,6 +33,7 @@ ExternalProject_Add(qt6-qtsvg
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
+        _IS_UNWIND_ALLOWED=set:1
         _NOCCACHE=set:${qt_disable_ccache}
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install

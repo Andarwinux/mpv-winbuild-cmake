@@ -48,11 +48,18 @@ else
     else
         FLAGS+=" @llvm_mllvm@ @polly@"
     fi
-    if [ "$_IS_EXCEPTIONS_ALLOWED" != "1" ]; then
-        FLAGS+=" -fno-exceptions"
-        if [ "$_IS_RTTI_ALLOWED" != "1" ]; then
-            FLAGS+=" -fno-rtti"
+    if [ "@clang_compiler@" == "clang++" ]; then
+        if [ "$_IS_EXCEPTIONS_ALLOWED" != "1" ]; then
+            FLAGS+=" -fno-exceptions"
+            if [ "$_IS_RTTI_ALLOWED" != "1" ]; then
+                FLAGS+=" -fno-rtti"
+            fi
+            if [ "$_IS_UNWIND_ALLOWED" != "1" ]; then
+                FLAGS+=" -fno-unwind-tables -fno-asynchronous-unwind-tables"
+            fi
         fi
+    else
+        FLAGS+=" -fno-exceptions -fno-rtti"
         if [ "$_IS_UNWIND_ALLOWED" != "1" ]; then
             FLAGS+=" -fno-unwind-tables -fno-asynchronous-unwind-tables"
         fi

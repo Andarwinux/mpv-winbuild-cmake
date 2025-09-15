@@ -28,6 +28,9 @@ else
     fi
     if [ "@MARCH_HAS_AVX@" == "ON" ]; then
         FLAGS+=" -mllvm -x86-use-vzeroupper=false"
+        if [ "@MARCH_HAS_AVX512@" == "ON" ]; then
+            FLAGS+=" -mllvm -x86-use-fsrm-for-memcpy"
+        fi
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
     FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/libopenlibm.a @MINGW_INSTALL_PREFIX@/lib/libsleefgnuabi.a"

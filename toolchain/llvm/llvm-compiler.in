@@ -7,7 +7,6 @@ FLAGS+=" -Wno-unused-command-line-argument -Wno-int-conversion -Wno-packed -Wno-
 FLAGS+=" -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DNDEBUG -UHAS_80_BIT_LONG_DOUBLE -DHAS_80_BIT_LONG_DOUBLE=0 -U__USE_MINGW_ANSI_STDIO -D__USE_MINGW_ANSI_STDIO=0 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"
 FLAGS+=" -Xclang -fno-pch-timestamp -Xclang -mlong-double-64 -fsplit-lto-unit -fno-auto-import -fno-temp-file -fno-ident -mno-stack-arg-probe"
 FLAGS+=" -ffile-prefix-map=@MINGW_INSTALL_PREFIX@=@TARGET_ARCH@ -fno-file-reproducible"
-FLAGS+=" -gcodeview-ghash -gno-codeview-command-line"
 unset CCACHE
 
 if [ "@TARGET_CPU@" == "aarch64" ]; then
@@ -16,15 +15,14 @@ else
     ARCH_FLAGS="-march=@MARCH@ -mtune=@MTUNE@"
 fi
 
-if [ "$_CODEVIEW_ENABLED" != "0" ]; then
-    FLAGS+=" -gcodeview"
-else
-    FLAGS+=" -gdwarf -gsplit-dwarf=single"
-fi
-
 if [ "$_IS_CONFIGURE" == "1" ]; then
     SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
 else
+    if [ "$_CODEVIEW_ENABLED" != "0" ]; then
+        FLAGS+=" -gcodeview -gcodeview-ghash -gno-codeview-command-line -Xclang -gsrc-hash=none"
+    else
+        FLAGS+=" -gdwarf -gsplit-dwarf=single -Xclang -gsrc-hash=none"
+    fi
     if [ "@TARGET_CPU@" == "aarch64" ]; then
         FLAGS+=" -fveclib=SLEEF"
     else

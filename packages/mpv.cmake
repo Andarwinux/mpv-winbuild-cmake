@@ -117,7 +117,7 @@ endif()
 ExternalProject_Add_Step(mpv copy-binary
     DEPENDEES ${copy-binary-dep}
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe <BINARY_DIR>/mpv-package/mpv.exe
-    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb <BINARY_DIR>/mpv-debug/mpv.pdb
+    COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb <BINARY_DIR>/mpv-package/mpv.pdb
     COMMENT "Copying mpv binaries"
 )
 
@@ -126,7 +126,6 @@ execute_process(COMMAND ${GIT_EXECUTABLE} -C ${mpv_src} rev-parse --short=7 HEAD
 ExternalProject_Add_Step(mpv copy-package-dir
     DEPENDEES copy-binary
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-package ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different <BINARY_DIR>/mpv-debug ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${MARCH_NAME}-${BUILDDATE}-git-${GIT}
     COMMENT "Moving mpv package folder"
     LOG 1
 )

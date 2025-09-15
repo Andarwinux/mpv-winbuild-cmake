@@ -118,6 +118,8 @@ ExternalProject_Add_Step(mpv copy-binary
     DEPENDEES ${copy-binary-dep}
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe <BINARY_DIR>/mpv-package/mpv.exe
     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb <BINARY_DIR>/mpv-package/mpv.pdb
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/etc/mpv-register.bat <BINARY_DIR>/mpv-package/mpv-register.bat
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/etc/mpv-unregister.bat <BINARY_DIR>/mpv-package/mpv-unregister.bat
     COMMENT "Copying mpv binaries"
 )
 

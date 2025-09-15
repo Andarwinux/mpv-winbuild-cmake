@@ -96,8 +96,8 @@ ExternalProject_Add(qt6-qtbase
         -DQT_INSTALL_EXAMPLES_SOURCES_BY_DEFAULT=OFF
         -DTEST_opensslv30=TRUE
         -DCMAKE_MESSAGE_LOG_LEVEL=STATUS
-        "-DCMAKE_C_FLAGS='-w -lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
-        "-DCMAKE_CXX_FLAGS='-w -lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
+        "-DCMAKE_C_FLAGS='-w -lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -DQ_DECL_VECTORCALL=__vectorcall -DQT_VECTORCALL=__vectorcall'"
+        "-DCMAKE_CXX_FLAGS='-w -lruntimeobject -lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -DQ_DECL_VECTORCALL=__vectorcall -DQT_VECTORCALL=__vectorcall'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

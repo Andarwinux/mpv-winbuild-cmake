@@ -28,7 +28,7 @@ ExternalProject_Add(qbittorrent
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DTESTING=OFF
         -DSTACKTRACE=OFF
-        "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd'"
+        "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -DQ_DECL_VECTORCALL=__vectorcall -DQT_VECTORCALL=__vectorcall'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

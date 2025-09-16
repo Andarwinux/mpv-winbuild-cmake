@@ -8,11 +8,12 @@ ExternalProject_Add(libvpx
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
+        STRIP=set:true
     CONFIGURE_COMMAND ${EXEC} CROSS=${TARGET_ARCH}- <SOURCE_DIR>/configure
         --extra-cflags='-fno-asynchronous-unwind-tables'
         --target=${libvpx_target}
         --prefix=${MINGW_INSTALL_PREFIX}
-        --as=yasm
+        --as=nasm
         --disable-decode-perf-tests
         --disable-dependency-tracking
         --disable-docs
@@ -22,7 +23,6 @@ ExternalProject_Add(libvpx
         --disable-unit-tests
         --disable-vp8
         --disable-vp9-decoder
-        --enable-debug
         --enable-vp9-highbitdepth
     COMMAND ${EXEC} sed -i [['/HAVE_PTHREAD_H/d']] <BINARY_DIR>/vpx_config.h
     COMMAND ${EXEC} sed -i [['/HAVE_PTHREAD_H/d']] <BINARY_DIR>/libs-${libvpx_target}.mk

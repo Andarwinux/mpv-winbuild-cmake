@@ -89,9 +89,10 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             _PACKAGE_NAME=set:${package}
             _BINARY_DIR=set:<BINARY_DIR>
             _IS_EXCEPTIONS_ALLOWED=set:1
+            _FORCE_HIDE_DLLEXPORT=set:1
             _FULL_DEBUGINFO=set:1
             _PDB_GENERATE=set:1
-        BUILD_COMMAND ${EXEC} _FORCE_HIDE_DLLEXPORT=1 meson install -C <BINARY_DIR> --only-changed --tags devel
+        BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
         INSTALL_COMMAND ""
         LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
     )

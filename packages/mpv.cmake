@@ -103,13 +103,16 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
     ExternalProject_Add_Step(mpv build-legacy
         DEPENDEES install
         LOG 1
+        ENVIRONMENT_MODIFICATION
+            _IS_EXCEPTIONS_ALLOWED=set:1
+            _FORCE_HIDE_DLLEXPORT=set:1
         COMMAND ${EXEC} _IS_CONFIGURE=1 meson setup --reconfigure <BINARY_DIR>/legacy <SOURCE_DIR>
             ${mpv_conf}
             -Dlibmpv=false
             -Dcplayer=true
             -Dwin32-subsystem=windows
         ${trim_path} <BINARY_DIR>/legacy/config.h
-        COMMAND ${EXEC} _PDB_GENERATE=1 _IS_EXCEPTIONS_ALLOWED=1 _FORCE_HIDE_DLLEXPORT=1 _FULL_DEBUGINFO=1 ninja -C <BINARY_DIR>/legacy mpv.exe
+        COMMAND ${EXEC} ninja -C <BINARY_DIR>/legacy mpv.exe
         COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/legacy/mpv.exe <BINARY_DIR>/mpv-package/mpv-legacy.exe
     )
     else()

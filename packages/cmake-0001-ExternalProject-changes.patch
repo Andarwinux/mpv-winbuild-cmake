@@ -1,4 +1,4 @@
-From 7f28c0c089363423979971e6c422f22b570f0781 Mon Sep 17 00:00:00 2001
+From c4f01c59635fbfab8566bcc9a36e2f4c39dec0d0 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sat, 30 Aug 2025 00:00:00 +0000
 Subject: [PATCH] ExternalProject: custom
@@ -46,7 +46,7 @@ index 449bcb30c7..d3ba0a4a23 100644
  if(init_submodules)
    execute_process(
 diff --git a/Modules/ExternalProject/shared_internal_commands.cmake b/Modules/ExternalProject/shared_internal_commands.cmake
-index df1290ee70..802c76ee82 100644
+index b7077ef07e..8c8404b15f 100644
 --- a/Modules/ExternalProject/shared_internal_commands.cmake
 +++ b/Modules/ExternalProject/shared_internal_commands.cmake
 @@ -390,6 +390,9 @@ function(_ep_write_gitclone_script

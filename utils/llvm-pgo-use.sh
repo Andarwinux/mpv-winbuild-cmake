@@ -7,7 +7,7 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DCLANG_PACKAGES_PGO=OFF \
 -DLLVM_ENABLE_PGO=USE \
 -DLLVM_PROFDATA_FILE="/build/llvm.profdata" \
--DCLANG_FLAGS="-mprefer-vector-width=512 -mno-gather" \
+-DCLANG_FLAGS="-mprefer-vector-width=512" \
 -DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather -Wl,-mllvm,-x86-use-fsrm-for-memcpy" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \

@@ -63,10 +63,8 @@ else
         fi
     fi
     if [ "@MARCH_HAS_AVX@" == "ON" ]; then
-        FLAGS+=" -Wa,-msse2avx -mno-vzeroupper"
-        if [ "@MARCH_HAS_AVX512@" != "ON" ]; then
-            FLAGS+=" -mno-gather"
-        else
+        FLAGS+=" -Wa,-msse2avx -mno-vzeroupper -mno-gather"
+        if [ "@MARCH_HAS_AVX512@" == "ON" ]; then
             if [ "$_LTO_ENABLED" == "0" ]; then
                 FLAGS+=" -mllvm -x86-use-fsrm-for-memcpy"
             fi

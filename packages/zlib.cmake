@@ -20,7 +20,6 @@ ExternalProject_Add(zlib
         -DWITH_GTEST=OFF
         -DWITH_SANITIZER=OFF
         -DFNO_LTO_AVAILABLE=OFF
-        -DCMAKE_C_STANDARD=11
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -45,6 +45,8 @@ ExternalProject_Add(ffmpeg
         libvidstab
         frei0r
         codec2
+        xz
+        libsdl2
     GIT_REPOSITORY https://github.com/Andarwinux/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"

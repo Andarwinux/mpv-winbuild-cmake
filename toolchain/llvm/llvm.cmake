@@ -10,6 +10,7 @@ ExternalProject_Add(llvm
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !*/test !*/docs !*/unittests !*/examples !*/benchmarks !/lldb !/mlir !/clang-tools-extra !/mlir !/flang !openmp !libclc !bolt !cross-project-tests !offload !llvm-libgcc !third-party !flang-rt third-party/siphash lld/docs/CMakeLists.txt clang/examples/CMakeLists.txt polly/test/CMakeLists.txt polly/docs/CMakeLists.txt polly/unittests/CMakeLists.txt"
     UPDATE_COMMAND ""
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/llvm/llvm-*.patch
     GIT_REMOTE_NAME origin
     GIT_TAG main
     LIST_SEPARATOR ^^
@@ -212,7 +213,7 @@ ExternalProject_Add(llvm
         -DLLVM_TOOLCHAIN_TOOLS='llvm-driver^^llvm-ar^^llvm-ranlib^^llvm-objdump^^llvm-rc^^llvm-nm^^llvm-readobj^^llvm-dlltool^^llvm-objcopy^^llvm-strip^^llvm-profdata^^llvm-addr2line^^llvm-symbolizer^^llvm-windres^^llvm-ml^^llvm-mt^^llvm-readelf^^llvm-size'
     BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR> llvm-driver
     INSTALL_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR> install-llvm-driver install-clang-resource-headers
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(llvm)

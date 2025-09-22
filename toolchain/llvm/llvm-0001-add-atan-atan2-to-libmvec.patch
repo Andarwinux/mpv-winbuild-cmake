@@ -1,0 +1,47 @@
+From 64bc50242bc2564d05c39d3bc45d7f4a33609513 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Mon, 22 Sep 2025 00:00:00 +0000
+Subject: [PATCH] add atan/atan2 to libmvec
+
+---
+ llvm/include/llvm/Analysis/VecFuncs.def | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/llvm/include/llvm/Analysis/VecFuncs.def b/llvm/include/llvm/Analysis/VecFuncs.def
+index 4015df990..0eb1c4ff2 100644
+--- a/llvm/include/llvm/Analysis/VecFuncs.def
++++ b/llvm/include/llvm/Analysis/VecFuncs.def
+@@ -237,6 +237,30 @@ TLI_DEFINE_VECFUNC("llvm.log.f64", "_ZGVdN4v_log", FIXED(4), "_ZGV_LLVM_N4v")
+ TLI_DEFINE_VECFUNC("llvm.log.f32", "_ZGVbN4v_logf", FIXED(4), "_ZGV_LLVM_N4v")
+ TLI_DEFINE_VECFUNC("llvm.log.f32", "_ZGVdN8v_logf", FIXED(8), "_ZGV_LLVM_N8v")
+ 
++TLI_DEFINE_VECFUNC("atan", "_ZGVbN2v_atan", FIXED(2), "_ZGV_LLVM_N2v")
++TLI_DEFINE_VECFUNC("atan", "_ZGVdN4v_atan", FIXED(4), "_ZGV_LLVM_N4v")
++
++TLI_DEFINE_VECFUNC("atanf", "_ZGVbN4v_atanf", FIXED(4), "_ZGV_LLVM_N4v")
++TLI_DEFINE_VECFUNC("atanf", "_ZGVdN8v_atanf", FIXED(8), "_ZGV_LLVM_N8v")
++
++TLI_DEFINE_VECFUNC("llvm.atan.f64", "_ZGVbN2v_atan", FIXED(2), "_ZGV_LLVM_N2v")
++TLI_DEFINE_VECFUNC("llvm.atan.f64", "_ZGVdN4v_atan", FIXED(4), "_ZGV_LLVM_N4v")
++
++TLI_DEFINE_VECFUNC("llvm.atan.f32", "_ZGVbN4v_atanf", FIXED(4), "_ZGV_LLVM_N4v")
++TLI_DEFINE_VECFUNC("llvm.atan.f32", "_ZGVdN8v_atanf", FIXED(8), "_ZGV_LLVM_N8v")
++
++TLI_DEFINE_VECFUNC("atan2", "_ZGVbN2vv_atan2", FIXED(2), "_ZGV_LLVM_N2vv")
++TLI_DEFINE_VECFUNC("atan2", "_ZGVdN4vv_atan2", FIXED(4), "_ZGV_LLVM_N4vv")
++
++TLI_DEFINE_VECFUNC("atan2f", "_ZGVbN4vv_atan2f", FIXED(4), "_ZGV_LLVM_N4vv")
++TLI_DEFINE_VECFUNC("atan2f", "_ZGVdN8vv_atan2f", FIXED(8), "_ZGV_LLVM_N8vv")
++
++TLI_DEFINE_VECFUNC("llvm.atan2.f64", "_ZGVbN2vv_atan2", FIXED(2), "_ZGV_LLVM_N2vv")
++TLI_DEFINE_VECFUNC("llvm.atan2.f64", "_ZGVdN4vv_atan2", FIXED(4), "_ZGV_LLVM_N4vv")
++
++TLI_DEFINE_VECFUNC("llvm.atan2.f32", "_ZGVbN4vv_atan2f", FIXED(4), "_ZGV_LLVM_N4vv")
++TLI_DEFINE_VECFUNC("llvm.atan2.f32", "_ZGVdN8vv_atan2f", FIXED(8), "_ZGV_LLVM_N8vv")
++
+ #elif defined(TLI_DEFINE_LIBMVEC_AARCH64_VECFUNCS)
+ 
+ TLI_DEFINE_VECFUNC("acos", "_ZGVnN2v_acos", FIXED(2), NOMASK, "_ZGV_LLVM_N2v", CallingConv::AArch64_VectorCall)
+-- 
+2.51.0
+

@@ -16,6 +16,10 @@ ExternalProject_Add(openlibm
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libopenlibm.a e_pow.c.obj
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libopenlibm.a e_powf.c.obj
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libopenlibm.a s_cpow.c.obj
+            COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar d ${MINGW_INSTALL_PREFIX}/lib/libopenlibm.a s_cpowf.c.obj
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

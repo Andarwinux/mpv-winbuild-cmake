@@ -4,7 +4,6 @@ ExternalProject_Add(libarchive
         xz
         zlib
         zstd
-        openssl
         libxml2
     GIT_REPOSITORY https://github.com/libarchive/libarchive.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -14,14 +13,14 @@ ExternalProject_Add(libarchive
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} sed -i [['/^CHECK_CRYPTO/ { /OPENSSL/!d }']] <SOURCE_DIR>/CMakeLists.txt
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/^CHECK_CRYPTO/d']] <SOURCE_DIR>/CMakeLists.txt
     COMMAND ${EXEC} sed -i [['s/MINGW/FALSE/g']] <SOURCE_DIR>/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${libarchive_force_skip_check}
         -DENABLE_ZLIB=ON
         -DENABLE_ZSTD=ON
-        -DENABLE_OPENSSL=ON
+        -DENABLE_OPENSSL=OFF
         -DENABLE_BZip2=ON
         -DENABLE_ICONV=ON
         -DENABLE_LIBXML2=ON
@@ -32,7 +31,7 @@ ExternalProject_Add(libarchive
         -DENABLE_LZ4=OFF
         -DENABLE_LIBB2=OFF
         -DENABLE_CPIO=OFF
-        -DENABLE_CNG=OFF
+        -DENABLE_CNG=ON
         -DENABLE_CAT=OFF
         -DENABLE_TAR=OFF
         -DENABLE_ACL=OFF
@@ -41,7 +40,6 @@ ExternalProject_Add(libarchive
         -DWINDOWS_VERSION=WIN10
         -DPOSIX_REGEX_LIB=OFF
         -DCMAKE_INSTALL_LIBDIR=lib
-        "-DCMAKE_C_FLAGS='-lxml2 -lbz2 -llzo2 -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lws2_32 -lgdi32 -lcrypt32 -liconv -lbcrypt'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

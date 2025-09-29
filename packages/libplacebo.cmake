@@ -11,9 +11,10 @@ ExternalProject_Add(libplacebo
         xxhash
     GIT_REPOSITORY https://github.com/haasn/libplacebo.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_SUBMODULES ""
+    GIT_RESET 5592d8829c31aee686548cbc2c8b248ba46b0450
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

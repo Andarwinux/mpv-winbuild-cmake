@@ -1,6 +1,6 @@
 #!/bin/sh
 cmake -DTARGET_ARCH=aarch64-w64-mingw32 \
--DMARCH=cortex-x3 \
+-DMARCH=cortex-x925 \
 -DMARCH_NAME='' \
 -DSINGLE_SOURCE_LOCATION="/build/src_packages/" \
 -DCMAKE_INSTALL_PREFIX="/build/install" \

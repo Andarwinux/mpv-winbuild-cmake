@@ -40,9 +40,6 @@ else
     fi
     if [ "$_LTO_ENABLED" != "0" ]; then
         LTO_FLAGS="-flto=thin -fwhole-program-vtables -funique-source-file-names"
-        if [ "@LLD_LTO_ALL_THREADS@" == "ON" ] && [ "$LTO_JOB" != "1" ]; then
-            LTO_FLAGS+=" -flto-jobs=@CPU_COUNT@"
-        fi
     else
         FLAGS+=" @llvm_mllvm@ @polly@"
     fi

@@ -9,7 +9,7 @@ if [ "$_IS_CONFIGURE" == "1" ]; then
     SKIP_OPT="-O0 --lto-O0 --lto-CGO0 -mllvm -import-instr-limit=0 --no-guard-cf --build-id=none"
 else
     FLAGS+=" --thinlto-cache-dir=@MINGW_INSTALL_PREFIX@/thinlto --thinlto-cache-policy=$POLICY"
-    FLAGS+=" -O3 --lto-O3 --lto-CGO3 -mllvm -import-instr-limit=30 --gc-sections --icf=all -Xlink=-release -Xlink=-opt:lldtailmerge -Xlink=-cetcompat -Xlink=-cetcompatstrict -Xlink=-pdbsourcepath:C:\\ -Xlink=-pdbaltpath:%_PDB%"
+    FLAGS+=" -O3 --lto-O3 --lto-CGO3 -mllvm -import-instr-limit=175 -mllvm -import-hot-multiplier=2 --gc-sections --icf=all -Xlink=-release -Xlink=-opt:lldtailmerge -Xlink=-cetcompat -Xlink=-cetcompatstrict -Xlink=-pdbsourcepath:C:\\ -Xlink=-pdbaltpath:%_PDB%"
     if [ "$_PDB_GENERATE" == "1" ]; then
         FLAGS+=" -Xlink=-debug:ghash,nodwarf,nosymtab --pdb="
     fi

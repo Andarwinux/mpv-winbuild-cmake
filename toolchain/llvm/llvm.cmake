@@ -205,7 +205,7 @@ ExternalProject_Add(llvm
         -DLIBXML2_INCLUDE_DIRS=${CMAKE_INSTALL_PREFIX}/include/libxml2
         -DHAVE_LIBXML2=ON
         "-DCMAKE_REQUIRED_FLAGS='-O0 -fno-lto -fno-whole-program-vtables'"
-        "-DCMAKE_REQUIRED_LINK_OPTIONS='-Wl,-O0,--lto-O0,--lto-CGO0,--no-gc-sections,--icf=none,--no-lto-whole-program-visibility,-mllvm,-polly=false'"
+        "-DCMAKE_REQUIRED_LINK_OPTIONS='-Wl,-O0,--lto-O0,--lto-CGO0,--no-gc-sections,--icf=none,--no-lto-whole-program-visibility,-mllvm,-polly=false,-mllvm,-import-instr-limit=0'"
         "-DCMAKE_C_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_CXX_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_ASM_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"

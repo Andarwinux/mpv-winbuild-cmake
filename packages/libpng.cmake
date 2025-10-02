@@ -4,7 +4,7 @@ ExternalProject_Add(libpng
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_TAG libpng16
+    GIT_TAG libpng18
     GIT_REMOTE_NAME origin
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

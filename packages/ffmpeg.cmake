@@ -14,7 +14,7 @@ ExternalProject_Add(ffmpeg
         libdvdread
         libmodplug
         libpng
-        #libvpx
+        libvpx
         libwebp
         libzimg
         libmysofa
@@ -117,7 +117,7 @@ ExternalProject_Add(ffmpeg
         --enable-libvidstab
         --enable-libvorbis
         --enable-libvpl
-        #--enable-libvpx
+        --enable-libvpx
         --enable-libwebp
         --enable-libxml2
         --enable-libzimg

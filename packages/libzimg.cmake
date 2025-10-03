@@ -13,10 +13,11 @@ ExternalProject_Add(libzimg
     GIT_TAG meson
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} sed -i [['s/Windows.h/windows.h/g']] <SOURCE_DIR>/src/zimg/common/arm/cpuinfo_arm.cpp
-    COMMAND ${CMAKE_COMMAND} -E rm -rf graphengine
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_graphengine} <SOURCE_DIR>/graphengine
-    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
+    COMMAND ${EXEC} sed -i [['s/Windows.h/windows.h/g']] <BINARY_DIR>/source/${package}/src/zimg/common/arm/cpuinfo_arm.cpp
+    COMMAND ${CMAKE_COMMAND} -E rm -rf <BINARY_DIR>/source/${package}/graphengine
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_graphengine} <BINARY_DIR>/source/${package}/graphengine
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
         ${meson_conf_args}
         -Dcpp_rtti=true
     BUILD_ENVIRONMENT_MODIFICATION
@@ -24,7 +25,7 @@ ExternalProject_Add(libzimg
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
         _FORCE_HIDE_DLLEXPORT=set:1
-    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -19,12 +19,12 @@ ExternalProject_Add(libplacebo
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ""
-    COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/3rdparty/glad
-    COMMAND ${CMAKE_COMMAND} -E rm -rf <SOURCE_DIR>/3rdparty/fast_float
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_glad} <SOURCE_DIR>/3rdparty/glad
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_fast_float} <SOURCE_DIR>/3rdparty/fast_float
-    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
+    COMMAND ${CMAKE_COMMAND} -E rm -rf <BINARY_DIR>/source/${package}/3rdparty/glad
+    COMMAND ${CMAKE_COMMAND} -E rm -rf <BINARY_DIR>/source/${package}/3rdparty/fast_float
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_glad} <BINARY_DIR>/source/${package}/3rdparty/glad
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_fast_float} <BINARY_DIR>/source/${package}/3rdparty/fast_float
+    COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
         ${meson_conf_args}
         -Dd3d11=enabled
         -Ddemos=false
@@ -44,7 +44,7 @@ ExternalProject_Add(libplacebo
         _BINARY_DIR=set:<BINARY_DIR>
         _FORCE_HIDE_DLLEXPORT=set:1
         _FULL_DEBUGINFO=set:1
-    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+    BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -80,11 +80,12 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         UPDATE_COMMAND ""
         CONFIGURE_ENVIRONMENT_MODIFICATION
             _IS_CONFIGURE=set:1
-        CONFIGURE_COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
+        COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
             ${mpv_conf}
             -Dlibmpv=true
             -Dcplayer=true
-        ${trim_path} <BINARY_DIR>/config.h
+        ${trim_path} <BINARY_DIR>/build/config.h
         BUILD_ENVIRONMENT_MODIFICATION
             _PACKAGE_NAME=set:${package}
             _BINARY_DIR=set:<BINARY_DIR>
@@ -92,7 +93,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             _FORCE_HIDE_DLLEXPORT=set:1
             _FULL_DEBUGINFO=set:1
             _PDB_GENERATE=set:1
-        BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
+        BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
         INSTALL_COMMAND ""
         LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
     )
@@ -106,7 +107,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         ENVIRONMENT_MODIFICATION
             _IS_EXCEPTIONS_ALLOWED=set:1
             _FORCE_HIDE_DLLEXPORT=set:1
-        COMMAND ${EXEC} _IS_CONFIGURE=1 meson setup --reconfigure <BINARY_DIR>/legacy <SOURCE_DIR>
+        COMMAND ${EXEC} _IS_CONFIGURE=1 meson setup --reconfigure <BINARY_DIR>/legacy <BINARY_DIR>/source/${package}
             ${mpv_conf}
             -Dlibmpv=false
             -Dcplayer=true
@@ -121,8 +122,8 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
 
     ExternalProject_Add_Step(mpv copy-binary
         DEPENDEES ${copy-binary-dep}
-        COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.exe <BINARY_DIR>/mpv-package/mpv.exe
-        COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpv.pdb <BINARY_DIR>/mpv-package/mpv.pdb
+        COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/build/mpv.exe <BINARY_DIR>/mpv-package/mpv.exe
+        COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/build/mpv.pdb <BINARY_DIR>/mpv-package/mpv.pdb
         COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/etc/mpv-register.bat <BINARY_DIR>/mpv-package/mpv-register.bat
         COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/etc/mpv-unregister.bat <BINARY_DIR>/mpv-package/mpv-unregister.bat
         COMMENT "Copying mpv binaries"

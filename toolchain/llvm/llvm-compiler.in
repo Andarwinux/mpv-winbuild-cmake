@@ -42,6 +42,9 @@ else
         LTO_FLAGS="-flto=thin -fwhole-program-vtables -funique-source-file-names"
     else
         FLAGS+=" @llvm_mllvm@ @polly@"
+        if [ "@TARGET_CPU@" == "aarch64" ]; then
+            FLAGS+=" -mllvm -enable-ipra=false"
+        fi
     fi
     if [ "@clang_compiler@" == "clang++" ]; then
         if [ "$_IS_EXCEPTIONS_ALLOWED" != "1" ]; then

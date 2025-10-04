@@ -7,6 +7,9 @@ if(TARGET_CPU STREQUAL "x86_64")
     set(libvpx_target "x86_64-win64-gcc")
     set(xxhash_dispatch "-DDISPATCH=ON")
     set(mimalloc_macro "-D_M_X64")
+    set(openal "openal-soft")
+    set(openal_ffmpeg "--enable-openal")
+    set(openal_mpv "-Dopenal=enabled")
     if(MARCH_HAS_AVX)
         set(aom_vpx_sse2avx
             COMMAND ${EXEC} sed -i [['/%macro INIT_XMM/,/%endmacro/ s/%assign avx_enabled 0/%assign avx_enabled 1/']] <SOURCE_DIR>/third_party/x86inc/x86inc.asm
@@ -112,6 +115,8 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
     set(libvpx_target "arm64-win64-gcc")
+    set(openal_ffmpeg "--disable-openal")
+    set(openal_mpv "-Dopenal=disabled")
     set(novzeroupper
         COMMAND true
     )

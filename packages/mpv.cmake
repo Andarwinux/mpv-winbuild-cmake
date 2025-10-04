@@ -25,7 +25,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Dlibavdevice=enabled
         -Dlibbluray=enabled
         -Dlua=luajit
-        -Dopenal=enabled
+        ${openal_mpv}
         -Drubberband=enabled
         -Dsdl2-audio=enabled
         -Dsdl2-gamepad=enabled
@@ -64,7 +64,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             luajit
             rubberband
             uchardet
-            openal-soft
+            ${openal}
             mujs
             vulkan
             shaderc

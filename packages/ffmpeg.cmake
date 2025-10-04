@@ -36,7 +36,7 @@ ExternalProject_Add(ffmpeg
         vapoursynth
         rubberband
         libva
-        openal-soft
+        ${openal}
         fdk-aac
         opencl
         vulkan
@@ -125,7 +125,7 @@ ExternalProject_Add(ffmpeg
         --enable-nonfree
         --enable-nvdec
         --enable-nvenc
-        --enable-openal
+        ${openal_ffmpeg}
         --enable-opencl
         --enable-opengl
         --enable-openssl

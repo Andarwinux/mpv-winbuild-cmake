@@ -37,7 +37,7 @@ ExternalProject_Add(llvm
         -DLLVM_ENABLE_PROJECTS='clang^^lld^^polly'
         -DLLVM_POLLY_LINK_INTO_TOOLS=ON
         -DLLVM_ENABLE_ASSERTIONS=OFF
-        -DLLVM_ENABLE_BACKTRACES=OFF
+        -DLLVM_ENABLE_BACKTRACES=ON
         -DLLVM_ENABLE_LIBCXX=ON
         -DLLVM_ENABLE_LLD=ON
         -DLLVM_ENABLE_LTO=${LLVM_ENABLE_LTO}
@@ -209,7 +209,7 @@ ExternalProject_Add(llvm
         "-DCMAKE_C_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_CXX_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_ASM_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
-        "-DCMAKE_EXE_LINKER_FLAGS='${CMAKE_INSTALL_PREFIX}/lib/mimalloc.o -Wl,-s ${tc_ldflags}'"
+        "-DCMAKE_EXE_LINKER_FLAGS='${CMAKE_INSTALL_PREFIX}/lib/mimalloc.o ${tc_ldflags}'"
         -DLLVM_TOOLCHAIN_TOOLS='llvm-driver^^llvm-ar^^llvm-ranlib^^llvm-objdump^^llvm-rc^^llvm-nm^^llvm-readobj^^llvm-dlltool^^llvm-objcopy^^llvm-strip^^llvm-profdata^^llvm-addr2line^^llvm-symbolizer^^llvm-windres^^llvm-ml^^llvm-mt^^llvm-readelf^^llvm-size'
     BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR> llvm-driver
     INSTALL_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR> install-llvm-driver install-clang-resource-headers

@@ -1,20 +1,63 @@
-From cbca993754db648fc46f70f7c567170a38c02a50 Mon Sep 17 00:00:00 2001
+From 1314322fcb3ef7b4eb6bbc515471f613f87f1302 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Mon, 22 Sep 2025 00:00:00 +0000
 Subject: [PATCH] add atan/atan2 to libmvec
 
 ---
- llvm/include/llvm/Analysis/VecFuncs.def | 30 +++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ llvm/include/llvm/Analysis/VecFuncs.def | 66 +++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
 diff --git a/llvm/include/llvm/Analysis/VecFuncs.def b/llvm/include/llvm/Analysis/VecFuncs.def
-index 4015df990..b6084e316 100644
+index 4015df990..017fb7cd8 100644
 --- a/llvm/include/llvm/Analysis/VecFuncs.def
 +++ b/llvm/include/llvm/Analysis/VecFuncs.def
-@@ -237,6 +237,36 @@ TLI_DEFINE_VECFUNC("llvm.log.f64", "_ZGVdN4v_log", FIXED(4), "_ZGV_LLVM_N4v")
+@@ -219,6 +219,18 @@ TLI_DEFINE_VECFUNC("llvm.exp.f64", "_ZGVdN4v_exp", FIXED(4), "_ZGV_LLVM_N4v")
+ TLI_DEFINE_VECFUNC("llvm.exp.f32", "_ZGVbN4v_expf", FIXED(4), "_ZGV_LLVM_N4v")
+ TLI_DEFINE_VECFUNC("llvm.exp.f32", "_ZGVdN8v_expf", FIXED(8), "_ZGV_LLVM_N8v")
+ 
++TLI_DEFINE_VECFUNC("ldexp", "_ZGVbN2vv_ldexp", FIXED(2), "_ZGV_LLVM_N2vv")
++TLI_DEFINE_VECFUNC("ldexp", "_ZGVdN4vv_ldexp", FIXED(4), "_ZGV_LLVM_N4vv")
++
++TLI_DEFINE_VECFUNC("ldexpf", "_ZGVbN4vv_ldexpf", FIXED(4), "_ZGV_LLVM_N4vv")
++TLI_DEFINE_VECFUNC("ldexpf", "_ZGVdN8vv_ldexpf", FIXED(8), "_ZGV_LLVM_N8vv")
++
++TLI_DEFINE_VECFUNC("llvm.ldexp.f64", "_ZGVbN2vv_ldexp", FIXED(2), "_ZGV_LLVM_N2vv")
++TLI_DEFINE_VECFUNC("llvm.ldexp.f64", "_ZGVdN4vv_ldexp", FIXED(4), "_ZGV_LLVM_N4vv")
++
++TLI_DEFINE_VECFUNC("llvm.ldexp.f32", "_ZGVbN4vv_ldexpf", FIXED(4), "_ZGV_LLVM_N4vv")
++TLI_DEFINE_VECFUNC("llvm.ldexp.f32", "_ZGVdN8vv_ldexpf", FIXED(8), "_ZGV_LLVM_N8vv")
++
+ TLI_DEFINE_VECFUNC("log", "_ZGVbN2v_log", FIXED(2), "_ZGV_LLVM_N2v")
+ TLI_DEFINE_VECFUNC("log", "_ZGVdN4v_log", FIXED(4), "_ZGV_LLVM_N4v")
+ 
+@@ -237,6 +249,60 @@ TLI_DEFINE_VECFUNC("llvm.log.f64", "_ZGVdN4v_log", FIXED(4), "_ZGV_LLVM_N4v")
  TLI_DEFINE_VECFUNC("llvm.log.f32", "_ZGVbN4v_logf", FIXED(4), "_ZGV_LLVM_N4v")
  TLI_DEFINE_VECFUNC("llvm.log.f32", "_ZGVdN8v_logf", FIXED(8), "_ZGV_LLVM_N8v")
  
++TLI_DEFINE_VECFUNC("log2", "_ZGVbN2v_log2", FIXED(2), "_ZGV_LLVM_N2v")
++TLI_DEFINE_VECFUNC("log2", "_ZGVdN4v_log2", FIXED(4), "_ZGV_LLVM_N4v")
++
++TLI_DEFINE_VECFUNC("log2f", "_ZGVbN4v_log2f", FIXED(4), "_ZGV_LLVM_N4v")
++TLI_DEFINE_VECFUNC("log2f", "_ZGVdN8v_log2f", FIXED(8), "_ZGV_LLVM_N8v")
++
++TLI_DEFINE_VECFUNC("llvm.log2.f64", "_ZGVbN2v_log2", FIXED(2), "_ZGV_LLVM_N2v")
++TLI_DEFINE_VECFUNC("llvm.log2.f64", "_ZGVdN4v_log2", FIXED(4), "_ZGV_LLVM_N4v")
++
++TLI_DEFINE_VECFUNC("llvm.log2.f32", "_ZGVbN4v_log2f", FIXED(4), "_ZGV_LLVM_N4v")
++TLI_DEFINE_VECFUNC("llvm.log2.f32", "_ZGVdN8v_log2f", FIXED(8), "_ZGV_LLVM_N8v")
++
++TLI_DEFINE_VECFUNC("log10", "_ZGVbN2v_log10", FIXED(2), "_ZGV_LLVM_N2v")
++TLI_DEFINE_VECFUNC("log10", "_ZGVdN4v_log10", FIXED(4), "_ZGV_LLVM_N4v")
++
++TLI_DEFINE_VECFUNC("log10f", "_ZGVbN4v_log10f", FIXED(4), "_ZGV_LLVM_N4v")
++TLI_DEFINE_VECFUNC("log10f", "_ZGVdN8v_log10f", FIXED(8), "_ZGV_LLVM_N8v")
++
++TLI_DEFINE_VECFUNC("llvm.log10.f64", "_ZGVbN2v_log10", FIXED(2), "_ZGV_LLVM_N2v")
++TLI_DEFINE_VECFUNC("llvm.log10.f64", "_ZGVdN4v_log10", FIXED(4), "_ZGV_LLVM_N4v")
++
++TLI_DEFINE_VECFUNC("llvm.log10.f32", "_ZGVbN4v_log10f", FIXED(4), "_ZGV_LLVM_N4v")
++TLI_DEFINE_VECFUNC("llvm.log10.f32", "_ZGVdN8v_log10f", FIXED(8), "_ZGV_LLVM_N8v")
++
 +TLI_DEFINE_VECFUNC("atan", "_ZGVbN2v_atan", FIXED(2), "_ZGV_LLVM_N2v")
 +TLI_DEFINE_VECFUNC("atan", "_ZGVdN4v_atan", FIXED(4), "_ZGV_LLVM_N4v")
 +

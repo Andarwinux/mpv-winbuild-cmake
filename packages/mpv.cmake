@@ -105,8 +105,11 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         DEPENDEES install
         LOG 1
         ENVIRONMENT_MODIFICATION
+            _PACKAGE_NAME=set:${package}
+            _BINARY_DIR=set:<BINARY_DIR>
             _IS_EXCEPTIONS_ALLOWED=set:1
             _FORCE_HIDE_DLLEXPORT=set:1
+            _FULL_DEBUGINFO=set:1
         COMMAND ${EXEC} _IS_CONFIGURE=1 meson setup --reconfigure <BINARY_DIR>/legacy <BINARY_DIR>/source/${package}
             ${mpv_conf}
             -Dlibmpv=false

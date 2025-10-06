@@ -72,14 +72,18 @@ ExternalProject_Add(sleef
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
-        _IS_UNWIND_ALLOWED=set:1
         _FORCE_HIDE_DLLEXPORT=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libsleef.a libsleefdft.a
           COMMAND ${EXEC} _LTO_ENABLED=0 _PGO_ENABLED=0 ninja -C <BINARY_DIR> libsleefgnuabi.a
+    INSTALL_ENVIRONMENT_MODIFICATION
+        _PACKAGE_NAME=set:${package}
+        _BINARY_DIR=set:<BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${EXEC} "echo 'Cflags: -DSLEEF_STATIC_LIBS -DIMPORT_IS_EXPORT -DSLEEF_ALWAYS_INLINE' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} "echo 'Libs: -lsleef -lsleefdft' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} cp ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleefdft.pc
+            COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/sleefmath.c <BINARY_DIR>/sleefmath.c
+            COMMAND ${EXEC} ${TARGET_ARCH}-clang -c sleefmath.c -o ${MINGW_INSTALL_PREFIX}/lib/sleefmath.o
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

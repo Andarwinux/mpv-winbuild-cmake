@@ -6,7 +6,7 @@ ExternalProject_Add(llvm-clang
         mingw-w64-gendef
         cppwinrt
         sleef
-        openlibm
+        #openlibm
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${SOURCE_LOCATION}
     UPDATE_COMMAND ""

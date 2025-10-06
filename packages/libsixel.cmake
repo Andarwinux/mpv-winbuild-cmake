@@ -18,7 +18,6 @@ ExternalProject_Add(libsixel
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
-        _IS_UNWIND_ALLOWED=set:1
         _FORCE_HIDE_DLLEXPORT=set:1
     BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ""

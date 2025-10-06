@@ -50,7 +50,6 @@ ExternalProject_Add(libjxl
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
-        _IS_UNWIND_ALLOWED=set:1
         _FORCE_HIDE_DLLEXPORT=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libjxl.a libjxl_cms.a libjxl_threads.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

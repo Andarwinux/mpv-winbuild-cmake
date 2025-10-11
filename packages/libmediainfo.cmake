@@ -7,7 +7,8 @@ ExternalProject_Add(libmediainfo
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/Project/CMake -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/MediaInfoDLL\.rc/d']] <SOURCE_DIR>/Project/CMake/CMakeLists.txt
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/Project/CMake -B<BINARY_DIR>
         ${cmake_conf_args}
         -DBUILD_ZLIB=OFF
         -DBUILD_ZENLIB=OFF

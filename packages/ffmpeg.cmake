@@ -23,7 +23,7 @@ ExternalProject_Add(ffmpeg
         opus
         speex
         vorbis
-        #x265
+        x265
         libxml2
         libvpl
         libjxl
@@ -118,6 +118,7 @@ ExternalProject_Add(ffmpeg
         --enable-libvpl
         --enable-libvpx
         --enable-libwebp
+        --enable-libx265
         --enable-libxml2
         --enable-libzimg
         --enable-lzma

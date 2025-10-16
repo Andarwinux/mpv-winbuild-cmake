@@ -8,7 +8,10 @@ ExternalProject_Add(x265
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/12b
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/mmx/d']] <SOURCE_DIR>/source/common/x86/mc.h
+    COMMAND ${EXEC} sed -i [['/mmx/d']] <SOURCE_DIR>/source/common/x86/pixel.h
+    COMMAND ${EXEC} sed -i [['/mmx/d']] <SOURCE_DIR>/source/common/x86/asm-primitives.cpp
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/12b
         ${cmake_conf_args}
         -DENABLE_CLI=OFF
         -DENABLE_HDR10_PLUS=ON

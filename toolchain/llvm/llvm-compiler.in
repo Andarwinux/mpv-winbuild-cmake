@@ -16,7 +16,7 @@ else
 fi
 
 if [ "$_IS_CONFIGURE" == "1" ]; then
-    SKIP_OPT="-g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
+    SKIP_OPT="-w -g0 -O0 -fno-lto -fno-data-sections -fno-function-sections"
 else
     if [ "$_CODEVIEW_ENABLED" != "0" ]; then
         FLAGS+=" -gcodeview -gcodeview-ghash -gno-codeview-command-line -Xclang -gsrc-hash=none"

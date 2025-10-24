@@ -83,7 +83,7 @@ double log2(double x) { return Sleef_log2d1_u35purecfma(x); }
 float  log2f(float x) { return Sleef_log2f1_u35purecfma(x); }
 
 double pow(double x, double y) { return Sleef_powd1_u10purecfma(x, y); }
-float  powf(float x, float y) { return Sleef_powf1_u10purecfma(x, y); }
+float  powf(float x, float y) { return Sleef_fastpowf1_u3500purecfma(x, y); }
 
 double sqrt(double x) { return Sleef_sqrtd1_u35purecfma(x); }
 float  sqrtf(float x) { return Sleef_sqrtf1_u35purecfma(x); }

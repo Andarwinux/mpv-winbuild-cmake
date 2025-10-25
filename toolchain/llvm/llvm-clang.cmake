@@ -1,5 +1,6 @@
 ExternalProject_Add(llvm-clang
     DEPENDS
+        llvm-libc
         llvm-libcxx
         llvm-compiler-rt-builtin
         mingw-w64-crt

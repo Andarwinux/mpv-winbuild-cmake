@@ -30,7 +30,7 @@ else
         fi
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
-    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o -lsleefgnuabi"
+    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o @MINGW_INSTALL_PREFIX@/lib/llvmlibc.a -lsleefgnuabi"
 fi
 
 "$PROG" $FLAGS_INIT "$@" $FLAGS $SKIP_OPT

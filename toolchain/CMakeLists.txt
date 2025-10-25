@@ -20,6 +20,7 @@ list(APPEND ep
     llvm-host-compiler-rt-builtin
     llvm-libcxx
     llvm-host-libcxx
+    llvm-libc
     llvm-compiler-rt
     llvm-host-compiler-rt
     openlibm

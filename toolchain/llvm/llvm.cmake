@@ -8,7 +8,7 @@ ExternalProject_Add(llvm
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !*/test !*/docs !*/unittests !*/examples !*/benchmarks !/lldb !/mlir !/clang-tools-extra !/mlir !/flang !openmp !libclc !bolt !cross-project-tests !offload !llvm-libgcc !third-party !flang-rt third-party/siphash lld/docs/CMakeLists.txt clang/examples/CMakeLists.txt polly/test/CMakeLists.txt polly/docs/CMakeLists.txt polly/unittests/CMakeLists.txt"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !*/test !*/docs !*/unittests !*/examples !*/benchmarks !/lldb !/mlir !/clang-tools-extra !/mlir !/flang !openmp !libclc !bolt !cross-project-tests !offload !llvm-libgcc !third-party !flang-rt third-party/siphash lld/docs/CMakeLists.txt clang/examples/CMakeLists.txt polly/test/CMakeLists.txt polly/docs/CMakeLists.txt polly/unittests/CMakeLists.txt libc/benchmarks/CMakeLists.txt"
     UPDATE_COMMAND ""
     PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/llvm/llvm-*.patch
     GIT_REMOTE_NAME origin

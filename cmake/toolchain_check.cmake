@@ -65,6 +65,12 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(crt_lib "--disable-lib32 --disable-lib64 --enable-libarm64")
 endif()
 
+if(LLVM_ENABLE_UNSAFE_X86_AVX512_VFABI)
+    set(llvm_patch "llvm-custom-VecFuncs-changes-avx512.patch")
+else()
+    set(llvm_patch "llvm-custom-VecFuncs-changes.patch")
+endif()
+
 set(cmake_conf_args
     -GNinja
     -DCMAKE_BUILD_TYPE=Release

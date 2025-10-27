@@ -1,7 +1,7 @@
-From 1d1b0c0bff1aed11fe4d217bd6a646ae7582c5e6 Mon Sep 17 00:00:00 2001
+From ae5eb054c7330fcacad37e12c793f21d0e8670c3 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Mon, 22 Sep 2025 00:00:00 +0000
-Subject: [PATCH] add atan/atan2 to libmvec
+Subject: [PATCH] custom VecFuncs changes
 
 ---
  llvm/include/llvm/Analysis/VecFuncs.def | 408 ++++++++++++++----------

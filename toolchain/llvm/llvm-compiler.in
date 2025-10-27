@@ -66,7 +66,7 @@ else
         FLAGS+=" -Wa,-msse2avx -mno-vzeroupper -mno-gather"
         if [ "@MARCH_HAS_AVX512@" == "ON" ]; then
             if [ "$_LTO_ENABLED" == "0" ]; then
-                FLAGS+=" -mllvm -x86-use-fsrm-for-memcpy"
+                FLAGS+=" -mllvm -x86-use-fsrm-for-memcpy -mllvm -enable-histogram-loop-vectorization"
             fi
         fi
     fi

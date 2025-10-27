@@ -23,7 +23,6 @@ ExternalProject_Add(luajit
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_UNWIND_ALLOWED=set:1
         _FULL_DEBUGINFO=set:1
-        _NO_AUTO_VAR_INIT_ZERO=set:1
     BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

@@ -24,13 +24,13 @@ ExternalProject_Add(llvm-libc
         -DLIBC_CONF_TIME_64BIT=ON
         -DLIBC_NAMESPACE=__llvm_libc
         -DLIBC_CC_SUPPORTS_NOSTDLIBPP=OFF
+        -DLIBC_CC_SUPPORTS_PATTERN_INIT=OFF
         -DLIBC_CONF_STRING_UNSAFE_WIDE_READ=OFF
         ${libc_memcpy_repmovsb}
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
-        _NO_AUTO_VAR_INIT_ZERO=set:1
         _FULL_DEBUGINFO=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libc.src.string.memcpy

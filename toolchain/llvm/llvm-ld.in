@@ -14,20 +14,11 @@ else
         FLAGS+=" -Xlink=-debug:ghash,nodwarf,nosymtab --pdb="
     fi
     if [ "$_LTO_ENABLED" != "0" ]; then
-        FLAGS+=" @llvm_mllvm@ @polly@"
-        if [ "@TARGET_CPU@" == "aarch64" ]; then
-            FLAGS+=" -mllvm -polly=false -mllvm -enable-ipra=false"
-        fi
+        FLAGS+=" @MLLVM_FLAGS@"
     fi
     if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
         export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/lld-%m.profraw" #enable profraw output only when CONF!=1
         export LLD_IN_TEST=1 #https://github.com/llvm/llvm-project/issues/52861
-    fi
-    if [ "@MARCH_HAS_AVX@" == "ON" ]; then
-        FLAGS+=" -mllvm -x86-use-vzeroupper=false"
-        if [ "@MARCH_HAS_AVX512@" == "ON" ]; then
-            FLAGS+=" -mllvm -x86-use-fsrm-for-memcpy -mllvm -enable-histogram-loop-vectorization"
-        fi
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
     FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o @MINGW_INSTALL_PREFIX@/lib/llvmlibc.a -lsleefgnuabi"

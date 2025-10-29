@@ -27,9 +27,9 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Dlua=luajit
         -Dopenal=enabled
         -Drubberband=enabled
-        -Dsdl2-audio=enabled
+        -Dsdl2-audio=disabled
         -Dsdl2-gamepad=enabled
-        -Dsdl2-video=enabled
+        -Dsdl2-video=disabled
         -Dsdl2=enabled
         -Dshaderc=enabled
         -Dsixel=enabled

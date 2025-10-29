@@ -2,6 +2,10 @@
 #include <stddef.h>
 #include <sleefinline_purecfma_scalar.h>
 
+#ifdef   __AVX512F__
+#include <immintrin.h>
+#endif
+
 __attribute__((always_inline,hot))                    double    acos(double x){return Sleef_acosd1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    double    acosh(double x){return Sleef_acoshd1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    double    asin(double x){return Sleef_asind1_u35purecfma(x);}
@@ -23,8 +27,10 @@ __attribute__((always_inline,hot))                    double    floor(double x){
 __attribute__((always_inline,hot))                    double    fmod(double x, double y){return Sleef_fmodd1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    double    frexp(double x, int *exp){return (*exp = Sleef_expfrexpd1_purecfma(x), Sleef_frfrexpd1_purecfma(x));}
 __attribute__((always_inline,hot))                    double    hypot(double x, double y){return Sleef_hypotd1_u35purecfma(x, y);}
-                                                      #ifdef     __ARM_FEATURE_SVE
+                                                      #if       defined(__ARM_FEATURE_SVE)
 __attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return __builtin_ldexp(x, exp);}
+                                                      #elif     defined(__AVX512F__)
+__attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return _mm_cvtsd_f64(_mm_scalef_sd(_mm_set_sd(x), _mm_set_sd((double)exp)));}
                                                       #else
 __attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return Sleef_ldexpd1_purecfma(x, exp);}
                                                       #endif
@@ -38,8 +44,10 @@ __attribute__((always_inline,hot))                    double    pow(double x, do
 __attribute__((always_inline,hot))                    double    remainder(double x, double y){return Sleef_remainderd1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    double    rint(double x){return __builtin_rint(x);}
 __attribute__((always_inline,hot))                    double    round(double x){return __builtin_round(x);}
-                                                      #ifdef     __ARM_FEATURE_SVE
+                                                      #if       defined( __ARM_FEATURE_SVE)
 __attribute__((always_inline,hot))                    double    scalbn(double x, int n){return __builtin_ldexp(x, n);}
+                                                      #elif     defined(__AVX512F__)
+                                                      double    scalbn(double x, int n){return _mm_cvtsd_f64(_mm_scalef_sd(_mm_set_sd(x), _mm_set_sd((double)n)));}
                                                       #else
 __attribute__((always_inline,hot))                    double    scalbn(double x, int n){return Sleef_ldexpd1_purecfma(x, n);}
                                                       #endif
@@ -71,8 +79,10 @@ __attribute__((always_inline,hot))                    float     floorf(float x){
 __attribute__((always_inline,hot))                    float     fmodf(float x, float y){return Sleef_fmodf1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     frexpf(float x, int *exp){return (*exp = Sleef_expfrexpf1_purecfma(x), Sleef_frfrexpf1_purecfma(x));}
 __attribute__((always_inline,hot))                    float     hypotf(float x, float y){return Sleef_hypotf1_u35purecfma(x, y);}
-                                                      #ifdef     __ARM_FEATURE_SVE
+                                                      #if       defined(__ARM_FEATURE_SVE)
 __attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return __builtin_ldexpf(x, exp);}
+                                                      #elif     defined(__AVX512F__)
+__attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return _mm_cvtss_f32(_mm_scalef_ss(_mm_set_ss(x), _mm_set_ss((float)exp)));}
                                                       #else
 __attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return Sleef_ldexpf1_purecfma(x, exp);}
                                                       #endif
@@ -86,8 +96,10 @@ __attribute__((always_inline,hot))                    float     powf(float x, fl
 __attribute__((always_inline,hot))                    float     remainderf(float x, float y){return Sleef_remainderf1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     rintf(float x){return __builtin_rintf(x);}
 __attribute__((always_inline,hot))                    float     roundf(float x){return __builtin_roundf(x);}
-                                                      #ifdef     __ARM_FEATURE_SVE
+                                                      #if       defined(__ARM_FEATURE_SVE)
 __attribute__((always_inline,hot))                    float     scalbnf(float x, int n){return __builtin_ldexpf(x, n);}
+                                                      #elif     defined(__AVX512F__)
+__attribute__((always_inline,hot))                    float     scalbnf(float x, int n){return _mm_cvtss_f32(_mm_scalef_ss(_mm_set_ss(x), _mm_set_ss((float)n)));}
                                                       #else
 __attribute__((always_inline,hot))                    float     scalbnf(float x, int n){return Sleef_ldexpf1_purecfma(x, n);}
                                                       #endif

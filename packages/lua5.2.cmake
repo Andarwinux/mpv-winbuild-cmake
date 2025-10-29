@@ -1,23 +1,18 @@
-ExternalProject_Add(luajit
-    DEPENDS
-        meson-wrap
-    GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT.git
+ExternalProject_Add(lua5.2
+    GIT_REPOSITORY https://github.com/franko/lua.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
-    GIT_TAG v2.1
+    GIT_TAG lua-5.2
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${src_meson_wrap}/subprojects/packagefiles/luajit <BINARY_DIR>/source/${package}
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
         ${meson_conf_args}
-        -Damalgam=true
-        -Dlua52compat=true
-        -Dluajit=false
-        -Dsysmalloc=true
+        -Dapp=false
+        -Dshared=false
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
@@ -28,5 +23,5 @@ ExternalProject_Add(luajit
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
-force_rebuild_git(luajit)
-cleanup(luajit install)
+force_rebuild_git(lua5.2)
+cleanup(lua5.2 install)

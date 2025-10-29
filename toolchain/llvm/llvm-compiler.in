@@ -74,7 +74,7 @@ if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$_PGO_ENABLED" != "0" ]; then
 fi
 
 if [ -n "$_PACKAGE_NAME" ] && [ -n "$_BINARY_DIR" ]; then
-    FLAGS+="  -ffile-compilation-dir=. -Wa,-fdebug-compilation-dir=. -ffile-prefix-map=$_BINARY_DIR/=build/$_PACKAGE_NAME/ -ffile-prefix-map=@PKG_TO_SRC@/=soucre/ -ffile-prefix-map=@SINGLE_SOURCE_LOCATION@/=soucre/"
+    FLAGS+=" -ffile-compilation-dir=. -Wa,-fdebug-compilation-dir=. -ffile-prefix-map=$_BINARY_DIR/=build/$_PACKAGE_NAME/ -ffile-prefix-map=@PKG_TO_SRC@/=soucre/ -ffile-prefix-map=@SINGLE_SOURCE_LOCATION@/=soucre/"
 fi
 
 #filtered_args=()

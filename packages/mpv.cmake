@@ -24,7 +24,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Dlibarchive=enabled
         -Dlibavdevice=enabled
         -Dlibbluray=enabled
-        -Dlua=luajit
+        -Dlua=lua5.2
         -Dopenal=enabled
         -Drubberband=enabled
         -Dsdl2-audio=disabled
@@ -61,7 +61,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             libiconv
             libjpeg
             libpng
-            luajit
+            lua5.2
             rubberband
             uchardet
             openal-soft

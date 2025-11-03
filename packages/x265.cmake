@@ -54,8 +54,7 @@ ExternalProject_Add(x265
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_RTTI_ALLOWED=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>/12b & ${EXEC} ninja -C <BINARY_DIR>/10b & ${EXEC} ninja -C <BINARY_DIR>
-    COMMAND ${EXEC} mv <BINARY_DIR>/12b/libx265.a <BINARY_DIR>/libx26512.a & mv <BINARY_DIR>/10b/libx265.a <BINARY_DIR>/libx26510.a
-    COMMAND bash -c "cd <BINARY_DIR> && echo -e 'create libx265.a\naddlib libx265.a\naddlib libx26510.a\naddlib libx26512.a\nsave\nend' | ${EXEC} ${TARGET_ARCH}-ar -M"
+    COMMAND ${EXEC} ${TARGET_ARCH}-llvm-lib /out:libx265.a {.,10b,12b}/libx265.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

@@ -9,6 +9,7 @@ ExternalProject_Add(llvm-wrapper
     COMMAND ${CMAKE_COMMAND} -E make_directory ${MINGW_INSTALL_PREFIX}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${MINGW_INSTALL_PREFIX}/lib
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-ar        ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-ar
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-lib       ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-lib
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-ranlib    ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-ranlib
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-dlltool   ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-dlltool
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-objcopy   ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-objcopy
@@ -20,6 +21,7 @@ ExternalProject_Add(llvm-wrapper
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-windres   ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-windres
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-addr2line ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-addr2line
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-ar        ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-llvm-ar
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-lib       ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-llvm-lib
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-ranlib    ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-llvm-ranlib
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-dlltool   ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-llvm-dlltool
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_INSTALL_PREFIX}/llvmbin/llvm-objcopy   ${CMAKE_INSTALL_PREFIX}/bin/${TARGET_ARCH}-llvm-objcopy

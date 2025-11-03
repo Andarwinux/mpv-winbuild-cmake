@@ -23,8 +23,7 @@ ExternalProject_Add(spirv-cross
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-          COMMAND bash -c "cd <BINARY_DIR> && echo -e 'create libspirv-cross-c-shared.a\naddlib libspirv-cross-c.a\naddlib libspirv-cross-core.a\naddlib libspirv-cross-glsl.a\naddlib libspirv-cross-hlsl.a\nsave\nend' | ${EXEC} ${TARGET_ARCH}-ar -M"
-          COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libspirv-cross-c-shared.a <BINARY_DIR>/libspirv-cross-c.a
+          COMMAND ${EXEC} ${TARGET_ARCH}-llvm-lib /out:libspirv-cross-c.a libspirv-cross-{c,core,glsl,hlsl}.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${CMAKE_COMMAND} -E create_symlink ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/spirv-cross-c.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/spirv-cross-c-shared.pc
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

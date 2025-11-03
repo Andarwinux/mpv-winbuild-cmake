@@ -21,7 +21,6 @@ ExternalProject_Add(libjxl
         ${cmake_conf_args}
         ${libjxl_disable_sse}
         ${libjxl_force_skip_check}
-        -DJPEGXL_STATIC=ON
         -DJPEGXL_EMSCRIPTEN=OFF
         -DJPEGXL_BUNDLE_LIBPNG=OFF
         -DJPEGXL_ENABLE_TOOLS=OFF

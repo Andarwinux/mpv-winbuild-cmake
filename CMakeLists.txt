@@ -132,6 +132,14 @@ if(TARGET_CPU STREQUAL "x86_64")
             set(MARCH_HAS_AVX512 ON)
         endif()
     endif()
+else()
+    execute_process(
+        COMMAND ${EXEC} echo | ${CMAKE_C_COMPILER} --target=aarch64 -dM -E - -mcpu=${MARCH}
+        OUTPUT_VARIABLE CC_OUTPUT
+    )
+    if(CC_OUTPUT MATCHES "__ARM_FEATURE_SVE2 1")
+        set(MARCH_HAS_SVE2 ON)
+    endif()
 endif()
 
 string(TIMESTAMP BUILDDATE "%Y%m%d" UTC)

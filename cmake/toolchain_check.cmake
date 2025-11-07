@@ -76,6 +76,7 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(MLLVM_FLAGS "${llvm_mllvm} -mllvm -enable-ipra=false")
     if(MARCH_HAS_SVE2)
         set(MLLVM_FLAGS "${MLLVM_FLAGS} -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -mllvm -sve-tail-folding=all")
+        set(ARCH_FLAGS "${ARCH_FLAGS} -msve-vector-bits=128")
     endif()
 endif()
 

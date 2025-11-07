@@ -1,6 +1,6 @@
 #!/bin/sh
 cmake -DTARGET_ARCH=aarch64-w64-mingw32 \
--DMARCH=cortex-x925 \
+-DMARCH=cortex-x3 \
 -DMARCH_NAME='' \
 -DSINGLE_SOURCE_LOCATION="/build/src_packages/" \
 -DCMAKE_INSTALL_PREFIX="/build/install" \
@@ -12,7 +12,6 @@ cmake -DTARGET_ARCH=aarch64-w64-mingw32 \
 -DCCACHE_MAXSIZE=8G \
 -DCLANG_PACKAGES_PGO=ON \
 -DCLANG_PACKAGES_PROFDATA_FILE="/build/pgo.profdata" \
--DCLANG_FLAGS="-msve-vector-bits=128" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \
 -G Ninja \

@@ -55,6 +55,8 @@ ExternalProject_Add(llvm-libc
                                                 libc.src.string.strnlen
                                                 libc.src.string.strpbrk
                                                 libc.src.string.strcoll
+                                                libc.src.strings.strcasecmp
+                                                libc.src.strings.strncasecmp
                                                 libc.src.stdlib.qsort
                                                 libc.src.stdlib.strtol
                                                 libc.src.stdlib.strtold

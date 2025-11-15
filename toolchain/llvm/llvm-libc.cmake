@@ -32,6 +32,7 @@ ExternalProject_Add(llvm-libc
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _FULL_DEBUGINFO=set:1
+        _FORCE_BUILTIN=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libc.src.string.memcpy
                                                 libc.src.string.memset
@@ -40,7 +41,7 @@ ExternalProject_Add(llvm-libc
                                                 libc.src.string.memchr
                                                 libc.src.string.memcmp
                                                 libc.src.string.strspn
-                                                libc.src.string.strlen
+                                                #libc.src.string.strlen
                                                 libc.src.string.strstr
                                                 libc.src.string.strcpy
                                                 libc.src.string.strtok
@@ -95,6 +96,7 @@ ExternalProject_Add(llvm-libc
                                                 libc.src.ctype.toascii
                                                 libc.src.ctype.tolower
                                                 libc.src.ctype.toupper
+    COMMAND ${EXEC} _FORCE_BUILTIN=0 ninja -C <BINARY_DIR> libc.src.string.strlen
     COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar rcs llvmlibc.a libc/src/*/CMakeFiles/libc.src.*.*.dir/*.cpp.obj
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy llvmlibc.a ${MINGW_INSTALL_PREFIX}/lib/llvmlibc.a
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

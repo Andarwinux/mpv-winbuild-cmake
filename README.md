@@ -87,7 +87,7 @@ After that, build mpv as usual:
 | Options                      | Description                                                                                                                 | Default                                        |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- |------------------------------------------------|
 | TARGET_ARCH                  | the target to build. available: x86_64-w64-mingw32, aarch64-w64-mingw32                                                     | x86_64-w64-mingw32                             |
-| MARCH                     | for a specific microarchitecture. For x86_64, this means -march, for aarch64, this means -mcpu                              | x86_64:x86-64-v3 aarch64:cortex-a76            |
+| MARCH                     | for a specific microarchitecture. For x86_64, this means -march, for aarch64, this means -mcpu                              | x86_64:x86-64-v3 aarch64:cortex-x1                |
 | CMAKE_INSTALL_PREFIX         | location of the host toolchain installation                                                                                 | `${CMAKE_CURRENT_BINARY_DIR}/install`          |
 | SINGLE_SOURCE_LOCATION       | location of the packages source                                                                                             | `${CMAKE_CURRENT_BINARY_DIR}/src_packages`     |
 | MINGW_INSTALL_PREFIX         | location of the MinGW sysroot                                                                                               | `${CMAKE_INSTALL_PREFIX}/${TARGET_ARCH}`       |

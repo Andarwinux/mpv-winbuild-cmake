@@ -2,7 +2,7 @@
 PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/ld.lld
 POLICY="cache_size_bytes=2g:prune_interval=1m"
 FLAGS="-m @ld_m_flag@"
-FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info -s -Xlink=-debug:none,nodwarf,nosymtab --stack=1048576,1048576 --thinlto-jobs=all"
+FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info -s -Xlink=-debug:none,nodwarf,symtab --stack=1048576,1048576 --thinlto-jobs=all"
 unset FLAGS_INIT
 
 if [ "$_IS_CONFIGURE" == "1" ]; then
@@ -11,7 +11,7 @@ else
     FLAGS+=" --thinlto-cache-dir=@MINGW_INSTALL_PREFIX@/thinlto --thinlto-cache-policy=$POLICY"
     FLAGS+=" -O3 --lto-O3 --lto-CGO3 -mllvm -import-instr-limit=100 -mllvm -import-hot-multiplier=3 --gc-sections --icf=all -Xlink=-release -Xlink=-opt:lldtailmerge -Xlink=-cetcompat -Xlink=-cetcompatstrict -Xlink=-pdbsourcepath:C:\\ -Xlink=-pdbaltpath:%_PDB%"
     if [ "$_PDB_GENERATE" == "1" ]; then
-        FLAGS+=" -Xlink=-debug:ghash,nodwarf,nosymtab --pdb="
+        FLAGS+=" -Xlink=-debug:ghash,nodwarf,symtab --pdb="
     fi
     if [ "$_LTO_ENABLED" != "0" ]; then
         FLAGS+=" @MLLVM_FLAGS@"

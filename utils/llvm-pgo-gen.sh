@@ -9,7 +9,7 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DCLANG_PACKAGES_PROFDATA_FILE="/build/pgo.profdata" \
 -DLLVM_ENABLE_PGO=GEN \
 -DCLANG_FLAGS="-mprefer-vector-width=512" \
--DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather -Wl,-mllvm,-x86-use-fsrm-for-memcpy" \
+-DTOOLCHAIN_FLAGS="-mprefer-vector-width=512 -mno-gather -Wl,-mllvm,-x86-use-fsrm-for-memcpy" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \
 -G Ninja \

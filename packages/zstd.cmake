@@ -18,7 +18,7 @@ ExternalProject_Add(zstd
         -Dzlib=disabled
         -Dlzma=disabled
         -Dlz4=disabled
-        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
+        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE -DZSTD_DISABLE_ASM'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

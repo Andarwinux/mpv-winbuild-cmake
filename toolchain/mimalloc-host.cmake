@@ -57,7 +57,7 @@ ExternalProject_Add(mimalloc-host
         "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
         "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
         "-DCMAKE_ASM_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
-        "-DCMAKE_SHARED_LINKER_FLAGS='-Wl,-s ${tc_ldflags}'"
+        "-DCMAKE_SHARED_LINKER_FLAGS='${tc_ldflags}'"
     BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>
           COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>/shared
     INSTALL_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} --install <BINARY_DIR>

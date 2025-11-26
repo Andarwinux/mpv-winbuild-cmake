@@ -23,6 +23,7 @@ ExternalProject_Add(llvm-compiler-rt-builtin
         _BINARY_DIR=set:<BINARY_DIR>
         _LTO_ENABLED=set:0
         _PGO_ENABLED=set:0
+        _FORCE_BUILTIN=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

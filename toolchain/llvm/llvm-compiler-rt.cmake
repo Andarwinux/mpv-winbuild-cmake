@@ -31,6 +31,7 @@ ExternalProject_Add(llvm-compiler-rt
         _BINARY_DIR=set:<BINARY_DIR>
         _LTO_ENABLED=set:0
         _PGO_ENABLED=set:0
+        _FORCE_BUILTIN=set:1
         _IS_RTTI_ALLOWED=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>

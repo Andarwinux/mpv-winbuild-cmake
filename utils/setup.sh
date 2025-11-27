@@ -5,6 +5,6 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DLLVM_ENABLE_LTO=Thin \
 -DENABLE_CCACHE=ON \
 -DCCACHE_MAXSIZE=2G \
--DCLANG_FLAGS="-mprefer-vector-width=512" \
+-DCLANG_FLAGS="" \
 -G Ninja \
 -B /build

@@ -35,6 +35,8 @@ ExternalProject_Add(libsdl2
         -DSDL_OPENGLES=OFF
         -DHAVE_GDWARF_4=OFF
         -DHAVE_GCC_NO_STRICT_ALIASING=OFF
+        "-DCMAKE_C_FLAGS='-U__MMX__'"
+        "-DCMAKE_CXX_FLAGS='-U__MMX__'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

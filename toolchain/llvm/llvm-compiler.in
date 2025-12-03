@@ -23,7 +23,12 @@ else
         CCACHE="ccache"
     fi
     if [ "$_LTO_ENABLED" != "0" ]; then
-        LTO_FLAGS="-flto=thin -fwhole-program-vtables -funique-source-file-names"
+        if [ "$_LTO_FULL" != "1" ]; then
+            LTO_FLAGS="-flto=thin"
+        else
+            LTO_FLAGS="-flto=full"
+        fi
+        LTO_FLAGS+=" -fwhole-program-vtables -funique-source-file-names"
     else
         FLAGS+=" @MLLVM_FLAGS@"
     fi

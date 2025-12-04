@@ -10,8 +10,8 @@ __attribute__((always_inline,hot))                    double    atan(double x){r
 __attribute__((always_inline,hot))                    double    atan2(double y, double x){return Sleef_atan2d1_u35purecfma(y, x);}
 __attribute__((always_inline,hot))                    double    atanh(double x){return Sleef_atanhd1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    double    cbrt(double x){return Sleef_cbrtd1_u35purecfma(x);}
-__attribute__((always_inline,hot))                    double    ceil(double x){return __builtin_ceil(x);}
-__attribute__((always_inline,hot))                    double    copysign(double x, double y){return __builtin_copysign(x, y);}
+__attribute__((always_inline,hot))                    double    ceil(double x){return __builtin_elementwise_ceil(x);}
+__attribute__((always_inline,hot))                    double    copysign(double x, double y){return __builtin_elementwise_copysign(x, y);}
 __attribute__((always_inline,hot))                    double    cos(double x){return Sleef_cosd1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    double    cosh(double x){return Sleef_coshd1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    double    erf(double x){return Sleef_erfd1_u10purecfma(x);}
@@ -19,12 +19,12 @@ __attribute__((always_inline,hot))                    double    exp(double x){re
 __attribute__((always_inline,hot))                    double    exp2(double x){return Sleef_exp2d1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    double    expm1(double x){return Sleef_expm1d1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    double    fabs(double x){return __builtin_fabs(x);}
-__attribute__((always_inline,hot))                    double    floor(double x){return __builtin_floor(x);}
+__attribute__((always_inline,hot))                    double    floor(double x){return __builtin_elementwise_floor(x);}
 __attribute__((always_inline,hot))                    double    fmod(double x, double y){return Sleef_fmodd1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    double    frexp(double x, int *exp){return (*exp = Sleef_expfrexpd1_purecfma(x), Sleef_frfrexpd1_purecfma(x));}
 __attribute__((always_inline,hot))                    double    hypot(double x, double y){return Sleef_hypotd1_u35purecfma(x, y);}
                                                       #if       defined(__ARM_FEATURE_SVE) || defined(__AVX512F__)
-__attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return __builtin_ldexp(x, exp);}
+__attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return __builtin_elementwise_ldexp(x, exp);}
                                                       #else
 __attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return Sleef_ldexpd1_purecfma(x, exp);}
                                                       #endif
@@ -36,19 +36,19 @@ __attribute__((always_inline,hot))                    double    modf(double x, d
 __attribute__((always_inline,hot))                    double    nextafter(double x, double y){return Sleef_nextafterd1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    double    pow(double x, double y){return Sleef_powd1_u10purecfma(x, y);}
 __attribute__((always_inline,hot))                    double    remainder(double x, double y){return Sleef_remainderd1_purecfma(x, y);}
-__attribute__((always_inline,hot))                    double    rint(double x){return __builtin_rint(x);}
-__attribute__((always_inline,hot))                    double    round(double x){return __builtin_round(x);}
+__attribute__((always_inline,hot))                    double    rint(double x){return __builtin_elementwise_rint(x);}
+__attribute__((always_inline,hot))                    double    round(double x){return __builtin_elementwise_round(x);}
                                                       #if       defined( __ARM_FEATURE_SVE) || defined(__AVX512F__)
-__attribute__((always_inline,hot))                    double    scalbn(double x, int n){return __builtin_ldexp(x, n);}
+__attribute__((always_inline,hot))                    double    scalbn(double x, int n){return __builtin_elementwise_ldexp(x, n);}
                                                       #else
 __attribute__((always_inline,hot))                    double    scalbn(double x, int n){return Sleef_ldexpd1_purecfma(x, n);}
                                                       #endif
 __attribute__((always_inline,hot))                    double    sin(double x){return Sleef_sind1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    double    sinh(double x){return Sleef_sinhd1_u35purecfma(x);}
-__attribute__((always_inline,hot))                    double    sqrt(double x){return __builtin_sqrt(x);}
+__attribute__((always_inline,hot))                    double    sqrt(double x){return __builtin_elementwise_sqrt(x);}
 __attribute__((always_inline,hot))                    double    tan(double x){return Sleef_tand1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    double    tanh(double x){return Sleef_tanhd1_u35purecfma(x);}
-__attribute__((always_inline,hot))                    double    trunc(double x){return __builtin_trunc(x);}
+__attribute__((always_inline,hot))                    double    trunc(double x){return __builtin_elementwise_trunc(x);}
 
 __attribute__((always_inline,hot))                    float     acosf(float x){return Sleef_acosf1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    float     acoshf(float x){return Sleef_acoshf1_u10purecfma(x);}
@@ -58,8 +58,8 @@ __attribute__((always_inline,hot))                    float     atan2f(float y, 
 __attribute__((always_inline,hot))                    float     atanf(float x){return Sleef_atanf1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    float     atanhf(float x){return Sleef_atanhf1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    float     cbrtf(float x){return Sleef_cbrtf1_u35purecfma(x);}
-__attribute__((always_inline,hot))                    float     ceilf(float x){return __builtin_ceilf(x);}
-__attribute__((always_inline,hot))                    float     copysignf(float x, float y){return __builtin_copysignf(x, y);}
+__attribute__((always_inline,hot))                    float     ceilf(float x){return __builtin_elementwise_ceil(x);}
+__attribute__((always_inline,hot))                    float     copysignf(float x, float y){return __builtin_elementwise_copysign(x, y);}
 __attribute__((always_inline,hot))                    float     cosf(float x){return Sleef_cosf1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    float     coshf(float x){return Sleef_coshf1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    float     erff(float x){return Sleef_erff1_u10purecfma(x);}
@@ -67,12 +67,12 @@ __attribute__((always_inline,hot))                    float     exp2f(float x){r
 __attribute__((always_inline,hot))                    float     expf(float x){return Sleef_expf1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    float     expm1f(float x){return Sleef_expm1f1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    float     fabsf(float x){return __builtin_fabsf(x);}
-__attribute__((always_inline,hot))                    float     floorf(float x){return __builtin_floorf(x);}
+__attribute__((always_inline,hot))                    float     floorf(float x){return __builtin_elementwise_floor(x);}
 __attribute__((always_inline,hot))                    float     fmodf(float x, float y){return Sleef_fmodf1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     frexpf(float x, int *exp){return (*exp = Sleef_expfrexpf1_purecfma(x), Sleef_frfrexpf1_purecfma(x));}
 __attribute__((always_inline,hot))                    float     hypotf(float x, float y){return Sleef_hypotf1_u35purecfma(x, y);}
                                                       #if       defined(__ARM_FEATURE_SVE) || defined(__AVX512F__)
-__attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return __builtin_ldexpf(x, exp);}
+__attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return __builtin_elementwise_ldexp(x, exp);}
                                                       #else
 __attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return Sleef_ldexpf1_purecfma(x, exp);}
                                                       #endif
@@ -84,28 +84,28 @@ __attribute__((always_inline,hot))                    float     modff(float x, f
 __attribute__((always_inline,hot))                    float     nextafterf(float x, float y){return Sleef_nextafterf1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     powf(float x, float y){return Sleef_fastpowf1_u3500purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     remainderf(float x, float y){return Sleef_remainderf1_purecfma(x, y);}
-__attribute__((always_inline,hot))                    float     rintf(float x){return __builtin_rintf(x);}
-__attribute__((always_inline,hot))                    float     roundf(float x){return __builtin_roundf(x);}
+__attribute__((always_inline,hot))                    float     rintf(float x){return __builtin_elementwise_rint(x);}
+__attribute__((always_inline,hot))                    float     roundf(float x){return __builtin_elementwise_round(x);}
                                                       #if       defined(__ARM_FEATURE_SVE) || defined(__AVX512F__)
-__attribute__((always_inline,hot))                    float     scalbnf(float x, int n){return __builtin_ldexpf(x, n);}
+__attribute__((always_inline,hot))                    float     scalbnf(float x, int n){return __builtin_elementwise_ldexp(x, n);}
                                                       #else
 __attribute__((always_inline,hot))                    float     scalbnf(float x, int n){return Sleef_ldexpf1_purecfma(x, n);}
                                                       #endif
 __attribute__((always_inline,hot))                    float     sinf(float x){return Sleef_sinf1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    float     sinhf(float x){return Sleef_sinhf1_u35purecfma(x);}
-__attribute__((always_inline,hot))                    float     sqrtf(float x){return __builtin_sqrtf(x);}
+__attribute__((always_inline,hot))                    float     sqrtf(float x){return __builtin_elementwise_sqrt(x);}
 __attribute__((always_inline,hot))                    float     tanf(float x){return Sleef_tanf1_u35purecfma(x);}
 __attribute__((always_inline,hot))                    float     tanhf(float x){return Sleef_tanhf1_u35purecfma(x);}
-__attribute__((always_inline,hot))                    float     truncf(float x){return __builtin_truncf(x);}
+__attribute__((always_inline,hot))                    float     truncf(float x){return __builtin_elementwise_trunc(x);}
 
 __attribute__((always_inline,hot))                    int       ilogb(double x){return Sleef_ilogbd1_purecfma(x);}
 __attribute__((always_inline,hot))                    int       ilogbf(float x){return Sleef_ilogbf1_purecfma(x);}
 
-__attribute__((always_inline,hot))                    long      lround(double x){return (long)(__builtin_round(x));}
-__attribute__((always_inline,hot))                    long      lroundf(float x){return (long)(__builtin_roundf(x));}
+__attribute__((always_inline,hot))                    long      lround(double x){return __builtin_elementwise_round(x);}
+__attribute__((always_inline,hot))                    long      lroundf(float x){return __builtin_elementwise_round(x);}
 
-__attribute__((always_inline,hot))                    long long llround(double x){return (long long)(__builtin_round(x));}
-__attribute__((always_inline,hot))                    long long llroundf(float x){return (long long)(__builtin_roundf(x));}
+__attribute__((always_inline,hot))                    long long llround(double x){return __builtin_elementwise_round(x);}
+__attribute__((always_inline,hot))                    long long llroundf(float x){return __builtin_elementwise_round(x);}
 
 __attribute__((always_inline,hot))                    void      sincos(double x, double *s, double *c){vdouble2_purecfma_scalar_sleef r = Sleef_sincosd1_u35purecfma(x); *s = r.x; *c = r.y;}
 __attribute__((always_inline,hot))                    void      sincosf(float x, float *s, float *c){vfloat2_purecfma_scalar_sleef r = Sleef_sincosf1_u35purecfma(x); *s = r.x; *c = r.y;}

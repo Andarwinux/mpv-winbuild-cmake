@@ -49,6 +49,7 @@ ExternalProject_Add(qt6-qttools
         -DQT_FEATURE_kmap2qmap=OFF
         -DQT_FEATURE_libcpp_hardening=OFF
         -DQT_FEATURE_library=OFF
+        -DQT_FEATURE_liburing=OFF
         -DQT_FEATURE_linguist=ON
         -DQT_FEATURE_network=OFF
         -DQT_FEATURE_opengl_desktop=OFF

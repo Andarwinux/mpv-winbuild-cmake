@@ -51,6 +51,7 @@ ExternalProject_Add(qt6-qtbase
         -DQT_FEATURE_libcpp_hardening=OFF
         -DQT_FEATURE_library=OFF
         -DQT_FEATURE_libstdcpp_assertions=OFF
+        -DQT_FEATURE_liburing=OFF
         -DQT_FEATURE_network=OFF
         -DQT_FEATURE_opengl_desktop=OFF
         -DQT_FEATURE_opengl_dynamic=OFF

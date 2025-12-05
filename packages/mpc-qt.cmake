@@ -4,7 +4,7 @@ ExternalProject_Add(mpc-qt
         qt6-qtbase
         qt6-qtsvg
         qt6-qttools
-    GIT_REPOSITORY https://github.com/Andarwinux/mpc-qt.git
+    GIT_REPOSITORY https://github.com/mpc-qt/mpc-qt.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
@@ -18,11 +18,12 @@ ExternalProject_Add(mpc-qt
         ${qt_target_features}
         ${qt_force_skip_check}
         -DMPCQT_VERSION=100
+        -DCMAKE_DISABLE_FIND_PACKAGE_Boost=OFF
         -DCMAKE_PREFIX_PATH=${MINGW_INSTALL_PREFIX}/qt6
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=<BINARY_DIR>
         "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -lpathcch -Wl,-delayload=VSScript.dll -Wl,-delayload=VapourSynth.dll'"
-    COMMAND ${CMAKE_COMMAND} -E copy ${mpv_src}/etc/mpv-icon.ico <BINARY_DIR>/mpc-qt.ico
+    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/images/icon/mpc-qt.ico <BINARY_DIR>/mpc-qt.ico
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

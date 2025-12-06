@@ -7,6 +7,7 @@ ExternalProject_Add(llvm-clang
         mingw-w64-gendef
         cppwinrt
         sleef
+        directx-headers
         #openlibm
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${SOURCE_LOCATION}

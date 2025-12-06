@@ -3,7 +3,6 @@ ExternalProject_Add(libsdl2
         vulkan
         libiconv
         libsamplerate
-        directx-headers
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --no-single-branch --sparse --filter=tree:0"

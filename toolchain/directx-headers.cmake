@@ -1,4 +1,6 @@
 ExternalProject_Add(directx-headers
+    DEPENDS
+        mingw-w64-headers
     GIT_REPOSITORY https://github.com/microsoft/DirectX-Headers.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_REMOTE_NAME origin

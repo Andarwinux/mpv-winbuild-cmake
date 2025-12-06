@@ -62,6 +62,7 @@ list(APPEND ep
     spirv-cross
     glslang
     vulkan-header
+    directx-headers
     vulkan
     libsdl2
     openal-soft

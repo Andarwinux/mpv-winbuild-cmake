@@ -18,8 +18,8 @@ ExternalProject_Add(rubberband
         -Djni=disabled
         -Dcmdline=disabled
         -Dtests=disabled
-        "-Dc_args='-DNO_EXCEPTIONS'"
-        "-Dcpp_args='-DNO_EXCEPTIONS'"
+        "-Dc_args='-DNO_EXCEPTIONS -DLACK_SINCOS'"
+        "-Dcpp_args='-DNO_EXCEPTIONS -DLACK_SINCOS'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

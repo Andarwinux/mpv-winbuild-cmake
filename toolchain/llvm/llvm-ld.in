@@ -21,7 +21,7 @@ else
         export LLD_IN_TEST=1 #https://github.com/llvm/llvm-project/issues/52861
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
-    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o @MINGW_INSTALL_PREFIX@/lib/llvmlibc.a"
+    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o @MINGW_INSTALL_PREFIX@/lib/llvmlibc.a -lsleefgnuabi"
 fi
 
 "$PROG" $FLAGS_INIT "$@" $FLAGS $SKIP_OPT

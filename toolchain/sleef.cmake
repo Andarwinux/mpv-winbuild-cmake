@@ -63,7 +63,7 @@ ExternalProject_Add(sleef
         -DSLEEF_DISABLE_SSL=ON
         -DSLEEF_ENABLE_TESTER=OFF
         -DSLEEF_ENABLE_TLFLOAT=OFF
-        -DENABLE_GNUABI=OFF
+        -DENABLE_GNUABI=ON
         -DOPENSSL_FOUND=OFF
         -DCMAKE_DISABLE_FIND_PACKAGE_OpenSSL=ON
         -DLIB_MPFR=''
@@ -74,6 +74,7 @@ ExternalProject_Add(sleef
         _BINARY_DIR=set:<BINARY_DIR>
         _FORCE_HIDE_DLLEXPORT=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libsleef.a libsleefdft.a inline_headers_util
+          COMMAND ${EXEC} _LTO_ENABLED=0 _PGO_ENABLED=0 ninja -C <BINARY_DIR> libsleefgnuabi.a
     INSTALL_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

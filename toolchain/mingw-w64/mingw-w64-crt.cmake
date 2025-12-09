@@ -26,7 +26,7 @@ ExternalProject_Add(mingw-w64-crt
         _IS_UNWIND_ALLOWED=set:1
         _FORCE_BUILTIN=set:1
         _NOCCACHE=set:1
-    BUILD_COMMAND ${MAKE} "CCC_OVERRIDE_OPTIONS='+-fno-builtin-sin +-fno-builtin-sinf +-fno-builtin-sinl'"
+    BUILD_COMMAND ${MAKE} "CCC_OVERRIDE_OPTIONS='+-fno-builtin-sin +-fno-builtin-sinf +-fno-builtin-sinl +-fno-builtin-cos +-fno-builtin-cosf +-fno-builtin-cosl +-fno-builtin-ldexp +-fno-builtin-ldexpf +-fno-builtin-ldexpl'"
     INSTALL_COMMAND ${MAKE} install
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libpowrprof.a ${MINGW_INSTALL_PREFIX}/lib/libPowrProf.a
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libiphlpapi.a ${MINGW_INSTALL_PREFIX}/lib/libIphlpapi.a

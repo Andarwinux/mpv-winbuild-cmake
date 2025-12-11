@@ -1,0 +1,81 @@
+From 39cc6bd38afeec4433f17a78bc5163aa896ebf7d Mon Sep 17 00:00:00 2001
+From: Andarwinux <Andarwinux@users.noreply.github.com>
+Date: Wed, 10 Dec 2025 00:00:00 +0000
+Subject: [PATCH] bitmap_engine: use static cpu_flags to improve DCE
+
+Determines the baseline for runtime schedule based on the ISA available at compile time, allows compiler to eliminate routines that will never be used that have been unconditionally overwritten.
+---
+ libass/ass_bitmap_engine.c | 30 +++++++++++++++++++++++++++++-
+ libass/ass_bitmap_engine.h |  5 ++++-
+ 2 files changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/libass/ass_bitmap_engine.c b/libass/ass_bitmap_engine.c
+index 847adc4..67d3a34 100644
+--- a/libass/ass_bitmap_engine.c
++++ b/libass/ass_bitmap_engine.c
+@@ -110,6 +110,29 @@
+     BLUR_FUNCTIONS(align_order_, alignment, suffix)
+ 
+ 
++static inline unsigned ass_get_cpu_flags_static(void)
++{
++    unsigned flags = ASS_CPU_FLAG_NONE;
++
++#if ARCH_X86
++  #ifdef __AVX2__
++    flags |= ASS_CPU_FLAG_X86_AVX2;
++  #endif
++  #ifdef __SSSE3__
++    flags |= ASS_CPU_FLAG_X86_SSSE3;
++  #endif
++  #ifdef __SSE2__
++    flags |= ASS_CPU_FLAG_X86_SSE2;
++  #endif
++#elif ARCH_AARCH64
++  #ifdef __ARM_NEON
++    flags |= ASS_CPU_FLAG_ARM_NEON;
++  #endif
++#endif
++
++    return flags;
++}
++
+ unsigned ass_get_cpu_flags(unsigned mask)
+ {
+     unsigned flags = ASS_CPU_FLAG_NONE;
+@@ -168,7 +191,12 @@ BitmapEngine ass_bitmap_engine_init(unsigned mask)
+     engine.tile_order = mask & ASS_FLAG_LARGE_TILES ? 5 : 4;
+ 
+ #if CONFIG_ASM
+-    unsigned flags = ass_get_cpu_flags(mask);
++    unsigned flags = ass_get_cpu_flags_static();
++    if (flags != ASS_CPU_FLAG_ALL) {
++        if ((mask & ASS_CPU_FLAG_ALL) != ASS_CPU_FLAG_NONE) {
++            flags |= ass_get_cpu_flags(mask);
++        }
++    }
+ #if ARCH_X86
+     if (flags & ASS_CPU_FLAG_X86_AVX2) {
+         ALL_PROTOTYPES(32, avx2)
+diff --git a/libass/ass_bitmap_engine.h b/libass/ass_bitmap_engine.h
+index 68d7aa8..53e3bc1 100644
+--- a/libass/ass_bitmap_engine.h
++++ b/libass/ass_bitmap_engine.h
+@@ -93,10 +93,13 @@ enum {
+     ASS_CPU_FLAG_X86_SSE2      = 0x0001,
+     ASS_CPU_FLAG_X86_SSSE3     = 0x0002,
+     ASS_CPU_FLAG_X86_AVX2      = 0x0004,
++    ASS_CPU_FLAG_ALL           = ASS_CPU_FLAG_X86_SSE2 | ASS_CPU_FLAG_X86_SSSE3 | ASS_CPU_FLAG_X86_AVX2,
+ #elif ARCH_AARCH64
+     ASS_CPU_FLAG_ARM_NEON      = 0x0001,
+-#endif
++    ASS_CPU_FLAG_ALL           = ASS_CPU_FLAG_ARM_NEON,
++#else
+     ASS_CPU_FLAG_ALL           = 0x0FFF,
++#endif
+     ASS_FLAG_LARGE_TILES       = 0x1000,
+     ASS_FLAG_WIDE_STRIPE       = 0x2000,  // for C version only
+ };
+-- 
+2.52.0
+

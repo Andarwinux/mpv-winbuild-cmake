@@ -270,6 +270,7 @@ set(qt_target_features
     -DQT_FEATURE_vulkan=ON
     -DQT_FEATURE_wasmdeployqt=OFF
     -DQT_FEATURE_winsdkicu=ON
+    -DQT_FEATURE_windows_ioring=ON
     -DQT_FEATURE_zstd=ON
 )
 

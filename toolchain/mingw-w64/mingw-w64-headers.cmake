@@ -18,7 +18,8 @@ ExternalProject_Add(mingw-w64-headers
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/include/shlobj.h ${MINGW_INSTALL_PREFIX}/include/Shlobj.h
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/include/shellapi.h ${MINGW_INSTALL_PREFIX}/include/Shellapi.h
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/include/objbase.h ${MINGW_INSTALL_PREFIX}/include/Objbase.h
-            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/headers/icu.h ${MINGW_INSTALL_PREFIX}/include/
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/headers/icu.h ${MINGW_INSTALL_PREFIX}/include/icu.h
+            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/headers/winerror.h ${MINGW_INSTALL_PREFIX}/include/winerror.h
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

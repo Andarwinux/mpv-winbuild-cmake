@@ -70,15 +70,18 @@ else
     if [ "@LLVM_ENABLE_PGO@" == "GEN" ] || [ "@LLVM_ENABLE_PGO@" == "CSGEN" ]; then
         export LLVM_PROFILE_FILE="@LLVM_PROFILE_DATA_DIR@/clang-%m.profraw"
     fi
-    if [ "@CLANG_PACKAGES_PGO@" == "USE" ] && [ "$_PGO_ENABLED" != "0" ]; then
-        PGO_FLAGS="-fprofile-use=@CLANG_PACKAGES_PROFDATA_FILE@"
-    fi
     FLAGS+=" @CLANG_FLAGS@ $EXTRA_CFLAGS"
     FLAGS_INIT="$EXTRA_CFLAGS_INIT"
 fi
 
-if [ "@CLANG_PACKAGES_PGO@" == "GEN" ] && [ "$_PGO_ENABLED" != "0" ]; then
-    PGO_FLAGS="-fprofile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64"
+if [ "$_PGO_ENABLED" != "0" ]; then
+    if [ "@CLANG_PACKAGES_PGO@" == "USE" ]; then
+        PGO_FLAGS="-fprofile-use=@CLANG_PACKAGES_PROFDATA_FILE@"
+    elif [ "@CLANG_PACKAGES_PGO@" == "GEN" ]; then
+        PGO_FLAGS="-fprofile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64"
+    elif [ "@CLANG_PACKAGES_PGO@" == "CSGEN" ]; then
+        PGO_FLAGS="-fcs-profile-generate="@CLANG_PACKAGES_PROFILE_DATA_DIR@" -fprofile-update=atomic -mllvm -vp-counters-per-site=64 -fprofile-use=@CLANG_PACKAGES_PROFDATA_FILE@"
+    fi
 fi
 
 if [ -n "$_PACKAGE_NAME" ] && [ -n "$_BINARY_DIR" ]; then

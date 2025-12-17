@@ -5,11 +5,12 @@ ExternalProject_Add(openssl
         brotli
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
+    GIT_RESET 131c2a1adba13fa549e68dc3ebeb8447b8667348
     UPDATE_COMMAND ""
     PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION

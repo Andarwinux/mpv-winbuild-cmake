@@ -1,18 +1,88 @@
-From 39cc6bd38afeec4433f17a78bc5163aa896ebf7d Mon Sep 17 00:00:00 2001
+From e7c2c9ebf6d20c3e7f4be39ef03e271ff8def2c7 Mon Sep 17 00:00:00 2001
 From: Andarwinux <Andarwinux@users.noreply.github.com>
-Date: Wed, 10 Dec 2025 00:00:00 +0000
-Subject: [PATCH] bitmap_engine: use static cpu_flags to improve DCE
+Date: Sat, 13 Dec 2025 00:00:00 +0000
+Subject: [PATCH 1/2] bitmap_engine: use static cpu_flags to improve DCE
 
-Determines the baseline for runtime schedule based on the ISA available at compile time, allows compiler to eliminate routines that will never be used that have been unconditionally overwritten.
+Determines the baseline for runtime dispatch based on the ISA available at compile time, allows compiler to eliminate routines that will never be used that have been unconditionally overwritten.
 ---
- libass/ass_bitmap_engine.c | 30 +++++++++++++++++++++++++++++-
- libass/ass_bitmap_engine.h |  5 ++++-
- 2 files changed, 33 insertions(+), 2 deletions(-)
+ checkasm/be_blur.c         |  2 +-
+ checkasm/blend_bitmaps.c   |  2 +-
+ checkasm/blur.c            |  4 ++--
+ checkasm/rasterizer.c      |  4 ++--
+ libass/ass_bitmap_engine.c | 49 ++++++++++++++++++++++++++++++++++----
+ libass/ass_bitmap_engine.h |  9 +++++--
+ libass/ass_render.c        |  6 +----
+ libass/ass_utils.h         |  9 +++++++
+ 8 files changed, 67 insertions(+), 18 deletions(-)
 
+diff --git a/checkasm/be_blur.c b/checkasm/be_blur.c
+index 1aba5af96..f7b8e829d 100644
+--- a/checkasm/be_blur.c
++++ b/checkasm/be_blur.c
+@@ -66,6 +66,6 @@ static void check_be_blur(BeBlurFunc func)
+ 
+ void checkasm_check_be_blur(unsigned cpu_flag)
+ {
+-    BitmapEngine engine = ass_bitmap_engine_init(cpu_flag);
++    BitmapEngine engine = ass_bitmap_engine_init_checkasm(cpu_flag);
+     check_be_blur(engine.be_blur);
+ }
+diff --git a/checkasm/blend_bitmaps.c b/checkasm/blend_bitmaps.c
+index bf119a082..94eeb9b7f 100644
+--- a/checkasm/blend_bitmaps.c
++++ b/checkasm/blend_bitmaps.c
+@@ -101,7 +101,7 @@ static void check_mul_bitmaps(BitmapMulFunc func)
+ 
+ void checkasm_check_blend_bitmaps(unsigned cpu_flag)
+ {
+-    BitmapEngine engine = ass_bitmap_engine_init(cpu_flag);
++    BitmapEngine engine = ass_bitmap_engine_init_checkasm(cpu_flag);
+     check_blend_bitmaps(engine.add_bitmaps, "add_bitmaps");
+     check_blend_bitmaps(engine.imul_bitmaps, "imul_bitmaps");
+     check_mul_bitmaps(engine.mul_bitmaps);
+diff --git a/checkasm/blur.c b/checkasm/blur.c
+index bd5a9f37d..f1b74aafe 100644
+--- a/checkasm/blur.c
++++ b/checkasm/blur.c
+@@ -178,8 +178,8 @@ static void check_param_filter(ParamFilterFunc func, const char *name, int n, in
+ void checkasm_check_blur(unsigned cpu_flag)
+ {
+     BitmapEngine engine[2] = {
+-        ass_bitmap_engine_init(cpu_flag),
+-        ass_bitmap_engine_init(cpu_flag | ASS_FLAG_WIDE_STRIPE)
++        ass_bitmap_engine_init_checkasm(cpu_flag),
++        ass_bitmap_engine_init_checkasm(cpu_flag | ASS_FLAG_WIDE_STRIPE)
+     };
+     for (int i = 0; i < 2; i++) {
+         int align = 1 << engine[i].align_order;
+diff --git a/checkasm/rasterizer.c b/checkasm/rasterizer.c
+index 505dca22c..6cba94ae9 100644
+--- a/checkasm/rasterizer.c
++++ b/checkasm/rasterizer.c
+@@ -199,8 +199,8 @@ static void check_merge_tile(MergeTileFunc func, const char *name, int tile_size
+ void checkasm_check_rasterizer(unsigned cpu_flag)
+ {
+     BitmapEngine engine[2] = {
+-        ass_bitmap_engine_init(cpu_flag),
+-        ass_bitmap_engine_init(cpu_flag | ASS_FLAG_LARGE_TILES)
++        ass_bitmap_engine_init_checkasm(cpu_flag),
++        ass_bitmap_engine_init_checkasm(cpu_flag | ASS_FLAG_LARGE_TILES)
+     };
+     for (int i = 0; i < 2; i++) {
+         int tile_size = 1 << engine[i].tile_order;
 diff --git a/libass/ass_bitmap_engine.c b/libass/ass_bitmap_engine.c
-index 847adc4..67d3a34 100644
+index 847adc4fb..fa5e3ac9b 100644
 --- a/libass/ass_bitmap_engine.c
 +++ b/libass/ass_bitmap_engine.c
+@@ -32,7 +32,7 @@
+     MergeTileFunc         ass_merge_tile          ## tile_size ## _ ## suffix;
+ 
+ #define RASTERIZER_FUNCTION(name, suffix) \
+-    engine.name = mask & ASS_FLAG_LARGE_TILES ? \
++    engine.name = flags & ASS_FLAG_LARGE_TILES ? \
+         ass_ ## name ## _tile32_ ## suffix : \
+         ass_ ## name ## _tile16_ ## suffix;
+ 
 @@ -110,6 +110,29 @@
      BLUR_FUNCTIONS(align_order_, alignment, suffix)
  
@@ -43,25 +113,64 @@ index 847adc4..67d3a34 100644
  unsigned ass_get_cpu_flags(unsigned mask)
  {
      unsigned flags = ASS_CPU_FLAG_NONE;
-@@ -168,7 +191,12 @@ BitmapEngine ass_bitmap_engine_init(unsigned mask)
-     engine.tile_order = mask & ASS_FLAG_LARGE_TILES ? 5 : 4;
+@@ -160,15 +183,14 @@ unsigned ass_get_cpu_flags(unsigned mask)
+     return flags & mask;
+ }
+ 
+-BitmapEngine ass_bitmap_engine_init(unsigned mask)
++ASS_FORCELINE static inline BitmapEngine ass_bitmap_engine_init_impl(unsigned flags)
+ {
+     ALL_PROTOTYPES(16, c)
+     BLUR_PROTOTYPES(32, c)
+     BitmapEngine engine = {0};
+-    engine.tile_order = mask & ASS_FLAG_LARGE_TILES ? 5 : 4;
++    engine.tile_order = flags & ASS_FLAG_LARGE_TILES ? 5 : 4;
  
  #if CONFIG_ASM
 -    unsigned flags = ass_get_cpu_flags(mask);
-+    unsigned flags = ass_get_cpu_flags_static();
-+    if (flags != ASS_CPU_FLAG_ALL) {
-+        if ((mask & ASS_CPU_FLAG_ALL) != ASS_CPU_FLAG_NONE) {
-+            flags |= ass_get_cpu_flags(mask);
-+        }
-+    }
  #if ARCH_X86
      if (flags & ASS_CPU_FLAG_X86_AVX2) {
          ALL_PROTOTYPES(32, avx2)
+@@ -197,8 +219,25 @@ BitmapEngine ass_bitmap_engine_init(unsigned mask)
+ #endif
+ 
+     ALL_FUNCTIONS(4, 16, c)
+-    if (mask & ASS_FLAG_WIDE_STRIPE) {
++    if (flags & ASS_FLAG_WIDE_STRIPE) {
+         BLUR_FUNCTIONS(5, 32, c)
+     }
+     return engine;
+ }
++
++BitmapEngine ass_bitmap_engine_init(void)
++{
++    unsigned flags = ass_get_cpu_flags_static();
++    if (flags != ASS_CPU_FLAG_ALL) {
++        flags |= ass_get_cpu_flags(ASS_CPU_FLAG_ALL);
++    }
++#if CONFIG_LARGE_TILES
++    flags |= ASS_FLAG_LARGE_TILES;
++#endif
++    return ass_bitmap_engine_init_impl(flags);
++}
++
++BitmapEngine ass_bitmap_engine_init_checkasm(unsigned mask)
++{
++    return ass_bitmap_engine_init_impl((mask & ~ASS_CPU_FLAG_ALL) | ass_get_cpu_flags(mask));
++}
 diff --git a/libass/ass_bitmap_engine.h b/libass/ass_bitmap_engine.h
-index 68d7aa8..53e3bc1 100644
+index 68d7aa846..6c69a0b1f 100644
 --- a/libass/ass_bitmap_engine.h
 +++ b/libass/ass_bitmap_engine.h
-@@ -93,10 +93,13 @@ enum {
+@@ -21,6 +21,7 @@
+ 
+ #include <stddef.h>
+ #include <stdint.h>
++#include "ass_utils.h"
+ 
+ /*
+  * All of these routines require some basic preconditions about their args:
+@@ -93,16 +94,20 @@ enum {
      ASS_CPU_FLAG_X86_SSE2      = 0x0001,
      ASS_CPU_FLAG_X86_SSSE3     = 0x0002,
      ASS_CPU_FLAG_X86_AVX2      = 0x0004,
@@ -76,6 +185,103 @@ index 68d7aa8..53e3bc1 100644
      ASS_FLAG_LARGE_TILES       = 0x1000,
      ASS_FLAG_WIDE_STRIPE       = 0x2000,  // for C version only
  };
--- 
-2.52.0
+ 
+ unsigned ass_get_cpu_flags(unsigned mask);
+ 
+-BitmapEngine ass_bitmap_engine_init(unsigned mask);
++ASS_INTERNAL BitmapEngine ass_bitmap_engine_init(void);
++ASS_INTERNAL BitmapEngine ass_bitmap_engine_init_checkasm(unsigned mask);
+ 
+ #endif /* LIBASS_BITMAP_ENGINE_H */
+diff --git a/libass/ass_render.c b/libass/ass_render.c
+index c291d26e4..1009006d9 100644
+--- a/libass/ass_render.c
++++ b/libass/ass_render.c
+@@ -129,11 +129,7 @@ ASS_Renderer *ass_renderer_init(ASS_Library *library)
+     priv->ftlibrary = ft;
+     // images_root and related stuff is zero-filled in calloc
+ 
+-    unsigned flags = ASS_CPU_FLAG_ALL;
+-#if CONFIG_LARGE_TILES
+-    flags |= ASS_FLAG_LARGE_TILES;
+-#endif
+-    priv->engine = ass_bitmap_engine_init(flags);
++    priv->engine = ass_bitmap_engine_init();
+ 
+     priv->cache.font_cache = ass_font_cache_create();
+     priv->cache.bitmap_cache = ass_bitmap_cache_create();
+diff --git a/libass/ass_utils.h b/libass/ass_utils.h
+index 5b7cc7a86..40ffb1567 100644
+--- a/libass/ass_utils.h
++++ b/libass/ass_utils.h
+@@ -32,6 +32,15 @@
+ 
+ #if defined(_MSC_VER) && !defined(__clang__)
+ #include <intrin.h>
++#define ASS_FORCELINE __forceinline
++#else
++#define ASS_FORCELINE __attribute__((always_inline))
++#endif
++
++#ifndef _WIN32
++#define ASS_INTERNAL __attribute__((visibility("hidden")))
++#else
++#define ASS_INTERNAL
+ #endif
+ 
+ #include "ass.h"
 
+From 5bab9640b144ad60d9b98fe69eef74031ec430d3 Mon Sep 17 00:00:00 2001
+From: Andarwinux <Andarwinux@users.noreply.github.com>
+Date: Sat, 20 Dec 2025 00:00:00 +0000
+Subject: [PATCH 2/2] x86inc.asm: add support for separate .text sections
+
+this allows linkers to discard unused asm code
+---
+ libass/x86/x86inc.asm | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/libass/x86/x86inc.asm b/libass/x86/x86inc.asm
+index fc490b6f4..ab4a52b57 100644
+--- a/libass/x86/x86inc.asm
++++ b/libass/x86/x86inc.asm
+@@ -763,9 +763,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
+ 
+ %define last_branch_adr $$
+ %macro AUTO_REP_RET 0
+-    %if notcpuflag(ssse3)
+-        times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
+-    %endif
++    ;%if notcpuflag(ssse3)
++    ;    times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
++    ;%endif
+     ret
+     annotate_function_size
+ %endmacro
+@@ -828,14 +828,23 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+     %xdefine current_function_section __SECT__
+     %if FORMAT_ELF
+         %if %1
++            section .text.%2 progbits alloc exec nowrite
+             global %2:function hidden
+         %else
+             global %2:function
+         %endif
+-    %elif FORMAT_MACHO && HAVE_PRIVATE_EXTERN && %1
+-        global %2:private_extern
++    %elif FORMAT_MACHO
++        %if HAVE_PRIVATE_EXTERN && %1
++            global %2:private_extern
++        %else
++            global %2
++        %endif
+     %else
+-        global %2
++        %if %1
++            section .text$%2 comdat=1:%2
++        %else
++            global %2
++        %endif
+     %endif
+     align function_align
+     %2:

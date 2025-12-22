@@ -22,8 +22,8 @@ ExternalProject_Add(mpc-qt
         -DCMAKE_PREFIX_PATH=${MINGW_INSTALL_PREFIX}/qt6
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=<BINARY_DIR>
-        "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -lpathcch -Wl,-delayload=VSScript.dll -Wl,-delayload=VapourSynth.dll'"
-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/images/icon/mpc-qt.ico <BINARY_DIR>/mpc-qt.ico
+        "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -lpathcch -lshcore -Wl,-delayload=VSScript.dll -Wl,-delayload=VapourSynth.dll'"
+    COMMAND ${CMAKE_COMMAND} -E copy ${mpv_src}/etc/mpv-icon.ico <BINARY_DIR>/mpc-qt.ico
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -5,17 +5,17 @@ ExternalProject_Add(openssl
         brotli
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
-    GIT_RESET 131c2a1adba13fa549e68dc3ebeb8447b8667348
     UPDATE_COMMAND ""
     PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
+    CONFIGURE_COMMAND ${EXEC} sed -i [['1i#include <stdint.h>']] <SOURCE_DIR>/include/openssl/e_os2.h
+    COMMAND  ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
     COMMAND ${EXEC} <BINARY_DIR>/source/${package}/Configure
         --cross-compile-prefix=${TARGET_ARCH}-
         --prefix=${MINGW_INSTALL_PREFIX}

@@ -1,6 +1,7 @@
 if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
     set(mpv_conf
         ${meson_conf_args}
+        -Damf=enabled
         -Dbuild-date=true
         -Dcplugins=enabled
         -Dcuda-hwaccel=enabled

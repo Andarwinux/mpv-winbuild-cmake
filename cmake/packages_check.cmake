@@ -240,9 +240,9 @@ set(qt_target_features
     -DQT_FEATURE_egl=OFF
     -DQT_FEATURE_fontconfig=OFF
     -DQT_FEATURE_harfbuzz=ON
-    -DQT_FEATURE_imageformat_jpeg=OFF
+    -DQT_FEATURE_imageformat_jpeg=ON
     -DQT_FEATURE_intelcet=OFF
-    -DQT_FEATURE_jpeg=OFF
+    -DQT_FEATURE_jpeg=ON
     -DQT_FEATURE_libcpp_hardening=OFF
     -DQT_FEATURE_networklistmanager=OFF
     -DQT_FEATURE_openssl_linked=ON
@@ -263,6 +263,7 @@ set(qt_target_features
     -DQT_FEATURE_system_png=ON
     -DQT_FEATURE_system_sqlite=OFF
     -DQT_FEATURE_system_webp=ON
+    -DQT_FEATURE_system_jpeg=ON
     -DQT_FEATURE_system_zlib=ON
     -DQT_FEATURE_test_gui=OFF
     -DQT_FEATURE_testlib=OFF
@@ -333,7 +334,7 @@ set(qt_force_skip_check
     -DCMAKE_DISABLE_FIND_PACKAGE_ICU=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_Interbase=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_JeMalloc=ON
-    -DCMAKE_DISABLE_FIND_PACKAGE_JPEG=ON
+    -DCMAKE_DISABLE_FIND_PACKAGE_JPEG=OFF
     -DCMAKE_DISABLE_FIND_PACKAGE_Libb2=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_Libdrm=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_Libinput=ON
@@ -361,9 +362,10 @@ set(qt_force_skip_check
     -DCMAKE_DISABLE_FIND_PACKAGE_WrapResolv=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_WrapRt=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_WrapSystemDoubleConversion=ON
-    -DCMAKE_DISABLE_FIND_PACKAGE_WrapSystemJpeg=ON
+    -DCMAKE_DISABLE_FIND_PACKAGE_WrapSystemJpeg=OFF
     -DCMAKE_DISABLE_FIND_PACKAGE_WrapSystemMd4c=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_WrapSystemPCRE2=ON
+    -DCMAKE_DISABLE_FIND_PACKAGE_Liburing=ON
     -DCMAKE_DISABLE_FIND_PACKAGE_X11_XCB=ON
 )
 

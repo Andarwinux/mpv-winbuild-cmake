@@ -9,6 +9,7 @@ ExternalProject_Add(qt6-qtbase
         openssl
         bzip2
         harfbuzz
+        libjpeg
     GIT_REPOSITORY https://github.com/qt/qtbase.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --no-single-branch --sparse --filter=tree:0"

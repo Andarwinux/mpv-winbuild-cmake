@@ -14,7 +14,9 @@ ExternalProject_Add(libjpeg
         -DENABLE_SHARED=OFF
         -DWITH_TESTS=OFF
         -DWITH_TOOLS=OFF
+        -DWITH_SIMD=OFF
         -DWITH_TURBOJPEG=OFF
+        "-DCMAKE_C_FLAGS='-DNO_GETENV'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -21,6 +21,7 @@ ExternalProject_Add(llvm-host-compiler-rt-builtin
         -DCOMPILER_RT_HAS_ATOMIC_KEYWORD=ON
         -DCOMPILER_RT_INCLUDE_TESTS=OFF
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON
+        -DCOMPILER_RT_HAS_FNO_LTO_FLAG=OFF
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
         "-DCMAKE_C_FLAGS='${tc_cflags}'"
         "-DCMAKE_CXX_FLAGS='${tc_cflags}'"

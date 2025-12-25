@@ -32,6 +32,7 @@ ExternalProject_Add(llvm-host-compiler-rt
         -DCOMPILER_RT_TARGET_HAS_FCNTL_LCK=ON
         -DCOMPILER_RT_TARGET_HAS_FLOCK=ON
         -DCOMPILER_RT_TARGET_HAS_UNAME=ON
+        -DCOMPILER_RT_HAS_FNO_LTO_FLAG=OFF
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
         "-DCMAKE_C_FLAGS='${tc_cflags} ${tc_libcxx} ${tc_compiler_rt}'"
         "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_libcxx} ${tc_compiler_rt}'"

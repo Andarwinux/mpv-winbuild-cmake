@@ -54,9 +54,9 @@ ExternalProject_Add(mimalloc-host
         -DCMAKE_PLATFORM_NO_VERSIONED_SONAME=ON
         "-DCMAKE_REQUIRED_FLAGS='-O0 -fno-lto -fno-whole-program-vtables'"
         "-DCMAKE_REQUIRED_LINK_OPTIONS='-Wl,-O0,--lto-O0,--lto-CGO0,--no-gc-sections,--icf=none,--no-lto-whole-program-visibility,-mllvm,-polly=false'"
-        "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
-        "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
-        "-DCMAKE_ASM_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -ftls-model=initial-exec --unwindlib=none'"
+        "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -flto=full -ftls-model=initial-exec --unwindlib=none'"
+        "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -flto=full -ftls-model=initial-exec --unwindlib=none'"
+        "-DCMAKE_ASM_FLAGS='-DMI_DEBUG=0 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo} -flto=full -ftls-model=initial-exec --unwindlib=none'"
         "-DCMAKE_SHARED_LINKER_FLAGS='${tc_ldflags}'"
     BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>
           COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>/shared

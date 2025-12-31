@@ -1,0 +1,188 @@
+From 2d54168ec41c3c438214df30a0a9764cbc0953f1 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Wed, 31 Dec 2025 00:00:00 +0000
+Subject: [PATCH] add static dispatch support
+
+---
+ Source/Lib/ASM_AVX2/convolve_avx2.c |  2 +-
+ Source/Lib/Codec/aom_dsp_rtcd.c     | 46 ++++++++++++++++----
+ Source/Lib/Codec/common_dsp_rtcd.c  | 65 ++++++++++++++++++++++++-----
+ 3 files changed, 94 insertions(+), 19 deletions(-)
+
+diff --git a/Source/Lib/ASM_AVX2/convolve_avx2.c b/Source/Lib/ASM_AVX2/convolve_avx2.c
+index ff5a7b9..df61e24 100644
+--- a/Source/Lib/ASM_AVX2/convolve_avx2.c
++++ b/Source/Lib/ASM_AVX2/convolve_avx2.c
+@@ -1577,7 +1577,7 @@ void svt_aom_subtract_block_avx2(int rows, int cols, int16_t *diff_ptr, ptrdiff_
+         aom_subtract_block_128xn_avx2(rows, diff_ptr, diff_stride, src_ptr, src_stride, pred_ptr, pred_stride);
+         break;
+     default:
+-        svt_aom_subtract_block_sse2(rows, cols, diff_ptr, diff_stride, src_ptr, src_stride, pred_ptr, pred_stride);
++        svt_aom_subtract_block_c(rows, cols, diff_ptr, diff_stride, src_ptr, src_stride, pred_ptr, pred_stride);
+         break;
+     }
+ }
+diff --git a/Source/Lib/Codec/aom_dsp_rtcd.c b/Source/Lib/Codec/aom_dsp_rtcd.c
+index 3203138..770692e 100644
+--- a/Source/Lib/Codec/aom_dsp_rtcd.c
++++ b/Source/Lib/Codec/aom_dsp_rtcd.c
+@@ -36,13 +36,13 @@
+ #endif /* EN_AVX512_SUPPORT */
+ 
+ #define SET_FUNCTIONS_X86(ptr, c, mmx, sse, sse2, sse3, ssse3, sse4_1, sse4_2, avx, avx2, avx512) \
+-    if (((uintptr_t)NULL != (uintptr_t)mmx)    && (flags & HAS_MMX))    ptr = mmx;                \
+-    if (((uintptr_t)NULL != (uintptr_t)sse)    && (flags & HAS_SSE))    ptr = sse;                \
+-    if (((uintptr_t)NULL != (uintptr_t)sse2)   && (flags & HAS_SSE2))   ptr = sse2;               \
+-    if (((uintptr_t)NULL != (uintptr_t)sse3)   && (flags & HAS_SSE3))   ptr = sse3;               \
+-    if (((uintptr_t)NULL != (uintptr_t)ssse3)  && (flags & HAS_SSSE3))  ptr = ssse3;              \
+-    if (((uintptr_t)NULL != (uintptr_t)sse4_1) && (flags & HAS_SSE4_1)) ptr = sse4_1;             \
+-    if (((uintptr_t)NULL != (uintptr_t)sse4_2) && (flags & HAS_SSE4_2)) ptr = sse4_2;             \
++    /*if (((uintptr_t)NULL != (uintptr_t)mmx)    && (flags & HAS_MMX))    ptr = mmx;*/                \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse)    && (flags & HAS_SSE))    ptr = sse;*/                \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse2)   && (flags & HAS_SSE2))   ptr = sse2;*/               \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse3)   && (flags & HAS_SSE3))   ptr = sse3;*/               \
++    /*if (((uintptr_t)NULL != (uintptr_t)ssse3)  && (flags & HAS_SSSE3))  ptr = ssse3;*/              \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse4_1) && (flags & HAS_SSE4_1)) ptr = sse4_1;*/             \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse4_2) && (flags & HAS_SSE4_2)) ptr = sse4_2;*/             \
+     if (((uintptr_t)NULL != (uintptr_t)avx)    && (flags & HAS_AVX))    ptr = avx;                \
+     if (((uintptr_t)NULL != (uintptr_t)avx2)   && (flags & HAS_AVX2))   ptr = avx2;               \
+     SET_FUNCTIONS_AVX512(ptr, avx512)
+@@ -193,7 +193,37 @@ void svt_aom_setup_rtcd_internal(EbCpuFlags flags) {
+     /** Should be done during library initialization,
+         but for safe limiting cpu flags again. */
+ #if defined ARCH_X86_64 || defined ARCH_AARCH64
+-    flags &= svt_aom_get_cpu_flags_to_use();
++    flags = svt_aom_get_cpu_flags_to_use();
++    #if defined ARCH_X86_64
++        #if defined(__AVX__)
++            flags |= EB_CPU_FLAGS_AVX;
++        #endif
++        #if defined(__AVX2__)
++            flags |= EB_CPU_FLAGS_AVX2;
++        #endif
++        #if defined(__AVX512F__) && defined(__AVX512CD__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512VL__)
++            flags |=  EB_CPU_FLAGS_AVX512F | EB_CPU_FLAGS_AVX512CD | EB_CPU_FLAGS_AVX512DQ | EB_CPU_FLAGS_AVX512BW | EB_CPU_FLAGS_AVX512VL;
++            #if defined(__AVX512IFMA__) && defined(__AVX512VBMI__) && defined(__AVX512VBMI2__) && defined(__AVX512VL__) && defined(__AVX512BITALG__) && defined(__GFNI__) && defined(__AVX512VNNI__) && defined(__AVX512VPOPCNTDQ__)
++                flags |= EB_CPU_FLAGS_AVX512ICL;
++            #endif
++        #endif
++    #else
++        #if defined(__ARM_FEATURE_CRC32)
++            flags |= EB_CPU_FLAGS_ARM_CRC32;
++        #endif
++        #if defined(__ARM_FEATURE_DOTPROD)
++            flags |= EB_CPU_FLAGS_NEON_DOTPROD;
++        #endif
++        #if defined(__ARM_FEATURE_MATMUL_INT8)
++            flags |= EB_CPU_FLAGS_NEON_I8MM;
++        #endif
++        #if defined(__ARM_FEATURE_SVE)
++            flags |= EB_CPU_FLAGS_SVE;
++        #endif
++        #if defined(EB_CPU_FLAGS_SVE2)
++            flags |= EB_CPU_FLAGS_SVE2;
++        #endif
++    #endif
+ #else
+     flags = 0;
+     //to use C: flags=0
+diff --git a/Source/Lib/Codec/common_dsp_rtcd.c b/Source/Lib/Codec/common_dsp_rtcd.c
+index 73e18d9..220df52 100644
+--- a/Source/Lib/Codec/common_dsp_rtcd.c
++++ b/Source/Lib/Codec/common_dsp_rtcd.c
+@@ -257,6 +257,21 @@ EbCpuFlags svt_aom_get_cpu_flags() {
+     // safe to call multiple times, and threadsafe
+ 
+     flags |= EB_CPU_FLAGS_NEON;
++    #if defined(__ARM_FEATURE_CRC32)
++        flags |= EB_CPU_FLAGS_ARM_CRC32;
++    #endif
++    #if defined(__ARM_FEATURE_DOTPROD)
++        flags |= EB_CPU_FLAGS_NEON_DOTPROD;
++    #endif
++    #if defined(__ARM_FEATURE_MATMUL_INT8)
++        flags |= EB_CPU_FLAGS_NEON_I8MM;
++    #endif
++    #if defined(__ARM_FEATURE_SVE)
++        flags |= EB_CPU_FLAGS_SVE;
++    #endif
++    #if defined(EB_CPU_FLAGS_SVE2)
++        flags |= EB_CPU_FLAGS_SVE2;
++    #endif
+ 
+     return flags;
+ }
+@@ -297,13 +312,13 @@ EbCpuFlags svt_aom_get_cpu_flags_to_use() {
+ #endif /* EN_AVX512_SUPPORT */
+ 
+ #define SET_FUNCTIONS_X86(ptr, c, mmx, sse, sse2, sse3, ssse3, sse4_1, sse4_2, avx, avx2, avx512) \
+-    if (((uintptr_t)NULL != (uintptr_t)mmx)    && (flags & HAS_MMX))    ptr = mmx;                \
+-    if (((uintptr_t)NULL != (uintptr_t)sse)    && (flags & HAS_SSE))    ptr = sse;                \
+-    if (((uintptr_t)NULL != (uintptr_t)sse2)   && (flags & HAS_SSE2))   ptr = sse2;               \
+-    if (((uintptr_t)NULL != (uintptr_t)sse3)   && (flags & HAS_SSE3))   ptr = sse3;               \
+-    if (((uintptr_t)NULL != (uintptr_t)ssse3)  && (flags & HAS_SSSE3))  ptr = ssse3;              \
+-    if (((uintptr_t)NULL != (uintptr_t)sse4_1) && (flags & HAS_SSE4_1)) ptr = sse4_1;             \
+-    if (((uintptr_t)NULL != (uintptr_t)sse4_2) && (flags & HAS_SSE4_2)) ptr = sse4_2;             \
++    /*if (((uintptr_t)NULL != (uintptr_t)mmx)    && (flags & HAS_MMX))    ptr = mmx;*/                \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse)    && (flags & HAS_SSE))    ptr = sse;*/                \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse2)   && (flags & HAS_SSE2))   ptr = sse2;*/               \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse3)   && (flags & HAS_SSE3))   ptr = sse3;*/               \
++    /*if (((uintptr_t)NULL != (uintptr_t)ssse3)  && (flags & HAS_SSSE3))  ptr = ssse3;*/              \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse4_1) && (flags & HAS_SSE4_1)) ptr = sse4_1;*/             \
++    /*if (((uintptr_t)NULL != (uintptr_t)sse4_2) && (flags & HAS_SSE4_2)) ptr = sse4_2;*/             \
+     if (((uintptr_t)NULL != (uintptr_t)avx)    && (flags & HAS_AVX))    ptr = avx;                \
+     if (((uintptr_t)NULL != (uintptr_t)avx2)   && (flags & HAS_AVX2))   ptr = avx2;               \
+     SET_FUNCTIONS_AVX512(ptr, avx512)
+@@ -471,7 +486,37 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
+     /** Should be done during library initialization,
+         but for safe limiting cpu flags again. */
+ #if defined ARCH_X86_64 || defined ARCH_AARCH64
+-    flags &= svt_aom_get_cpu_flags_to_use();
++    flags = svt_aom_get_cpu_flags_to_use();
++    #if defined ARCH_X86_64
++        #if defined(__AVX__)
++            flags |= EB_CPU_FLAGS_AVX;
++        #endif
++        #if defined(__AVX2__)
++            flags |= EB_CPU_FLAGS_AVX2;
++        #endif
++        #if defined(__AVX512F__) && defined(__AVX512CD__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512VL__)
++            flags |=  EB_CPU_FLAGS_AVX512F | EB_CPU_FLAGS_AVX512CD | EB_CPU_FLAGS_AVX512DQ | EB_CPU_FLAGS_AVX512BW | EB_CPU_FLAGS_AVX512VL;
++            #if defined(__AVX512IFMA__) && defined(__AVX512VBMI__) && defined(__AVX512VBMI2__) && defined(__AVX512VL__) && defined(__AVX512BITALG__) && defined(__GFNI__) && defined(__AVX512VNNI__) && defined(__AVX512VPOPCNTDQ__)
++                flags |= EB_CPU_FLAGS_AVX512ICL;
++            #endif
++        #endif
++    #else
++        #if defined(__ARM_FEATURE_CRC32)
++            flags |= EB_CPU_FLAGS_ARM_CRC32;
++        #endif
++        #if defined(__ARM_FEATURE_DOTPROD)
++            flags |= EB_CPU_FLAGS_NEON_DOTPROD;
++        #endif
++        #if defined(__ARM_FEATURE_MATMUL_INT8)
++            flags |= EB_CPU_FLAGS_NEON_I8MM;
++        #endif
++        #if defined(__ARM_FEATURE_SVE)
++            flags |= EB_CPU_FLAGS_SVE;
++        #endif
++        #if defined(EB_CPU_FLAGS_SVE2)
++            flags |= EB_CPU_FLAGS_SVE2;
++        #endif
++    #endif
+ #else
+     flags = 0;
+     //to use C: flags=0
+@@ -562,8 +607,8 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
+     SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_2d_copy, svt_av1_jnt_convolve_2d_copy_c, svt_av1_jnt_convolve_2d_copy_sse2, svt_av1_jnt_convolve_2d_copy_avx2, svt_av1_jnt_convolve_2d_copy_avx512);
+     SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_x, svt_av1_jnt_convolve_x_c, svt_av1_jnt_convolve_x_sse2, svt_av1_jnt_convolve_x_avx2, svt_av1_jnt_convolve_x_avx512);
+     SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_y, svt_av1_jnt_convolve_y_c, svt_av1_jnt_convolve_y_sse2, svt_av1_jnt_convolve_y_avx2, svt_av1_jnt_convolve_y_avx512);
+-    SET_SSSE3_AVX2(svt_aom_convolve8_horiz, svt_aom_convolve8_horiz_c, svt_aom_convolve8_horiz_ssse3, svt_aom_convolve8_horiz_avx2);
+-    SET_SSSE3_AVX2(svt_aom_convolve8_vert, svt_aom_convolve8_vert_c, svt_aom_convolve8_vert_ssse3, svt_aom_convolve8_vert_avx2);
++    SET_ONLY_C(svt_aom_convolve8_horiz, svt_aom_convolve8_horiz_c);
++    SET_ONLY_C(svt_aom_convolve8_vert, svt_aom_convolve8_vert_c);
+     SET_SSE41_AVX2(svt_av1_build_compound_diffwtd_mask, svt_av1_build_compound_diffwtd_mask_c, svt_av1_build_compound_diffwtd_mask_sse4_1, svt_av1_build_compound_diffwtd_mask_avx2);
+     SET_SSSE3_AVX2(svt_av1_build_compound_diffwtd_mask_highbd, svt_av1_build_compound_diffwtd_mask_highbd_c, svt_av1_build_compound_diffwtd_mask_highbd_ssse3, svt_av1_build_compound_diffwtd_mask_highbd_avx2);
+     SET_SSE2_AVX2(svt_av1_wedge_sse_from_residuals, svt_av1_wedge_sse_from_residuals_c, svt_av1_wedge_sse_from_residuals_sse2, svt_av1_wedge_sse_from_residuals_avx2);
+-- 
+2.52.0
+

@@ -1,0 +1,521 @@
+From 213065c6b5f8cc306658f90de8ffca1596aeef51 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Fri, 2 Jan 2026 00:00:00 +0000
+Subject: [PATCH] fuck perlasm
+
+---
+ crypto/aes/asm/aesni-mb-x86_64.pl     |   2 +-
+ crypto/aes/asm/aesni-sha1-x86_64.pl   |   6 +-
+ crypto/aes/asm/aesni-sha256-x86_64.pl |   2 +-
+ crypto/aes/asm/aesni-x86_64.pl        |   2 +-
+ crypto/bn/asm/rsaz-x86_64.pl          |  20 +--
+ crypto/ec/asm/ecp_nistz256-x86_64.pl  |  44 ++---
+ crypto/modes/asm/ghash-x86_64.pl      |  48 +++---
+ crypto/perlasm/x86_64-xlate.pl        | 222 +++++++++++++-------------
+ 8 files changed, 173 insertions(+), 173 deletions(-)
+
+diff --git a/crypto/aes/asm/aesni-mb-x86_64.pl b/crypto/aes/asm/aesni-mb-x86_64.pl
+index 852c484..5095c58 100644
+--- a/crypto/aes/asm/aesni-mb-x86_64.pl
++++ b/crypto/aes/asm/aesni-mb-x86_64.pl
+@@ -1498,7 +1498,7 @@ sub aesni {
+ }
+ 
+ $code =~ s/\`([^\`]*)\`/eval($1)/gem;
+-$code =~ s/\b(aes.*%xmm[0-9]+).*$/aesni($1)/gem;
++#$code =~ s/\b(aes.*%xmm[0-9]+).*$/aesni($1)/gem;
+ 
+ print $code;
+ close STDOUT or die "error closing STDOUT: $!";
+diff --git a/crypto/aes/asm/aesni-sha1-x86_64.pl b/crypto/aes/asm/aesni-sha1-x86_64.pl
+index e7c218f..e4a5b17 100644
+--- a/crypto/aes/asm/aesni-sha1-x86_64.pl
++++ b/crypto/aes/asm/aesni-sha1-x86_64.pl
+@@ -2141,9 +2141,9 @@ sub aesni {
+ foreach (split("\n",$code)) {
+         s/\`([^\`]*)\`/eval $1/geo;
+ 
+-	s/\b(sha1rnds4)\s+(.*)/sha1rnds4($2)/geo		or
+-	s/\b(sha1[^\s]*)\s+(.*)/sha1op38($1,$2)/geo		or
+-	s/\b(aes.*%xmm[0-9]+).*$/aesni($1)/geo;
++	#s/\b(sha1rnds4)\s+(.*)/sha1rnds4($2)/geo		or
++	#s/\b(sha1[^\s]*)\s+(.*)/sha1op38($1,$2)/geo		or
++	#s/\b(aes.*%xmm[0-9]+).*$/aesni($1)/geo;
+ 
+ 	print $_,"\n";
+ }
+diff --git a/crypto/aes/asm/aesni-sha256-x86_64.pl b/crypto/aes/asm/aesni-sha256-x86_64.pl
+index da39d48..2cbe76e 100644
+--- a/crypto/aes/asm/aesni-sha256-x86_64.pl
++++ b/crypto/aes/asm/aesni-sha256-x86_64.pl
+@@ -1801,6 +1801,6 @@ sub rex {
+ }
+ 
+ $code =~ s/\`([^\`]*)\`/eval $1/gem;
+-$code =~ s/\b(sha256[^\s]*)\s+(.*)/sha256op38($1,$2)/gem;
++#$code =~ s/\b(sha256[^\s]*)\s+(.*)/sha256op38($1,$2)/gem;
+ print $code;
+ close STDOUT or die "error closing STDOUT: $!";
+diff --git a/crypto/aes/asm/aesni-x86_64.pl b/crypto/aes/asm/aesni-x86_64.pl
+index 06b8ff8..e1cba6d 100644
+--- a/crypto/aes/asm/aesni-x86_64.pl
++++ b/crypto/aes/asm/aesni-x86_64.pl
+@@ -5163,7 +5163,7 @@ sub movbe {
+ }
+ 
+ $code =~ s/\`([^\`]*)\`/eval($1)/gem;
+-$code =~ s/\b(aes.*%xmm[0-9]+).*$/aesni($1)/gem;
++#$code =~ s/\b(aes.*%xmm[0-9]+).*$/aesni($1)/gem;
+ #$code =~ s/\bmovbe\s+%eax/bswap %eax; mov %eax/gm;	# debugging artefact
+ $code =~ s/\bmovbe\s+%eax,\s*([0-9]+)\(%rsp\)/movbe($1)/gem;
+ 
+diff --git a/crypto/bn/asm/rsaz-x86_64.pl b/crypto/bn/asm/rsaz-x86_64.pl
+index ebb4762..587e5f1 100755
+--- a/crypto/bn/asm/rsaz-x86_64.pl
++++ b/crypto/bn/asm/rsaz-x86_64.pl
+@@ -2157,16 +2157,16 @@ ___
+ $code.=<<___	if ($win64);
+ .LSEH_begin_rsaz_512_gather4:
+ 	.byte	0x48,0x81,0xec,0xa8,0x00,0x00,0x00	# sub    $0xa8,%rsp
+-	.byte	0x0f,0x29,0x34,0x24			# movaps %xmm6,(%rsp)
+-	.byte	0x0f,0x29,0x7c,0x24,0x10		# movaps %xmm7,0x10(%rsp)
+-	.byte	0x44,0x0f,0x29,0x44,0x24,0x20		# movaps %xmm8,0x20(%rsp)
+-	.byte	0x44,0x0f,0x29,0x4c,0x24,0x30		# movaps %xmm9,0x30(%rsp)
+-	.byte	0x44,0x0f,0x29,0x54,0x24,0x40		# movaps %xmm10,0x40(%rsp)
+-	.byte	0x44,0x0f,0x29,0x5c,0x24,0x50		# movaps %xmm11,0x50(%rsp)
+-	.byte	0x44,0x0f,0x29,0x64,0x24,0x60		# movaps %xmm12,0x60(%rsp)
+-	.byte	0x44,0x0f,0x29,0x6c,0x24,0x70		# movaps %xmm13,0x70(%rsp)
+-	.byte	0x44,0x0f,0x29,0xb4,0x24,0x80,0,0,0	# movaps %xmm14,0x80(%rsp)
+-	.byte	0x44,0x0f,0x29,0xbc,0x24,0x90,0,0,0	# movaps %xmm15,0x90(%rsp)
++	movaps %xmm6,(%rsp)
++	movaps %xmm7,0x10(%rsp)
++	movaps %xmm8,0x20(%rsp)
++	movaps %xmm9,0x30(%rsp)
++	movaps %xmm10,0x40(%rsp)
++	movaps %xmm11,0x50(%rsp)
++	movaps %xmm12,0x60(%rsp)
++	movaps %xmm13,0x70(%rsp)
++	movaps %xmm14,0x80(%rsp)
++	movaps %xmm15,0x90(%rsp)
+ ___
+ $code.=<<___;
+ 	movd	$power,%xmm8
+diff --git a/crypto/ec/asm/ecp_nistz256-x86_64.pl b/crypto/ec/asm/ecp_nistz256-x86_64.pl
+index bfd7676..704dcdc 100755
+--- a/crypto/ec/asm/ecp_nistz256-x86_64.pl
++++ b/crypto/ec/asm/ecp_nistz256-x86_64.pl
+@@ -2604,17 +2604,17 @@ ___
+ $code.=<<___	if ($win64);
+ 	lea	-0x88(%rsp), %rax
+ .LSEH_begin_ecp_nistz256_gather_w5:
+-	.byte	0x48,0x8d,0x60,0xe0		#lea	-0x20(%rax), %rsp
+-	.byte	0x0f,0x29,0x70,0xe0		#movaps	%xmm6, -0x20(%rax)
+-	.byte	0x0f,0x29,0x78,0xf0		#movaps	%xmm7, -0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x00		#movaps	%xmm8, 0(%rax)
+-	.byte	0x44,0x0f,0x29,0x48,0x10	#movaps	%xmm9, 0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x50,0x20	#movaps	%xmm10, 0x20(%rax)
+-	.byte	0x44,0x0f,0x29,0x58,0x30	#movaps	%xmm11, 0x30(%rax)
+-	.byte	0x44,0x0f,0x29,0x60,0x40	#movaps	%xmm12, 0x40(%rax)
+-	.byte	0x44,0x0f,0x29,0x68,0x50	#movaps	%xmm13, 0x50(%rax)
+-	.byte	0x44,0x0f,0x29,0x70,0x60	#movaps	%xmm14, 0x60(%rax)
+-	.byte	0x44,0x0f,0x29,0x78,0x70	#movaps	%xmm15, 0x70(%rax)
++	lea	-0x20(%rax), %rsp
++	movaps	%xmm6, -0x20(%rax)
++	movaps	%xmm7, -0x10(%rax)
++	movaps	%xmm8, 0(%rax)
++	movaps	%xmm9, 0x10(%rax)
++	movaps	%xmm10, 0x20(%rax)
++	movaps	%xmm11, 0x30(%rax)
++	movaps	%xmm12, 0x40(%rax)
++	movaps	%xmm13, 0x50(%rax)
++	movaps	%xmm14, 0x60(%rax)
++	movaps	%xmm15, 0x70(%rax)
+ ___
+ $code.=<<___;
+ 	movdqa	.LOne(%rip), $ONE
+@@ -2724,17 +2724,17 @@ ___
+ $code.=<<___	if ($win64);
+ 	lea	-0x88(%rsp), %rax
+ .LSEH_begin_ecp_nistz256_gather_w7:
+-	.byte	0x48,0x8d,0x60,0xe0		#lea	-0x20(%rax), %rsp
+-	.byte	0x0f,0x29,0x70,0xe0		#movaps	%xmm6, -0x20(%rax)
+-	.byte	0x0f,0x29,0x78,0xf0		#movaps	%xmm7, -0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x00		#movaps	%xmm8, 0(%rax)
+-	.byte	0x44,0x0f,0x29,0x48,0x10	#movaps	%xmm9, 0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x50,0x20	#movaps	%xmm10, 0x20(%rax)
+-	.byte	0x44,0x0f,0x29,0x58,0x30	#movaps	%xmm11, 0x30(%rax)
+-	.byte	0x44,0x0f,0x29,0x60,0x40	#movaps	%xmm12, 0x40(%rax)
+-	.byte	0x44,0x0f,0x29,0x68,0x50	#movaps	%xmm13, 0x50(%rax)
+-	.byte	0x44,0x0f,0x29,0x70,0x60	#movaps	%xmm14, 0x60(%rax)
+-	.byte	0x44,0x0f,0x29,0x78,0x70	#movaps	%xmm15, 0x70(%rax)
++	lea	-0x20(%rax), %rsp
++	movaps	%xmm6, -0x20(%rax)
++	movaps	%xmm7, -0x10(%rax)
++	movaps	%xmm8, 0(%rax)
++	movaps	%xmm9, 0x10(%rax)
++	movaps	%xmm10, 0x20(%rax)
++	movaps	%xmm11, 0x30(%rax)
++	movaps	%xmm12, 0x40(%rax)
++	movaps	%xmm13, 0x50(%rax)
++	movaps	%xmm14, 0x60(%rax)
++	movaps	%xmm15, 0x70(%rax)
+ ___
+ $code.=<<___;
+ 	movdqa	.LOne(%rip), $M0
+diff --git a/crypto/modes/asm/ghash-x86_64.pl b/crypto/modes/asm/ghash-x86_64.pl
+index eea0648..8350839 100644
+--- a/crypto/modes/asm/ghash-x86_64.pl
++++ b/crypto/modes/asm/ghash-x86_64.pl
+@@ -541,7 +541,7 @@ $code.=<<___ if ($win64);
+ .LSEH_begin_gcm_init_clmul:
+ 	# I can't trust assembler to use specific encoding:-(
+ 	.byte	0x48,0x83,0xec,0x18		#sub	$0x18,%rsp
+-	.byte	0x0f,0x29,0x34,0x24		#movaps	%xmm6,(%rsp)
++	movaps	%xmm6,(%rsp)
+ ___
+ $code.=<<___;
+ 	movdqu		($Xip),$Hkey
+@@ -676,17 +676,17 @@ $code.=<<___ if ($win64);
+ 	lea	-0x88(%rsp),%rax
+ .LSEH_begin_gcm_ghash_clmul:
+ 	# I can't trust assembler to use specific encoding:-(
+-	.byte	0x48,0x8d,0x60,0xe0		#lea	-0x20(%rax),%rsp
+-	.byte	0x0f,0x29,0x70,0xe0		#movaps	%xmm6,-0x20(%rax)
+-	.byte	0x0f,0x29,0x78,0xf0		#movaps	%xmm7,-0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x00		#movaps	%xmm8,0(%rax)
+-	.byte	0x44,0x0f,0x29,0x48,0x10	#movaps	%xmm9,0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x50,0x20	#movaps	%xmm10,0x20(%rax)
+-	.byte	0x44,0x0f,0x29,0x58,0x30	#movaps	%xmm11,0x30(%rax)
+-	.byte	0x44,0x0f,0x29,0x60,0x40	#movaps	%xmm12,0x40(%rax)
+-	.byte	0x44,0x0f,0x29,0x68,0x50	#movaps	%xmm13,0x50(%rax)
+-	.byte	0x44,0x0f,0x29,0x70,0x60	#movaps	%xmm14,0x60(%rax)
+-	.byte	0x44,0x0f,0x29,0x78,0x70	#movaps	%xmm15,0x70(%rax)
++	lea	-0x20(%rax),%rsp
++	movaps	%xmm6,-0x20(%rax)
++	movaps	%xmm7,-0x10(%rax)
++	movaps	%xmm8,0(%rax)
++	movaps	%xmm9,0x10(%rax)
++	movaps	%xmm10,0x20(%rax)
++	movaps	%xmm11,0x30(%rax)
++	movaps	%xmm12,0x40(%rax)
++	movaps	%xmm13,0x50(%rax)
++	movaps	%xmm14,0x60(%rax)
++	movaps	%xmm15,0x70(%rax)
+ ___
+ $code.=<<___;
+ 	movdqa		.Lbswap_mask(%rip),$T3
+@@ -1038,7 +1038,7 @@ $code.=<<___ if ($win64);
+ .LSEH_begin_gcm_init_avx:
+ 	# I can't trust assembler to use specific encoding:-(
+ 	.byte	0x48,0x83,0xec,0x18		#sub	$0x18,%rsp
+-	.byte	0x0f,0x29,0x34,0x24		#movaps	%xmm6,(%rsp)
++	movaps	%xmm6,(%rsp)
+ ___
+ $code.=<<___;
+ 	vzeroupper
+@@ -1199,17 +1199,17 @@ $code.=<<___ if ($win64);
+ 	lea	-0x88(%rsp),%rax
+ .LSEH_begin_gcm_ghash_avx:
+ 	# I can't trust assembler to use specific encoding:-(
+-	.byte	0x48,0x8d,0x60,0xe0		#lea	-0x20(%rax),%rsp
+-	.byte	0x0f,0x29,0x70,0xe0		#movaps	%xmm6,-0x20(%rax)
+-	.byte	0x0f,0x29,0x78,0xf0		#movaps	%xmm7,-0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x00		#movaps	%xmm8,0(%rax)
+-	.byte	0x44,0x0f,0x29,0x48,0x10	#movaps	%xmm9,0x10(%rax)
+-	.byte	0x44,0x0f,0x29,0x50,0x20	#movaps	%xmm10,0x20(%rax)
+-	.byte	0x44,0x0f,0x29,0x58,0x30	#movaps	%xmm11,0x30(%rax)
+-	.byte	0x44,0x0f,0x29,0x60,0x40	#movaps	%xmm12,0x40(%rax)
+-	.byte	0x44,0x0f,0x29,0x68,0x50	#movaps	%xmm13,0x50(%rax)
+-	.byte	0x44,0x0f,0x29,0x70,0x60	#movaps	%xmm14,0x60(%rax)
+-	.byte	0x44,0x0f,0x29,0x78,0x70	#movaps	%xmm15,0x70(%rax)
++	lea	-0x20(%rax),%rsp
++	movaps	%xmm6,-0x20(%rax)
++	movaps	%xmm7,-0x10(%rax)
++	movaps	%xmm8,0(%rax)
++	movaps	%xmm9,0x10(%rax)
++	movaps	%xmm10,0x20(%rax)
++	movaps	%xmm11,0x30(%rax)
++	movaps	%xmm12,0x40(%rax)
++	movaps	%xmm13,0x50(%rax)
++	movaps	%xmm14,0x60(%rax)
++	movaps	%xmm15,0x70(%rax)
+ ___
+ $code.=<<___;
+ 	vzeroupper
+diff --git a/crypto/perlasm/x86_64-xlate.pl b/crypto/perlasm/x86_64-xlate.pl
+index 6ee56b8..d40daa2 100755
+--- a/crypto/perlasm/x86_64-xlate.pl
++++ b/crypto/perlasm/x86_64-xlate.pl
+@@ -1217,126 +1217,126 @@ sub rex {
+ }
+ 
+ my $movq = sub {	# elderly gas can't handle inter-register movq
+-  my $arg = shift;
+-  my @opcode=(0x66);
+-    if ($arg =~ /%xmm([0-9]+),\s*%r(\w+)/) {
+-	my ($src,$dst)=($1,$2);
+-	if ($dst !~ /[0-9]+/)	{ $dst = $regrm{"%e$dst"}; }
+-	rex(\@opcode,$src,$dst,0x8);
+-	push @opcode,0x0f,0x7e;
+-	push @opcode,0xc0|(($src&7)<<3)|($dst&7);	# ModR/M
+-	@opcode;
+-    } elsif ($arg =~ /%r(\w+),\s*%xmm([0-9]+)/) {
+-	my ($src,$dst)=($2,$1);
+-	if ($dst !~ /[0-9]+/)	{ $dst = $regrm{"%e$dst"}; }
+-	rex(\@opcode,$src,$dst,0x8);
+-	push @opcode,0x0f,0x6e;
+-	push @opcode,0xc0|(($src&7)<<3)|($dst&7);	# ModR/M
+-	@opcode;
+-    } else {
++  #my $arg = shift;
++  #my @opcode=(0x66);
++    #if ($arg =~ /%xmm([0-9]+),\s*%r(\w+)/) {
++	#my ($src,$dst)=($1,$2);
++	#if ($dst !~ /[0-9]+/)	{ $dst = $regrm{"%e$dst"}; }
++	#rex(\@opcode,$src,$dst,0x8);
++	#push @opcode,0x0f,0x7e;
++	#push @opcode,0xc0|(($src&7)<<3)|($dst&7);	# ModR/M
++	#@opcode;
++    #} elsif ($arg =~ /%r(\w+),\s*%xmm([0-9]+)/) {
++	#my ($src,$dst)=($2,$1);
++	#if ($dst !~ /[0-9]+/)	{ $dst = $regrm{"%e$dst"}; }
++	#rex(\@opcode,$src,$dst,0x8);
++	#push @opcode,0x0f,0x6e;
++	#push @opcode,0xc0|(($src&7)<<3)|($dst&7);	# ModR/M
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $pextrd = sub {
+-    if (shift =~ /\$([0-9]+),\s*%xmm([0-9]+),\s*(%\w+)/) {
+-      my @opcode=(0x66);
+-	my $imm=$1;
+-	my $src=$2;
+-	my $dst=$3;
+-	if ($dst =~ /%r([0-9]+)d/)	{ $dst = $1; }
+-	elsif ($dst =~ /%e/)		{ $dst = $regrm{$dst}; }
+-	rex(\@opcode,$src,$dst);
+-	push @opcode,0x0f,0x3a,0x16;
+-	push @opcode,0xc0|(($src&7)<<3)|($dst&7);	# ModR/M
+-	push @opcode,$imm;
+-	@opcode;
+-    } else {
++    #if (shift =~ /\$([0-9]+),\s*%xmm([0-9]+),\s*(%\w+)/) {
++      #my @opcode=(0x66);
++	#my $imm=$1;
++	#my $src=$2;
++	#my $dst=$3;
++	#if ($dst =~ /%r([0-9]+)d/)	{ $dst = $1; }
++	#elsif ($dst =~ /%e/)		{ $dst = $regrm{$dst}; }
++	#rex(\@opcode,$src,$dst);
++	#push @opcode,0x0f,0x3a,0x16;
++	#push @opcode,0xc0|(($src&7)<<3)|($dst&7);	# ModR/M
++	#push @opcode,$imm;
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $pinsrd = sub {
+-    if (shift =~ /\$([0-9]+),\s*(%\w+),\s*%xmm([0-9]+)/) {
+-      my @opcode=(0x66);
+-	my $imm=$1;
+-	my $src=$2;
+-	my $dst=$3;
+-	if ($src =~ /%r([0-9]+)/)	{ $src = $1; }
+-	elsif ($src =~ /%e/)		{ $src = $regrm{$src}; }
+-	rex(\@opcode,$dst,$src);
+-	push @opcode,0x0f,0x3a,0x22;
+-	push @opcode,0xc0|(($dst&7)<<3)|($src&7);	# ModR/M
+-	push @opcode,$imm;
+-	@opcode;
+-    } else {
++    #if (shift =~ /\$([0-9]+),\s*(%\w+),\s*%xmm([0-9]+)/) {
++      #my @opcode=(0x66);
++	#my $imm=$1;
++	#my $src=$2;
++	#my $dst=$3;
++	#if ($src =~ /%r([0-9]+)/)	{ $src = $1; }
++	#elsif ($src =~ /%e/)		{ $src = $regrm{$src}; }
++	#rex(\@opcode,$dst,$src);
++	#push @opcode,0x0f,0x3a,0x22;
++	#push @opcode,0xc0|(($dst&7)<<3)|($src&7);	# ModR/M
++	#push @opcode,$imm;
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $pshufb = sub {
+-    if (shift =~ /%xmm([0-9]+),\s*%xmm([0-9]+)/) {
+-      my @opcode=(0x66);
+-	rex(\@opcode,$2,$1);
+-	push @opcode,0x0f,0x38,0x00;
+-	push @opcode,0xc0|($1&7)|(($2&7)<<3);		# ModR/M
+-	@opcode;
+-    } else {
++    #if (shift =~ /%xmm([0-9]+),\s*%xmm([0-9]+)/) {
++      #my @opcode=(0x66);
++	#rex(\@opcode,$2,$1);
++	#push @opcode,0x0f,0x38,0x00;
++	#push @opcode,0xc0|($1&7)|(($2&7)<<3);		# ModR/M
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $palignr = sub {
+-    if (shift =~ /\$([0-9]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
+-      my @opcode=(0x66);
+-	rex(\@opcode,$3,$2);
+-	push @opcode,0x0f,0x3a,0x0f;
+-	push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
+-	push @opcode,$1;
+-	@opcode;
+-    } else {
++    #if (shift =~ /\$([0-9]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
++      #my @opcode=(0x66);
++	#rex(\@opcode,$3,$2);
++	#push @opcode,0x0f,0x3a,0x0f;
++	#push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
++	#push @opcode,$1;
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $pclmulqdq = sub {
+-    if (shift =~ /\$([x0-9a-f]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
+-      my @opcode=(0x66);
+-	rex(\@opcode,$3,$2);
+-	push @opcode,0x0f,0x3a,0x44;
+-	push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
+-	my $c=$1;
+-	push @opcode,$c=~/^0/?oct($c):$c;
+-	@opcode;
+-    } else {
++    #if (shift =~ /\$([x0-9a-f]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
++      #my @opcode=(0x66);
++	#rex(\@opcode,$3,$2);
++	#push @opcode,0x0f,0x3a,0x44;
++	#push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
++	#my $c=$1;
++	#push @opcode,$c=~/^0/?oct($c):$c;
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $rdrand = sub {
+-    if (shift =~ /%[er](\w+)/) {
+-      my @opcode=();
+-      my $dst=$1;
+-	if ($dst !~ /[0-9]+/) { $dst = $regrm{"%e$dst"}; }
+-	rex(\@opcode,0,$dst,8);
+-	push @opcode,0x0f,0xc7,0xf0|($dst&7);
+-	@opcode;
+-    } else {
++    #if (shift =~ /%[er](\w+)/) {
++      #my @opcode=();
++      #my $dst=$1;
++	#if ($dst !~ /[0-9]+/) { $dst = $regrm{"%e$dst"}; }
++	#rex(\@opcode,0,$dst,8);
++	#push @opcode,0x0f,0xc7,0xf0|($dst&7);
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $rdseed = sub {
+-    if (shift =~ /%[er](\w+)/) {
+-      my @opcode=();
+-      my $dst=$1;
+-	if ($dst !~ /[0-9]+/) { $dst = $regrm{"%e$dst"}; }
+-	rex(\@opcode,0,$dst,8);
+-	push @opcode,0x0f,0xc7,0xf8|($dst&7);
+-	@opcode;
+-    } else {
++    #if (shift =~ /%[er](\w+)/) {
++      #my @opcode=();
++      #my $dst=$1;
++	#if ($dst !~ /[0-9]+/) { $dst = $regrm{"%e$dst"}; }
++	#rex(\@opcode,0,$dst,8);
++	#push @opcode,0x0f,0xc7,0xf8|($dst&7);
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ # Not all AVX-capable assemblers recognize AMD XOP extension. Since we
+@@ -1355,31 +1355,31 @@ sub rxb {
+ }
+ 
+ my $vprotd = sub {
+-    if (shift =~ /\$([x0-9a-f]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
+-      my @opcode=(0x8f);
+-	rxb(\@opcode,$3,$2,-1,0x08);
+-	push @opcode,0x78,0xc2;
+-	push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
+-	my $c=$1;
+-	push @opcode,$c=~/^0/?oct($c):$c;
+-	@opcode;
+-    } else {
++    #if (shift =~ /\$([x0-9a-f]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
++      #my @opcode=(0x8f);
++	#rxb(\@opcode,$3,$2,-1,0x08);
++	#push @opcode,0x78,0xc2;
++	#push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
++	#my $c=$1;
++	#push @opcode,$c=~/^0/?oct($c):$c;
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ my $vprotq = sub {
+-    if (shift =~ /\$([x0-9a-f]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
+-      my @opcode=(0x8f);
+-	rxb(\@opcode,$3,$2,-1,0x08);
+-	push @opcode,0x78,0xc3;
+-	push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
+-	my $c=$1;
+-	push @opcode,$c=~/^0/?oct($c):$c;
+-	@opcode;
+-    } else {
++    #if (shift =~ /\$([x0-9a-f]+),\s*%xmm([0-9]+),\s*%xmm([0-9]+)/) {
++      #my @opcode=(0x8f);
++	#rxb(\@opcode,$3,$2,-1,0x08);
++	#push @opcode,0x78,0xc3;
++	#push @opcode,0xc0|($2&7)|(($3&7)<<3);		# ModR/M
++	#my $c=$1;
++	#push @opcode,$c=~/^0/?oct($c):$c;
++	#@opcode;
++    #} else {
+ 	();
+-    }
++    #}
+ };
+ 
+ # Intel Control-flow Enforcement Technology extension. All functions and
+-- 
+2.52.0
+

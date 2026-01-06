@@ -25,9 +25,6 @@ if(TARGET_CPU STREQUAL "x86_64")
         set(ffmpeg_nosse2avx
             COMMAND ${MAKE} libswscale/x86/ops_int.o _NASM_SSE2AVX=0
         )
-        if(MARCH_HAS_AVX512)
-            set(zlib_no_rtcd -DWITH_RUNTIME_CPU_DETECTION=OFF)
-        endif()
     else()
         set(novzeroupper
             COMMAND true
@@ -121,7 +118,6 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(ffmpeg_nosse2avx
         COMMAND true
     )
-    set(zlib_no_rtcd -DWITH_RUNTIME_CPU_DETECTION=OFF)
     set(libjxl_force_skip_check
         -DCXX_MAVX2_SUPPORTED=OFF
         -DCXX_MF16C_SUPPORTED=OFF

@@ -20,7 +20,7 @@ ExternalProject_Add(zlib
         -DWITH_GTEST=OFF
         -DWITH_SANITIZER=OFF
         -DFNO_LTO_AVAILABLE=OFF
-        ${zlib_no_rtcd}
+        -DWITH_RUNTIME_CPU_DETECTION=OFF
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

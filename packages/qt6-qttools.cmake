@@ -12,7 +12,6 @@ ExternalProject_Add(qt6-qttools
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC_HOST} echo '' > <SOURCE_DIR>/src/linguist/lcheck/CMakeLists.txt
-    COMMAND ${EXEC_HOST} echo '' > <SOURCE_DIR>/src/linguist/lprodump/CMakeLists.txt
     COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${qthost_force_skip_check}
         -GNinja

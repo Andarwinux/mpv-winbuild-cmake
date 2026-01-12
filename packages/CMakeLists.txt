@@ -82,6 +82,8 @@ list(APPEND ep
     frei0r
     vvenc
     codec2
+    ggml
+    whisper
     ffmpeg
     mpv
     ngtcp2

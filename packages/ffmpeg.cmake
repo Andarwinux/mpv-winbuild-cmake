@@ -45,6 +45,7 @@ ExternalProject_Add(ffmpeg
         codec2
         xz
         libsdl2
+        whisper
     GIT_REPOSITORY https://github.com/Andarwinux/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -135,6 +136,7 @@ ExternalProject_Add(ffmpeg
         --enable-version3
         --enable-vulkan
         --enable-w32threads
+        --enable-whisper
         --enable-zlib
         --extra-libs=-lc++
         --host-cc=clang

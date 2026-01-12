@@ -1,0 +1,11 @@
+prefix=@MINGW_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: whisper
+Description: Port of OpenAI's Whisper model in C/C++
+Version: 1.8.2
+Requires: vulkan
+Libs: -L${libdir} -lggml -lggml-base -lggml-cpu -lggml-vulkan -lwhisper
+Cflags: -I${includedir}

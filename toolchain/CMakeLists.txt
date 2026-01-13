@@ -12,6 +12,10 @@ list(APPEND ep
     libxml2-host
     zstd-host
     mimalloc-host
+    spirv-headers-host
+    spirv-tools-host
+    glslang-host
+    glslc-host
     ccache
     ninja
     llvm

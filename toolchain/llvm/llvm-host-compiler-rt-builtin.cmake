@@ -23,9 +23,9 @@ ExternalProject_Add(llvm-host-compiler-rt-builtin
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON
         -DCOMPILER_RT_HAS_FNO_LTO_FLAG=OFF
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-        "-DCMAKE_C_FLAGS='${tc_cflags} -flto=thin'"
-        "-DCMAKE_CXX_FLAGS='${tc_cflags} -flto=thin'"
-        "-DCMAKE_ASM_FLAGS='${tc_cflags}'"
+        "-DCMAKE_C_FLAGS='${tc_cflags} ${tc_compiler_rt} -flto=thin'"
+        "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_compiler_rt} -flto=thin'"
+        "-DCMAKE_ASM_FLAGS='${tc_cflags} ${tc_compiler_rt}'"
     BUILD_COMMAND ${EXEC_HOST} "CCC_OVERRIDE_OPTIONS='x-fno-builtin +-fbuiltin'" ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

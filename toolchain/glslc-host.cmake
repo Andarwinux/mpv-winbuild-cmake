@@ -1,0 +1,60 @@
+get_property(src_glslang-host TARGET glslang-host PROPERTY _EP_SOURCE_DIR)
+get_property(src_spirv-headers-host TARGET spirv-headers-host PROPERTY _EP_SOURCE_DIR)
+get_property(src_spirv-tools-host TARGET spirv-tools-host PROPERTY _EP_SOURCE_DIR)
+ExternalProject_Add(glslc-host
+    DEPENDS
+        glslang-host
+        spirv-headers-host
+        spirv-tools-host
+        mimalloc-host
+    GIT_REPOSITORY https://github.com/google/shaderc.git
+    SOURCE_DIR ${SOURCE_LOCATION}
+    GIT_REMOTE_NAME origin
+    GIT_TAG main
+    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_PROGRESS TRUE
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ${EXEC_HOST} echo > ${src_spirv-tools-host}/test/CMakeLists.txt
+    COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+        -GNinja
+        -DCMAKE_BUILD_TYPE=Release
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_FIND_NO_INSTALL_PREFIX=ON
+        -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_ASM_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_C_COMPILER_WORKS=ON
+        -DCMAKE_CXX_COMPILER_WORKS=ON
+        -DCMAKE_ASM_COMPILER_WORKS=ON        
+        -DSHADERC_SKIP_TESTS=ON
+        -DSHADERC_SKIP_SPVC=ON
+        -DSHADERC_SKIP_INSTALL=ON
+        -DSHADERC_SKIP_EXAMPLES=ON
+        -DSHADERC_SKIP_EXECUTABLES=OFF
+        -DSHADERC_SKIP_COPYRIGHT_CHECK=ON
+        -DSHADERC_ENABLE_WERROR_COMPILE=OFF
+        -DSPIRV_SKIP_EXECUTABLES=ON
+        -DSPIRV_SKIP_TESTS=ON
+        -DENABLE_SPIRV_TOOLS_INSTALL=ON
+        -DENABLE_GLSLANG_BINARIES=OFF
+        -DSPIRV_TOOLS_BUILD_STATIC=ON
+        -DSPIRV_TOOLS_LIBRARY_TYPE=STATIC
+        -DDISABLE_RTTI=ON
+        -DDISABLE_EXCEPTIONS=ON
+        -DSHADERC_SPIRV_TOOLS_DIR=${src_spirv-tools-host}
+        -DSHADERC_SPIRV_HEADERS_DIR=${src_spirv-headers-host}
+        -DSHADERC_GLSLANG_DIR=${src_glslang-host}
+        "-DCMAKE_REQUIRED_FLAGS='-O0 -fno-lto -fno-whole-program-vtables'"
+        "-DCMAKE_REQUIRED_LINK_OPTIONS='-Wl,-O0,--lto-O0,--lto-CGO0,--no-gc-sections,--icf=none,--no-lto-whole-program-visibility,-mllvm,-polly=false'"
+        "-DCMAKE_C_FLAGS='${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_ASM_FLAGS='${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_EXE_LINKER_FLAGS='${CMAKE_INSTALL_PREFIX}/lib/mimalloc.o ${tc_ldflags}'"
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> glslc_exe
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/glslc/glslc ${CMAKE_INSTALL_PREFIX}/bin/glslc
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+)
+
+force_rebuild_git(glslc-host)
+cleanup(glslc-host install)

@@ -1,0 +1,228 @@
+From dcc2985c8248a95bb80b864b1386cf3df8bb1f91 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Wed, 14 Jan 2026 00:00:00 +0000
+Subject: [PATCH] add DCE support
+
+---
+ src/ext/x86/x86inc.asm   | 17 ++++++++++++++---
+ src/x86/itx16_avx2.asm   |  2 ++
+ src/x86/itx16_avx512.asm |  2 ++
+ src/x86/itx16_sse.asm    |  2 ++
+ src/x86/itx_avx2.asm     |  2 ++
+ src/x86/itx_avx512.asm   |  2 ++
+ src/x86/itx_sse.asm      |  2 ++
+ src/x86/mc16_avx2.asm    |  2 ++
+ src/x86/mc16_avx512.asm  |  2 ++
+ src/x86/mc16_sse.asm     |  2 ++
+ src/x86/mc_avx2.asm      |  2 ++
+ src/x86/mc_avx512.asm    |  2 ++
+ src/x86/mc_sse.asm       |  2 ++
+ 13 files changed, 38 insertions(+), 3 deletions(-)
+
+diff --git a/src/ext/x86/x86inc.asm b/src/ext/x86/x86inc.asm
+index a7ad39e..13f2823 100644
+--- a/src/ext/x86/x86inc.asm
++++ b/src/ext/x86/x86inc.asm
+@@ -771,9 +771,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
+ 
+ %define last_branch_adr $$
+ %macro AUTO_REP_RET 0
+-    %if notcpuflag(ssse3)
+-        times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
+-    %endif
++    ;%if notcpuflag(ssse3)
++    ;    times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
++    ;%endif
+     ret
+     annotate_function_size
+ %endmacro
+@@ -807,6 +807,10 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+ ; arch-independent part
+ ;=============================================================================
+ 
++%ifndef ENABLE_DCE
++    %define ENABLE_DCE 1
++%endif
++
+ %assign function_align 16
+ 
+ ; Begin a function.
+@@ -836,12 +840,19 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+     %xdefine current_function_section __SECT__
+     %if FORMAT_ELF
+         %if %1
++            %if ENABLE_DCE
++                section .text.%2 progbits alloc exec nowrite
++                %define last_branch_adr $$
++            %endif
+             global %2:function hidden
+         %else
+             global %2:function
+         %endif
+     %elif FORMAT_MACHO && HAVE_PRIVATE_EXTERN && %1
+         global %2:private_extern
++    %elif WIN64 && %1 && ENABLE_DCE
++        section .text$%2 comdat=1:%2
++        %define last_branch_adr $$
+     %else
+         global %2
+     %endif
+diff --git a/src/x86/itx16_avx2.asm b/src/x86/itx16_avx2.asm
+index 0da970a..248aec6 100644
+--- a/src/x86/itx16_avx2.asm
++++ b/src/x86/itx16_avx2.asm
+@@ -24,6 +24,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/itx16_avx512.asm b/src/x86/itx16_avx512.asm
+index 9f5f909..eb065c1 100644
+--- a/src/x86/itx16_avx512.asm
++++ b/src/x86/itx16_avx512.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/itx16_sse.asm b/src/x86/itx16_sse.asm
+index 3833e17..1d75513 100644
+--- a/src/x86/itx16_sse.asm
++++ b/src/x86/itx16_sse.asm
+@@ -26,6 +26,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/itx_avx2.asm b/src/x86/itx_avx2.asm
+index a67f053..0bfb8b3 100644
+--- a/src/x86/itx_avx2.asm
++++ b/src/x86/itx_avx2.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/itx_avx512.asm b/src/x86/itx_avx512.asm
+index a3f25d3..8d4d28b 100644
+--- a/src/x86/itx_avx512.asm
++++ b/src/x86/itx_avx512.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/itx_sse.asm b/src/x86/itx_sse.asm
+index ec7e3a5..a215e3f 100644
+--- a/src/x86/itx_sse.asm
++++ b/src/x86/itx_sse.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/mc16_avx2.asm b/src/x86/mc16_avx2.asm
+index 6b44249..1a2b7c1 100644
+--- a/src/x86/mc16_avx2.asm
++++ b/src/x86/mc16_avx2.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/mc16_avx512.asm b/src/x86/mc16_avx512.asm
+index 3e352c5..d8ef5d8 100644
+--- a/src/x86/mc16_avx512.asm
++++ b/src/x86/mc16_avx512.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/mc16_sse.asm b/src/x86/mc16_sse.asm
+index 319dd45..27d4be8 100644
+--- a/src/x86/mc16_sse.asm
++++ b/src/x86/mc16_sse.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/mc_avx2.asm b/src/x86/mc_avx2.asm
+index df8bebb..d433013 100644
+--- a/src/x86/mc_avx2.asm
++++ b/src/x86/mc_avx2.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/mc_avx512.asm b/src/x86/mc_avx512.asm
+index 50e670e..fbb3aab 100644
+--- a/src/x86/mc_avx512.asm
++++ b/src/x86/mc_avx512.asm
+@@ -23,6 +23,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+diff --git a/src/x86/mc_sse.asm b/src/x86/mc_sse.asm
+index deeb6db..905468a 100644
+--- a/src/x86/mc_sse.asm
++++ b/src/x86/mc_sse.asm
+@@ -24,6 +24,8 @@
+ ; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ ; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
++%define ENABLE_DCE 0
++
+ %include "config.asm"
+ %include "ext/x86/x86inc.asm"
+ 
+-- 
+2.52.0
+

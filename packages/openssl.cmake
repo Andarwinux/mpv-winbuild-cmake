@@ -24,6 +24,10 @@ ExternalProject_Add(openssl
         no-tls-deprecated-ec
         no-autoload-config
         ${openssl_target}
+        no-tls1_2-method
+        no-tls1_1-method
+        no-dtls1-method
+        no-tls1-method
         no-ssl3-method
         no-makedepend
         enable-brotli
@@ -37,12 +41,16 @@ ExternalProject_Add(openssl
         no-module
         no-legacy
         no-engine
+        no-tls1_2
+        no-tls1_1
+        no-dtls1
         no-tests
         threads
         no-docs
         no-apps
         no-ocsp
         no-ssl3
+        no-tls1
         no-cmac
         no-mdc2
         no-idea

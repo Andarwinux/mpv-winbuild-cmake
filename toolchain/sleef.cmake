@@ -41,6 +41,7 @@ ExternalProject_Add(sleef
         "-DCMAKE_C_FLAGS='-g0'"
         "-DCMALE_CXX_FLAGS='-g0'"
     COMMAND ${EXEC} ninja -C <BINARY_DIR>/host mkunroll mkrename mkdisp mkalias mkdisp mkdispatch mkrename_gnuabi mkmasked_gnuabi addSuffix
+    COMMAND ${EXEC} sed -i [['s/ALIGNED(8192)/ALIGNED(64)/g']] <SOURCE_DIR>/src/dft/unroll0.org
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DNATIVE_BUILD_DIR=<BINARY_DIR>/host

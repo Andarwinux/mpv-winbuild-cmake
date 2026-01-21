@@ -1,0 +1,29 @@
+From 3de1a353c0f94a2a93b23e16ca228c75c39f071e Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Wed, 21 Jan 2026 00:00:00 +0000
+Subject: [PATCH] use builtin_elementwise_bitreverse
+
+---
+ src/stb_image.h | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/stb_image.h b/src/stb_image.h
+index e62bf73..4b86c9c 100644
+--- a/src/stb_image.h
++++ b/src/stb_image.h
+@@ -4107,11 +4107,7 @@ typedef struct
+ 
+ stbi_inline static int stbi__bitreverse16(int n)
+ {
+-  n = ((n & 0xAAAA) >>  1) | ((n & 0x5555) << 1);
+-  n = ((n & 0xCCCC) >>  2) | ((n & 0x3333) << 2);
+-  n = ((n & 0xF0F0) >>  4) | ((n & 0x0F0F) << 4);
+-  n = ((n & 0xFF00) >>  8) | ((n & 0x00FF) << 8);
+-  return n;
++  return __builtin_elementwise_bitreverse(n);
+ }
+ 
+ stbi_inline static int stbi__bit_reverse(int v, int bits)
+-- 
+2.52.0
+

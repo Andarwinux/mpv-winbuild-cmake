@@ -1,10 +1,9 @@
 ExternalProject_Add(svtav1
     GIT_REPOSITORY https://gitlab.com/AOMediaCodec/SVT-AV1.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test !Docs"
     GIT_PROGRESS TRUE
-    GIT_RESET f17a9e65b54668643547f75557ea0e1bc813a215
     PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/svtav1-0*.patch
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

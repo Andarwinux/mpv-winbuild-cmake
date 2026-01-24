@@ -1,0 +1,39 @@
+From 1a0bc0f36f21421565657f11b48fd9a9710175cb Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sat, 24 Jan 2026 00:00:00 +0000
+Subject: [PATCH] fix perlasm rodata section name on windows
+
+---
+ crypto/perlasm/arm-xlate.pl    | 2 +-
+ crypto/perlasm/x86_64-xlate.pl | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/perlasm/arm-xlate.pl b/crypto/perlasm/arm-xlate.pl
+index b94d1c7..936759e 100755
+--- a/crypto/perlasm/arm-xlate.pl
++++ b/crypto/perlasm/arm-xlate.pl
+@@ -33,7 +33,7 @@ my $rodata = sub {
+     SWITCH: for ($flavour) {
+ 	/linux/		&& return ".section\t.rodata";
+ 	/ios/		&& return ".section\t__TEXT,__const";
+-	/win64/		&& return ".section\t.rodata";
++	/win64/		&& return ".section\t.rdata";
+ 	last;
+     }
+ };
+diff --git a/crypto/perlasm/x86_64-xlate.pl b/crypto/perlasm/x86_64-xlate.pl
+index d40daa2..815a072 100755
+--- a/crypto/perlasm/x86_64-xlate.pl
++++ b/crypto/perlasm/x86_64-xlate.pl
+@@ -945,7 +945,7 @@ my %globals;
+                     push(@segment_stack, $current_segment);
+ 		    if (!$elf && $current_segment eq ".rodata") {
+ 			if	($flavour eq "macosx") { $self->{value} = ".section\t__DATA,__const"; }
+-			elsif	($flavour eq "mingw64")	{ $self->{value} = ".section\t.rodata"; }
++			elsif	($flavour eq "mingw64")	{ $self->{value} = ".section\t.rdata"; }
+ 		    }
+ 		    if (!$elf && $current_segment eq ".init") {
+ 			if	($flavour eq "macosx")	{ $self->{value} = ".mod_init_func"; }
+-- 
+2.52.0
+

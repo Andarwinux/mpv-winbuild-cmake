@@ -1,4 +1,4 @@
-From 2fce8f2e034bc5b10b073f4bbae93060cd5a685b Mon Sep 17 00:00:00 2001
+From 02643255d58094e08bd0c2fc0c903b1279ce1c77 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Wed, 31 Dec 2025 00:00:00 +0000
 Subject: [PATCH] add static dispatch support
@@ -23,7 +23,7 @@ index e6fdfdf..ba1a310 100644
      }
  }
 diff --git a/Source/Lib/Codec/aom_dsp_rtcd.c b/Source/Lib/Codec/aom_dsp_rtcd.c
-index 9c04dd0..6600bf3 100644
+index 53f7241..ac75044 100644
 --- a/Source/Lib/Codec/aom_dsp_rtcd.c
 +++ b/Source/Lib/Codec/aom_dsp_rtcd.c
 @@ -40,13 +40,13 @@
@@ -87,10 +87,10 @@ index 9c04dd0..6600bf3 100644
      flags = 0;
      //to use C: flags=0
 diff --git a/Source/Lib/Codec/common_dsp_rtcd.c b/Source/Lib/Codec/common_dsp_rtcd.c
-index e4413eb..fff57bc 100644
+index 162bb13..1933269 100644
 --- a/Source/Lib/Codec/common_dsp_rtcd.c
 +++ b/Source/Lib/Codec/common_dsp_rtcd.c
-@@ -255,10 +255,26 @@ EbCpuFlags svt_aom_get_cpu_flags() {
+@@ -256,10 +256,26 @@ EbCpuFlags svt_aom_get_cpu_flags() {
  
      // safe to call multiple times, and threadsafe
  
@@ -118,7 +118,7 @@ index e4413eb..fff57bc 100644
      return flags;
  }
  
-@@ -302,13 +318,13 @@ EbCpuFlags svt_aom_get_cpu_flags_to_use() { return 0; }
+@@ -303,13 +319,13 @@ EbCpuFlags svt_aom_get_cpu_flags_to_use() { return 0; }
  #endif /* EN_AVX512_SUPPORT */
  
  #define SET_FUNCTIONS_X86(ptr, mmx, sse, sse2, sse3, ssse3, sse4_1, sse4_2, avx, avx2, avx512) \
@@ -139,7 +139,7 @@ index e4413eb..fff57bc 100644
      SET_FUNCTION(ptr, avx, EB_CPU_FLAGS_AVX)                                                   \
      SET_FUNCTION(ptr, avx2, EB_CPU_FLAGS_AVX2)                                                 \
      SET_FUNCTION_AVX512(ptr, avx512)
-@@ -455,7 +471,37 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
+@@ -456,7 +472,37 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
      /** Should be done during library initialization,
          but for safe limiting cpu flags again. */
  #if defined ARCH_X86_64 || defined ARCH_AARCH64
@@ -178,7 +178,7 @@ index e4413eb..fff57bc 100644
  #else
      flags = 0;
      //to use C: flags=0
-@@ -562,8 +608,8 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
+@@ -563,8 +609,8 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
      SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_2d_copy, svt_av1_jnt_convolve_2d_copy_c, svt_av1_jnt_convolve_2d_copy_sse2, svt_av1_jnt_convolve_2d_copy_avx2, svt_av1_jnt_convolve_2d_copy_avx512);
      SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_x, svt_av1_jnt_convolve_x_c, svt_av1_jnt_convolve_x_sse2, svt_av1_jnt_convolve_x_avx2, svt_av1_jnt_convolve_x_avx512);
      SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_y, svt_av1_jnt_convolve_y_c, svt_av1_jnt_convolve_y_sse2, svt_av1_jnt_convolve_y_avx2, svt_av1_jnt_convolve_y_avx512);

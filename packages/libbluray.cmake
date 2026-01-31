@@ -18,7 +18,6 @@ ExternalProject_Add(libbluray
         ${meson_conf_args}
         -Denable_tools=false
         -Dbdj_jar=disabled
-        -Djava9=false
         -Dfreetype=enabled
         -Dlibxml2=enabled
         "-Dc_args='-Ddec_init=libbluray_dec_init'"

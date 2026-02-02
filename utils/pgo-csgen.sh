@@ -11,7 +11,7 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DCLANG_PACKAGES_PGO=CSGEN \
 -DCLANG_PACKAGES_PROFDATA_FILE="/build/pgo.profdata" \
 -DCLANG_FLAGS="" \
--DTOOLCHAIN_FLAGS="-mprefer-vector-width=512 -mno-gather -Wl,-mllvm,-x86-use-fsrm-for-memcpy" \
+-DTOOLCHAIN_FLAGS="-mprefer-vector-width=512 -Wl,-mllvm,-x86-use-fsrm-for-memcpy" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \
 -DQT_DISABLE_CCACHE=ON \

@@ -18,7 +18,7 @@ else
     else
         FLAGS+=" -gdwarf -gsplit-dwarf=single -Xclang -gsrc-hash=none"
     fi
-    FLAGS+=" -mguard=cf -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -fstrict-aliasing -falign-functions=32 -funroll-loops -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -ffunction-sections -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize @OPT_FLAGS@"
+    FLAGS+=" -mguard=cf -O3 -fsized-deallocation -fnew-infallible -faligned-allocation -fstrict-vtable-pointers -fstrict-flex-arrays=3 -fstrict-aliasing -fno-signed-zeros -fno-trapping-math -freciprocal-math -fapprox-func -mrecip=all -ffp-contract=fast -fno-math-errno -fomit-frame-pointer -fmerge-all-constants -fno-unique-section-names -ffunction-sections -fdata-sections -fno-stack-protector -fslp-vectorize -ftree-vectorize -fvectorize @OPT_FLAGS@"
     if [ "@ENABLE_CCACHE@" == "ON" ] && [ "$_NOCCACHE" != "1" ]; then
         CCACHE="ccache"
     fi

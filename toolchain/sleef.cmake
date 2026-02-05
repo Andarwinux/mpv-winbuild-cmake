@@ -80,7 +80,7 @@ ExternalProject_Add(sleef
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
-            COMMAND ${EXEC} "echo 'Cflags: -DSLEEF_STATIC_LIBS -DIMPORT_IS_EXPORT -DSLEEF_ALWAYS_INLINE' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
+            COMMAND ${EXEC} "echo 'Cflags: -DSLEEF_STATIC_LIBS -DIMPORT_IS_EXPORT' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} "echo 'Libs: -lsleef -lsleefdft' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} cp ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleefdft.pc
             COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/sleefmath.c <BINARY_DIR>/sleefmath.c

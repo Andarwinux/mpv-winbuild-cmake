@@ -1,6 +1,7 @@
 ExternalProject_Add(harfbuzz
     DEPENDS
         freetype2
+        graphite2
         libpng
     GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -19,6 +20,7 @@ ExternalProject_Add(harfbuzz
         -DHB_HAVE_GDI=ON
         -DHB_HAVE_DIRECTWRITE=ON
         -DHB_HAVE_UNISCRIBE=ON
+        -DHB_HAVE_GRAPHITE2=ON
         -DHB_BUILD_SUBSET=OFF
         "-DCMAKE_C_FLAGS='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"
         "-DCMAKE_CXX_FLAGS='-DHB_NO_LEGACY -DHB_NO_PRAGMA_GCC_DIAGNOSTIC_ERROR'"

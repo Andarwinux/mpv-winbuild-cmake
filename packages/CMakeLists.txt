@@ -33,6 +33,7 @@ list(APPEND ep
     freetype2
     libudfread
     libbluray
+    graphite2
     harfbuzz
     graphengine
     libzimg

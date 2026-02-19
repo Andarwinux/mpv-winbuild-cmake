@@ -16,6 +16,7 @@ ExternalProject_Add(openssl
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
     COMMAND ${EXEC} <BINARY_DIR>/source/${package}/Configure
+        CFLAGS=-DNO_INTERLOCKEDOR64
         --cross-compile-prefix=${TARGET_ARCH}-
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=lib

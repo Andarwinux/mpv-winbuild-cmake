@@ -12,6 +12,7 @@ ExternalProject_Add(frei0r
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DWITHOUT_OPENCV=ON
+        -DWITHOUT_CAIRO=ON
         -DWITHOUT_GAVL=ON
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

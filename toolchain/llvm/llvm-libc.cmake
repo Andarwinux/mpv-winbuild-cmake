@@ -1,6 +1,7 @@
 ExternalProject_Add(llvm-libc
     DEPENDS
         mingw-w64-headers
+        llvm-libcxx
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     SOURCE_DIR ${LLVM_SRC}

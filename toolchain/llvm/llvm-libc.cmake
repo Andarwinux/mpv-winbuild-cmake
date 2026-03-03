@@ -99,7 +99,7 @@ ExternalProject_Add(llvm-libc
                                                 libc.src.ctype.toascii
                                                 libc.src.ctype.tolower
                                                 libc.src.ctype.toupper
-    COMMAND ${EXEC} _FORCE_BUILTIN=0 ninja -C <BINARY_DIR> libc.src.string.{strlen,strstr,strcpy,strcat,strncat,strdup}
+    COMMAND ${EXEC} _FORCE_BUILTIN=${libc_strlen_builtin} ninja -C <BINARY_DIR> libc.src.string.{strlen,strstr,strcpy,strcat,strncat,strdup}
     COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar rcs llvmlibc.a libc/src/*/CMakeFiles/libc.src.*.*.dir/*.cpp.obj
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy llvmlibc.a ${MINGW_INSTALL_PREFIX}/lib/llvmlibc.a
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

@@ -15,7 +15,6 @@ ExternalProject_Add(curl
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !docs"
-    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/curl-*.patch
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
@@ -26,6 +25,7 @@ ExternalProject_Add(curl
         -DBUILD_LIBCURL_DOCS=OFF
         -DBUILD_EXAMPLES=OFF
         -DBUILD_MISC_DOCS=OFF
+        -DCURL_CA_NATIVE=ON
         -DCURL_BROTLI=ON
         -DCURL_USE_LIBPSL=ON
         -DCURL_USE_LIBSSH=ON
@@ -55,7 +55,7 @@ ExternalProject_Add(curl
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/curl.exe ${MINGW_INSTALL_PREFIX}/bin/curl.exe
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(curl)

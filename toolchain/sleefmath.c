@@ -82,7 +82,7 @@ __attribute__((always_inline,hot))                    float     log2f(float x){r
 __attribute__((always_inline,hot))                    float     logf(float x){return Sleef_logf1_u10purecfma(x);}
 __attribute__((always_inline,hot))                    float     modff(float x, float *iptr){vfloat2_purecfma_scalar_sleef r = Sleef_modff1_purecfma(x); return (*iptr = r.y, r.x);}
 __attribute__((always_inline,hot))                    float     nextafterf(float x, float y){return Sleef_nextafterf1_purecfma(x, y);}
-__attribute__((always_inline,hot))                    float     powf(float x, float y){return Sleef_fastpowf1_u3500purecfma(x, y);}
+__attribute__((always_inline,hot))                    float     powf(float x, float y){return Sleef_powf1_u10purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     remainderf(float x, float y){return Sleef_remainderf1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     rintf(float x){return __builtin_elementwise_rint(x);}
 __attribute__((always_inline,hot))                    float     roundf(float x){return __builtin_elementwise_round(x);}

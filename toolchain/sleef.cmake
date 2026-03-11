@@ -9,7 +9,8 @@ ExternalProject_Add(sleef
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/host
+    CONFIGURE_COMMAND ${EXEC} sed -i [['/FP_CONTRACT/d']] <SOURCE_DIR>/src/libm/*.c <SOURCE_DIR>/src/libm/sleefinline_header.h.org.in
+    COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>/host
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS=OFF

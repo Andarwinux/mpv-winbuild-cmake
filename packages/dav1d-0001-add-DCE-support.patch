@@ -1,9 +1,10 @@
-From dcc2985c8248a95bb80b864b1386cf3df8bb1f91 Mon Sep 17 00:00:00 2001
+From c64f9fa59b2b045465263d478615f2ac4d616e33 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Wed, 14 Jan 2026 00:00:00 +0000
 Subject: [PATCH] add DCE support
 
 ---
+ src/arm/cpu.c            |  8 ++++----
  src/ext/x86/x86inc.asm   | 17 ++++++++++++++---
  src/x86/itx16_avx2.asm   |  2 ++
  src/x86/itx16_avx512.asm |  2 ++
@@ -17,13 +18,41 @@ Subject: [PATCH] add DCE support
  src/x86/mc_avx2.asm      |  2 ++
  src/x86/mc_avx512.asm    |  2 ++
  src/x86/mc_sse.asm       |  2 ++
- 13 files changed, 38 insertions(+), 3 deletions(-)
+ 14 files changed, 42 insertions(+), 7 deletions(-)
 
+diff --git a/src/arm/cpu.c b/src/arm/cpu.c
+index c895049..7dce9f8 100644
+--- a/src/arm/cpu.c
++++ b/src/arm/cpu.c
+@@ -136,19 +136,19 @@ COLD unsigned dav1d_get_cpu_flags_arm(void) {
+ 
+ COLD unsigned dav1d_get_cpu_flags_arm(void) {
+     unsigned flags = dav1d_get_default_cpu_flags();
+-#ifdef PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE
++#if defined(PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE) && !defined(__ARM_FEATURE_DOTPROD)
+     if (IsProcessorFeaturePresent(PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE))
+         flags |= DAV1D_ARM_CPU_FLAG_DOTPROD;
+ #endif
+-#ifdef PF_ARM_SVE_INSTRUCTIONS_AVAILABLE
++#if defined(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE) && !defined(__ARM_FEATURE_SVE)
+     if (IsProcessorFeaturePresent(PF_ARM_SVE_INSTRUCTIONS_AVAILABLE))
+         flags |= DAV1D_ARM_CPU_FLAG_SVE;
+ #endif
+-#ifdef PF_ARM_SVE2_INSTRUCTIONS_AVAILABLE
++#if defined(PF_ARM_SVE2_INSTRUCTIONS_AVAILABLE) && !defined(__ARM_FEATURE_SVE2)
+     if (IsProcessorFeaturePresent(PF_ARM_SVE2_INSTRUCTIONS_AVAILABLE))
+         flags |= DAV1D_ARM_CPU_FLAG_SVE2;
+ #endif
+-#ifdef PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE
++#if defined(PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE) && !defined(__ARM_FEATURE_MATMUL_INT8)
+     if (IsProcessorFeaturePresent(PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE))
+         flags |= DAV1D_ARM_CPU_FLAG_I8MM;
+ #endif
 diff --git a/src/ext/x86/x86inc.asm b/src/ext/x86/x86inc.asm
-index a7ad39e..13f2823 100644
+index ece93f1..0398ad4 100644
 --- a/src/ext/x86/x86inc.asm
 +++ b/src/ext/x86/x86inc.asm
-@@ -771,9 +771,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
+@@ -778,9 +778,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
  
  %define last_branch_adr $$
  %macro AUTO_REP_RET 0
@@ -36,7 +65,7 @@ index a7ad39e..13f2823 100644
      ret
      annotate_function_size
  %endmacro
-@@ -807,6 +807,10 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+@@ -814,6 +814,10 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
  ; arch-independent part
  ;=============================================================================
  
@@ -47,7 +76,7 @@ index a7ad39e..13f2823 100644
  %assign function_align 16
  
  ; Begin a function.
-@@ -836,12 +840,19 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+@@ -843,12 +847,19 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
      %xdefine current_function_section __SECT__
      %if FORMAT_ELF
          %if %1
@@ -146,7 +175,7 @@ index ec7e3a5..a215e3f 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/mc16_avx2.asm b/src/x86/mc16_avx2.asm
-index 6b44249..1a2b7c1 100644
+index 98ca154..4680d1f 100644
 --- a/src/x86/mc16_avx2.asm
 +++ b/src/x86/mc16_avx2.asm
 @@ -23,6 +23,8 @@
@@ -185,7 +214,7 @@ index 319dd45..27d4be8 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/mc_avx2.asm b/src/x86/mc_avx2.asm
-index df8bebb..d433013 100644
+index f15ea42..981e74e 100644
 --- a/src/x86/mc_avx2.asm
 +++ b/src/x86/mc_avx2.asm
 @@ -23,6 +23,8 @@
@@ -211,7 +240,7 @@ index 50e670e..fbb3aab 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/mc_sse.asm b/src/x86/mc_sse.asm
-index deeb6db..905468a 100644
+index 9beb6c2..a8c5d16 100644
 --- a/src/x86/mc_sse.asm
 +++ b/src/x86/mc_sse.asm
 @@ -24,6 +24,8 @@
@@ -224,5 +253,5 @@ index deeb6db..905468a 100644
  %include "ext/x86/x86inc.asm"
  
 -- 
-2.52.0
+2.53.0
 

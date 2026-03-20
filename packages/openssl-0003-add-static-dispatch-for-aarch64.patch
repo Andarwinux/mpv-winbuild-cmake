@@ -1,25 +1,36 @@
-From 17e85dd4790d4991ed986bc65d22288747249d4e Mon Sep 17 00:00:00 2001
+From ff8879a0e07dcc4fc5eb9bbc8790cfa7e8da7352 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Thu, 22 Jan 2026 00:00:00 +0000
 Subject: [PATCH] add static dispatch for aarch64
 
 ---
- crypto/armcap.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ crypto/armcap.c | 31 ++++++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/crypto/armcap.c b/crypto/armcap.c
-index d8ad9ce..efc0594 100644
+index d8ad9ce01..2095f72ff 100644
 --- a/crypto/armcap.c
 +++ b/crypto/armcap.c
-@@ -48,6 +48,30 @@ void OPENSSL_cpuid_setup(void)
+@@ -41,13 +41,38 @@ void OPENSSL_cpuid_setup(void)
+ {
+     OPENSSL_armcap_P |= ARMV7_NEON;
+     OPENSSL_armv8_rsa_neonized = 1;
+-    if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE)) {
+-        /* These are all covered by one call in Windows */
++    #if defined(__ARM_FEATURE_CRYPTO)
+         OPENSSL_armcap_P |= ARMV8_AES;
+         OPENSSL_armcap_P |= ARMV8_PMULL;
          OPENSSL_armcap_P |= ARMV8_SHA1;
          OPENSSL_armcap_P |= ARMV8_SHA256;
-     }
-+    #if defined(__ARM_FEATURE_CRYPTO)
-+        OPENSSL_armcap_P |= ARMV8_AES;
-+        OPENSSL_armcap_P |= ARMV8_PMULL;
-+        OPENSSL_armcap_P |= ARMV8_SHA1;
-+        OPENSSL_armcap_P |= ARMV8_SHA256;
+-    }
++    #else
++        if (IsProcessorFeaturePresent(PF_ARM_V8_CRYPTO_INSTRUCTIONS_AVAILABLE)) {
++            /* These are all covered by one call in Windows */
++            OPENSSL_armcap_P |= ARMV8_AES;
++            OPENSSL_armcap_P |= ARMV8_PMULL;
++            OPENSSL_armcap_P |= ARMV8_SHA1;
++            OPENSSL_armcap_P |= ARMV8_SHA256;
++        }
 +    #endif
 +    #if defined(__ARM_FEATURE_SHA512)
 +        OPENSSL_armcap_P |= ARMV8_SHA512;
@@ -43,5 +54,5 @@ index d8ad9ce..efc0594 100644
  
  uint32_t OPENSSL_rdtsc(void)
 -- 
-2.52.0
+2.53.0
 

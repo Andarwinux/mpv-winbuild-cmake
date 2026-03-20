@@ -7,5 +7,5 @@ Name: whisper
 Description: Port of OpenAI's Whisper model in C/C++
 Version: 1.8.2
 Requires: vulkan
-Libs: -L${libdir} -lggml -lggml-base -lggml-cpu -lggml-vulkan -lwhisper
+Libs: -L${libdir} -lggml -lggml-base -lggml-cpu -lwhisper
 Cflags: -I${includedir}

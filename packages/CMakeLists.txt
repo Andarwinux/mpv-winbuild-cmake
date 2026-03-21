@@ -70,7 +70,6 @@ list(APPEND ep
     glad
     fast_float
     svtav1
-    svtav1-psy
     libplacebo
     libva
     libaribcaption

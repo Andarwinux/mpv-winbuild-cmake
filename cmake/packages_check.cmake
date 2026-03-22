@@ -5,7 +5,6 @@ if(TARGET_CPU STREQUAL "x86_64")
     set(dlltool_image "i386:x86-64")
     set(openssl_target "mingw64")
     set(libvpx_target "x86_64-win64-gcc")
-    set(xxhash_dispatch "-DDISPATCH=ON")
     set(mimalloc_macro "-D_M_X64")
     if(MARCH_HAS_AVX)
         set(aom_vpx_sse2avx

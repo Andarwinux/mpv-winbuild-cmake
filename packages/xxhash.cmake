@@ -10,7 +10,6 @@ ExternalProject_Add(xxhash
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/build/cmake -B<BINARY_DIR>
         ${cmake_conf_args}
-        ${xxhash_dispatch}
         -DXXHASH_BUILD_XXHSUM=OFF
         "-DCMAKE_C_FLAGS='-DXXH_ENABLE_AUTOVECTORIZE=1'"
     BUILD_ENVIRONMENT_MODIFICATION

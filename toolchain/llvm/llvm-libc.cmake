@@ -23,6 +23,7 @@ ExternalProject_Add(llvm-libc
         -DLIBC_ADD_NULL_CHECKS=OFF
         -DLIBC_CONF_MATH_OPTIMIZATIONS=LIBC_MATH_FAST
         -DLIBC_CONF_TIME_64BIT=ON
+        -DLIBC_CONF_WCTYPE_MODE=LIBC_WCTYPE_MODE_UTF8
         -DLIBC_NAMESPACE=__llvm_libc
         -DLIBC_CC_SUPPORTS_NOSTDLIBPP=OFF
         -DLIBC_CC_SUPPORTS_PATTERN_INIT=OFF
@@ -111,8 +112,9 @@ ExternalProject_Add(llvm-libc
                                                 libc.src.wctype.iswxdigit
                                                 libc.src.wctype.iswpunct
                                                 libc.src.wctype.iswprint
+                                                libc.src.__support.wctype.wctype_classification_utils
     COMMAND ${EXEC} _FORCE_BUILTIN=${libc_strlen_builtin} ninja -C <BINARY_DIR> libc.src.string.{strlen,strstr,strcpy,strcat,strncat,strdup}
-    COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar rcs llvmlibc.a libc/src/*/CMakeFiles/libc.src.*.*.dir/*.cpp.obj
+    COMMAND ${EXEC} ${TARGET_ARCH}-llvm-ar rcs llvmlibc.a libc/src/*/CMakeFiles/libc.src.*.*.dir/*.cpp.obj libc/src/__support/wctype/CMakeFiles/libc.src.__support.wctype.wctype_classification_utils.dir/wctype_classification_utils.cpp.obj
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy llvmlibc.a ${MINGW_INSTALL_PREFIX}/lib/llvmlibc.a
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

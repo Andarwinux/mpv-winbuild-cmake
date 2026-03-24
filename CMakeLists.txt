@@ -133,6 +133,9 @@ if(TARGET_CPU STREQUAL "x86_64")
             set(MARCH_HAS_AVX512 ON)
         endif()
     endif()
+    if(CC_OUTPUT MATCHES "__APX_F__ 1")
+        set(MARCH_HAS_APX ON)
+    endif()
 else()
     execute_process(
         COMMAND ${EXEC} echo | ${CMAKE_C_COMPILER} --target=aarch64 -dM -E - -mcpu=${MARCH}

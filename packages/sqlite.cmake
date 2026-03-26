@@ -1,8 +1,8 @@
 ExternalProject_Add(sqlite
     DEPENDS
         meson-wrap
-    URL https://www.sqlite.org/2025/sqlite-amalgamation-3500400.zip
-    URL_HASH SHA3_256=f131b68e6ba5fb891cc13ebb5ff9555054c77294cb92d8d1268bad5dba4fa2a1
+    URL https://www.sqlite.org/2026/sqlite-amalgamation-3510300.zip
+    URL_HASH SHA3_256=ced02ff9738970f338c9c8e269897b554bcda73f6cf1029d49459e1324dbeaea
     DOWNLOAD_DIR ${SOURCE_LOCATION}
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

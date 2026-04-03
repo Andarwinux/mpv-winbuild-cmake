@@ -1,4 +1,6 @@
 ExternalProject_Add(ggml
+    DEPENDS
+        vulkan
     GIT_REPOSITORY https://github.com/ggml-org/ggml.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -12,7 +14,7 @@ ExternalProject_Add(ggml
         ${cmake_conf_args}
         -DGGML_CCACHE=OFF
         -DGGML_ALL_WARNINGS=OFF
-        -DGGML_VULKAN=OFF
+        -DGGML_VULKAN=ON
         -DGGML_OPENMP=OFF
         -DGGML_BUILD_TESTS=OFF
         -DGGML_BUILD_EXAMPLES=OFF

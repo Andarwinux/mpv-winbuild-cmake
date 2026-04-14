@@ -1,6 +1,7 @@
 ExternalProject_Add(ggml
     DEPENDS
         vulkan
+        spirv-headers
     GIT_REPOSITORY https://github.com/ggml-org/ggml.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"

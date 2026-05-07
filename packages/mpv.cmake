@@ -23,6 +23,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Dlibarchive=enabled
         -Dlibavdevice=enabled
         -Dlibbluray=enabled
+        -Dlibcurl=enabled
         -Dlua=lua5.2
         -Dopenal=enabled
         -Drubberband=enabled
@@ -69,10 +70,12 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             vapoursynth
             libsdl2
             libsixel
+            curl
         GIT_REPOSITORY https://github.com/mpv-player/mpv.git
         SOURCE_DIR ${SOURCE_LOCATION}
         GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
         GIT_PROGRESS TRUE
+        PATCH_COMMAND ${EXEC} curl -sL https://github.com/mpv-player/mpv/pull/17879.patch | git am --3way --whitespace=fix
         UPDATE_COMMAND ""
         CONFIGURE_ENVIRONMENT_MODIFICATION
             _IS_CONFIGURE=set:1
@@ -91,7 +94,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             _PDB_GENERATE=set:1
         BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
         INSTALL_COMMAND ""
-        LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+        LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
     )
 
     get_property(mpv_src TARGET mpv PROPERTY _EP_SOURCE_DIR)

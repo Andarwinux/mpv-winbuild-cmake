@@ -54,7 +54,7 @@ ExternalProject_Add(curl
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/curl.exe ${MINGW_INSTALL_PREFIX}/bin/curl.exe
+    INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

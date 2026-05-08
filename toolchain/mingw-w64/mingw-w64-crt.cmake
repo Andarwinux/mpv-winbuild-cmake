@@ -26,7 +26,7 @@ ExternalProject_Add(mingw-w64-crt
         _IS_UNWIND_ALLOWED=set:1
         _FORCE_BUILTIN=set:1
         _NOCCACHE=set:1
-    BUILD_COMMAND ${MAKE} _LTO_ENABLED=1 _IS_UNWIND_ALLOWED=0 ${libprefix}/libws2_32.a ${libprefix}/libmingw32.a ${libprefix}/libmsvcrt.a
+    BUILD_COMMAND ${MAKE} _LTO_ENABLED=1 _IS_UNWIND_ALLOWED=0 ${libprefix}/libws2_32.a ${libprefix}/libmingw32.a ${libprefix}/libmsvcrt.a misc/${libprefix}_libmingwex_a-gettimeofday.o misc/${libprefix}_libmingwex_a-dirent.o misc/${libprefix}_libmingwex_a-mkstemp.o
           COMMAND ${MAKE} "CCC_OVERRIDE_OPTIONS='+-fno-builtin-sin +-fno-builtin-sinf +-fno-builtin-sinl +-fno-builtin-cos +-fno-builtin-cosf +-fno-builtin-cosl +-fno-builtin-ldexp +-fno-builtin-ldexpf +-fno-builtin-ldexpl'"
     INSTALL_COMMAND ${MAKE} install
             COMMAND ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libpowrprof.a ${MINGW_INSTALL_PREFIX}/lib/libPowrProf.a

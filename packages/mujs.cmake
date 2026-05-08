@@ -1,7 +1,7 @@
 ExternalProject_Add(mujs
     DEPENDS
         meson-wrap
-    GIT_REPOSITORY https://codeberg.org/ccxvii/mujs.git
+    GIT_REPOSITORY https://github.com/ArtifexSoftware/mujs.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE

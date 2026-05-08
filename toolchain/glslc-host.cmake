@@ -42,6 +42,8 @@ ExternalProject_Add(glslc-host
         -DSPIRV_TOOLS_LIBRARY_TYPE=STATIC
         -DDISABLE_RTTI=ON
         -DDISABLE_EXCEPTIONS=ON
+        -DENABLE_HLSL=OFF
+        -DSHADERC_ENABLE_HLSL=OFF
         -DSHADERC_SPIRV_TOOLS_DIR=${src_spirv-tools-host}
         -DSHADERC_SPIRV_HEADERS_DIR=${src_spirv-headers-host}
         -DSHADERC_GLSLANG_DIR=${src_glslang-host}

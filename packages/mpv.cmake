@@ -75,7 +75,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         SOURCE_DIR ${SOURCE_LOCATION}
         GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
         GIT_PROGRESS TRUE
-        PATCH_COMMAND ${EXEC} curl -sL https://github.com/mpv-player/mpv/pull/17879.patch | git am --3way --whitespace=fix
+        PATCH_COMMAND ${EXEC} curl -sL https://github.com/mpv-player/mpv/pull/17879.patch | git am --3way --whitespace=fix --exclude=ci/*
         UPDATE_COMMAND ""
         CONFIGURE_ENVIRONMENT_MODIFICATION
             _IS_CONFIGURE=set:1

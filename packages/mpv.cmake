@@ -25,7 +25,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Dlibbluray=enabled
         -Dlibcurl=enabled
         -Dlua=lua5.2
-        -Dopenal=enabled
+        -Dopenal=disabled
         -Drubberband=enabled
         -Dsdl2-gamepad=enabled
         -Dshaderc=enabled
@@ -61,7 +61,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             lua5.2
             rubberband
             uchardet
-            openal-soft
+            #openal-soft
             mujs
             vulkan
             shaderc

@@ -1,0 +1,693 @@
+From c4826667b551562f55466d1820859b518115ff37 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sun, 10 May 2026 00:00:00 +0000
+Subject: [PATCH] remove shit
+
+---
+ source/common/aarch64/asm-primitives.cpp |  60 +++++-
+ source/common/cpu.cpp                    | 225 ++++-------------------
+ source/common/cpu.h                      |   8 +-
+ source/common/x86/asm-primitives.cpp     |  90 ++++++---
+ source/common/x86/x86inc.asm             |  13 +-
+ 5 files changed, 157 insertions(+), 239 deletions(-)
+
+diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
+index fea65b4..fcadcba 100644
+--- a/source/common/aarch64/asm-primitives.cpp
++++ b/source/common/aarch64/asm-primitives.cpp
+@@ -664,30 +664,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
+ 
+ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
+ {
+-    if (cpuMask & X265_CPU_NEON)
++    if (1)
+     {
+         setupNeonPrimitives(p);
+     }
+ #ifdef HAVE_NEON_DOTPROD
+-    if (cpuMask & X265_CPU_NEON_DOTPROD)
++    #if defined(__ARM_FEATURE_DOTPROD)
++        static bool DOTPROD = true;
++    #else
++        static bool DOTPROD = false;
++    #endif
++    if (DOTPROD)
+     {
+         setupNeonDotProdPrimitives(p);
+     }
+ #endif
+ #ifdef HAVE_SVE
+-    if (cpuMask & X265_CPU_SVE)
++    #if defined(__ARM_FEATURE_SVE)
++        static bool SVE = true;
++    #else
++        static bool SVE = false;
++    #endif
++    if (SVE)
+     {
+         setupSvePrimitives(p);
+     }
+ #endif
+ #ifdef HAVE_SVE2
+-    if (cpuMask & X265_CPU_SVE2)
++    #if defined(__ARM_FEATURE_SVE2)
++        static bool SVE2 = true;
++    #else
++        static bool SVE2 = false;
++    #endif
++    if (SVE2)
+     {
+         setupSve2Primitives(p);
+     }
+ #endif
+ #ifdef HAVE_SVE2_BITPERM
+-    if (cpuMask & X265_CPU_SVE2_BITPERM)
++    #if defined(__ARM_FEATURE_SVE2_BITPERM)
++        static bool SVE2_BITPERM = true;
++    #else
++        static bool SVE2_BITPERM = false;
++    #endif
++    if (SVE2_BITPERM)
+     {
+         setupSve2BitPermPrimitives(p);
+     }
+@@ -696,7 +716,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
+ 
+ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
+ {
+-    if (cpuMask & X265_CPU_NEON)
++    if (1)
+     {
+         setupPixelPrimitives_neon(p);
+         setupFilterPrimitives_neon(p);
+@@ -706,20 +726,35 @@ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
+         setupSaoPrimitives_neon(p);
+     }
+ #ifdef HAVE_NEON_DOTPROD
+-    if (cpuMask & X265_CPU_NEON_DOTPROD)
++    #if defined(__ARM_FEATURE_DOTPROD)
++        static bool DOTPROD = true;
++    #else
++        static bool DOTPROD = false;
++    #endif
++    if (DOTPROD)
+     {
+         setupFilterPrimitives_neon_dotprod(p);
+         setupPixelPrimitives_neon_dotprod(p);
+     }
+ #endif
+ #ifdef HAVE_NEON_I8MM
+-    if (cpuMask & X265_CPU_NEON_I8MM)
++    #if defined(__ARM_FEATURE_MATMUL_INT8)
++        static bool NEON_I8MM = true;
++    #else
++        static bool NEON_I8MM = false;
++    #endif
++    if (NEON_I8MM)
+     {
+         setupFilterPrimitives_neon_i8mm(p);
+     }
+ #endif
+ #if defined(HAVE_SVE) && HAVE_SVE_BRIDGE
+-    if (cpuMask & X265_CPU_SVE)
++    #if defined(__ARM_FEATURE_SVE)
++        static bool SVE = true;
++    #else
++        static bool SVE = false;
++    #endif
++    if (SVE)
+     {
+         setupFilterPrimitives_sve(p);
+         setupSaoPrimitives_sve(p);
+@@ -728,7 +763,12 @@ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
+     }
+ #endif
+ #if defined(HAVE_SVE2) && HAVE_SVE_BRIDGE
+-    if (cpuMask & X265_CPU_SVE2)
++    #if defined(__ARM_FEATURE_SVE2)
++        static bool SVE2 = true;
++    #else
++        static bool SVE2 = false;
++    #endif
++    if (SVE2)
+     {
+         setupSaoPrimitives_sve2(p);
+     }
+diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
+index 48b7403..af5a45b 100644
+--- a/source/common/cpu.cpp
++++ b/source/common/cpu.cpp
+@@ -158,194 +158,26 @@ bool detect512()
+ uint32_t cpu_detect(bool benableavx512 )
+ {
+ 
+-    uint32_t cpu = 0; 
+-    uint32_t eax, ebx, ecx, edx;
+-    uint32_t vendor[4] = { 0 };
+-    uint32_t max_extended_cap, max_basic_cap;
+-    uint64_t xcr0 = 0;
+-
+-#if !X86_64
+-    if (!PFX(cpu_cpuid_test)())
+-        return 0;
+-#endif
+-
+-    PFX(cpu_cpuid)(0, &max_basic_cap, vendor + 0, vendor + 2, vendor + 1);
+-    if (max_basic_cap == 0)
+-        return 0;
+-
+-    PFX(cpu_cpuid)(1, &eax, &ebx, &ecx, &edx);
+-    if (edx & 0x00800000)
+-        cpu |= X265_CPU_MMX;
+-    else
+-        return cpu;
+-    if (edx & 0x02000000)
+-        cpu |= X265_CPU_MMX2 | X265_CPU_SSE;
+-    if (edx & 0x04000000)
+-        cpu |= X265_CPU_SSE2;
+-    if (ecx & 0x00000001)
+-        cpu |= X265_CPU_SSE3;
+-    if (ecx & 0x00000200)
+-        cpu |= X265_CPU_SSSE3 | X265_CPU_SSE2_IS_FAST;
+-    if (ecx & 0x00080000)
+-        cpu |= X265_CPU_SSE4;
+-    if (ecx & 0x00100000)
+-        cpu |= X265_CPU_SSE42;
+-
+-    if (ecx & 0x08000000) /* XGETBV supported and XSAVE enabled by OS */
+-    {
+-        /* Check for OS support */
+-        xcr0 = PFX(cpu_xgetbv)(0);
+-        if ((xcr0 & 0x6) == 0x6) /* XMM/YMM state */
+-        {
+-            if (ecx & 0x10000000)
+-            cpu |= X265_CPU_AVX;
+-            if (ecx & 0x00001000)
+-                cpu |= X265_CPU_FMA3;
+-        }
+-    }
+-
+-    if (max_basic_cap >= 7)
+-    {
+-        PFX(cpu_cpuid)(7, &eax, &ebx, &ecx, &edx);
+-        /* AVX2 requires OS support, but BMI1/2 don't. */
+-        if (ebx & 0x00000008)
+-            cpu |= X265_CPU_BMI1;
+-        if (ebx & 0x00000100)
+-            cpu |= X265_CPU_BMI2;
+-
+-        if ((xcr0 & 0x6) == 0x6) /* XMM/YMM state */
+-        {
+-            if (ebx & 0x00000020)
+-                cpu |= X265_CPU_AVX2;
+-            if (benableavx512)
+-            {
+-                if ((xcr0 & 0xE0) == 0xE0) /* OPMASK/ZMM state */
+-                {
+-                    if ((ebx & 0xD0030000) == 0xD0030000)
+-                    {
+-                        cpu |= X265_CPU_AVX512;
+-                        enable512 = true;
+-                    }
+-                }
+-            }
+-        }
+-    }
+-
+-    PFX(cpu_cpuid)(0x80000000, &eax, &ebx, &ecx, &edx);
+-    max_extended_cap = eax;
+-
+-    if (max_extended_cap >= 0x80000001)
+-    {
+-        PFX(cpu_cpuid)(0x80000001, &eax, &ebx, &ecx, &edx);
+-
+-        if (ecx & 0x00000020)
+-            cpu |= X265_CPU_LZCNT; /* Supported by Intel chips starting with Haswell */
+-        if (ecx & 0x00000040) /* SSE4a, AMD only */
+-        {
+-            int family = ((eax >> 8) & 0xf) + ((eax >> 20) & 0xff);
+-            cpu |= X265_CPU_SSE2_IS_FAST;      /* Phenom and later CPUs have fast SSE units */
+-            if (family == 0x14)
+-            {
+-                cpu &= ~X265_CPU_SSE2_IS_FAST; /* SSSE3 doesn't imply fast SSE anymore... */
+-                cpu |= X265_CPU_SSE2_IS_SLOW;  /* Bobcat has 64-bit SIMD units */
+-                cpu |= X265_CPU_SLOW_PALIGNR;  /* palignr is insanely slow on Bobcat */
+-            }
+-            if (family == 0x16)
+-            {
+-                cpu |= X265_CPU_SLOW_PSHUFB;   /* Jaguar's pshufb isn't that slow, but it's slow enough
+-                                                * compared to alternate instruction sequences that this
+-                                                * is equal or faster on almost all such functions. */
+-            }
+-        }
+-
+-        if (cpu & X265_CPU_AVX)
+-        {
+-            if (ecx & 0x00000800) /* XOP */
+-                cpu |= X265_CPU_XOP;
+-            if (ecx & 0x00010000) /* FMA4 */
+-                cpu |= X265_CPU_FMA4;
+-        }
+-
+-        if (!strcmp((char*)vendor, "AuthenticAMD"))
+-        {
+-            if (edx & 0x00400000)
+-                cpu |= X265_CPU_MMX2;
+-            if ((cpu & X265_CPU_SSE2) && !(cpu & X265_CPU_SSE2_IS_FAST))
+-                cpu |= X265_CPU_SSE2_IS_SLOW; /* AMD CPUs come in two types: terrible at SSE and great at it */
+-        }
+-    }
+-
+-    if (!strcmp((char*)vendor, "GenuineIntel"))
+-    {
+-        PFX(cpu_cpuid)(1, &eax, &ebx, &ecx, &edx);
+-        int family = ((eax >> 8) & 0xf) + ((eax >> 20) & 0xff);
+-        int model  = ((eax >> 4) & 0xf) + ((eax >> 12) & 0xf0);
+-        if (family == 6)
+-        {
+-            /* Detect Atom CPU */
+-            if (model == 28)
+-            {
+-                cpu |= X265_CPU_SLOW_ATOM;
+-                cpu |= X265_CPU_SLOW_PSHUFB;
+-            }
+-
+-            /* Conroe has a slow shuffle unit. Check the model number to make sure not
+-             * to include crippled low-end Penryns and Nehalems that don't have SSE4. */
+-            else if ((cpu & X265_CPU_SSSE3) && !(cpu & X265_CPU_SSE4) && model < 23)
+-                cpu |= X265_CPU_SLOW_SHUFFLE;
+-        }
+-    }
+-
+-    if ((!strcmp((char*)vendor, "GenuineIntel") || !strcmp((char*)vendor, "CyrixInstead")) && !(cpu & X265_CPU_SSE42))
+-    {
+-        /* cacheline size is specified in 3 places, any of which may be missing */
+-        PFX(cpu_cpuid)(1, &eax, &ebx, &ecx, &edx);
+-        int cache = (ebx & 0xff00) >> 5; // cflush size
+-        if (!cache && max_extended_cap >= 0x80000006)
+-        {
+-            PFX(cpu_cpuid)(0x80000006, &eax, &ebx, &ecx, &edx);
+-            cache = ecx & 0xff; // cacheline size
+-        }
+-        if (!cache && max_basic_cap >= 2)
+-        {
+-            // Cache and TLB Information
+-            static const char cache32_ids[] = { '\x0a','\x0c','\x41','\x42','\x43','\x44','\x45','\x82','\x83','\x84','\x85','\0' };
+-            static const char cache64_ids[] = { '\x22','\x23','\x25','\x29','\x2c','\x46','\x47','\x49','\x60','\x66','\x67',
+-                                                '\x68','\x78','\x79','\x7a','\x7b','\x7c','\x7c','\x7f','\x86','\x87','\0' };
+-            uint32_t buf[4];
+-            int max, i = 0;
+-            do
+-            {
+-                PFX(cpu_cpuid)(2, buf + 0, buf + 1, buf + 2, buf + 3);
+-                max = buf[0] & 0xff;
+-                buf[0] &= ~0xff;
+-                for (int j = 0; j < 4; j++)
+-                {
+-                    if (!(buf[j] >> 31))
+-                        while (buf[j])
+-                        {
+-                            if (strchr(cache32_ids, buf[j] & 0xff))
+-                                cache = 32;
+-                            if (strchr(cache64_ids, buf[j] & 0xff))
+-                                cache = 64;
+-                            buf[j] >>= 8;
+-                        }
+-                }
+-            }
+-            while (++i < max);
+-        }
+-
+-        if (cache == 32)
+-            cpu |= X265_CPU_CACHELINE_32;
+-        else if (cache == 64)
+-            cpu |= X265_CPU_CACHELINE_64;
+-        else
+-            x265_log(NULL, X265_LOG_WARNING, "unable to determine cacheline size\n");
+-    }
+-
+-#if BROKEN_STACK_ALIGNMENT
+-    cpu |= X265_CPU_STACK_MOD4;
+-#endif
++    uint32_t cpu = X265_CPU_MMX|X265_CPU_MMX2|X265_CPU_SSE|X265_CPU_SSE2|X265_CPU_SSE3|X265_CPU_SSSE3|X265_CPU_SSE2_IS_FAST|X265_CPU_SSE4|X265_CPU_SSE42;
++
++    #ifdef __AVX__
++        cpu |= X265_CPU_AVX;
++    #endif
++    #ifdef __AVX2__
++        cpu |= X265_CPU_AVX2;
++    #endif
++    #ifdef __FMA__
++        cpu |= X265_CPU_FMA3;
++    #endif
++    #ifdef __BMI__
++        cpu |= X265_CPU_BMI1|X265_CPU_LZCNT;
++    #endif
++    #ifdef __BMI2__
++        cpu |= X265_CPU_BMI2;
++    #endif
++    #ifdef __AVX512F__
++        cpu |= X265_CPU_AVX512;
++    #endif
+ 
+     return cpu;
+ }
+@@ -407,7 +239,22 @@ uint32_t cpu_detect(bool benableavx512)
+     int flags = 0;
+ 
+ #ifdef ENABLE_ASSEMBLY
+-    flags = aarch64_cpu_detect();
++    flags = X265_CPU_NEON;
++    #if defined(__ARM_FEATURE_DOTPROD)
++        flags |= X265_CPU_NEON_DOTPROD;
++    #endif
++    #if defined(__ARM_FEATURE_MATMUL_INT8)
++        flags |= X265_CPU_NEON_I8MM;
++    #endif
++    #if defined(__ARM_FEATURE_SVE)
++        flags |= X265_CPU_SVE;
++    #endif
++    #if defined(__ARM_FEATURE_SVE2)
++        flags |= X265_CPU_SVE2;
++    #endif
++    #if defined(__ARM_FEATURE_SVE2_BITPERM)
++        flags |= X265_CPU_SVE2_BITPERM;
++    #endif
+ #endif
+ 
+     return flags;
+diff --git a/source/common/cpu.h b/source/common/cpu.h
+index 52a9e9c..48d723b 100644
+--- a/source/common/cpu.h
++++ b/source/common/cpu.h
+@@ -36,16 +36,16 @@ extern "C" void PFX(cpu_emms)(void);
+ extern "C" void PFX(safe_intel_cpu_indicator_init)(void);
+ 
+ #if _MSC_VER && _WIN64
+-#define x265_emms() PFX(cpu_emms)()
++#define x265_emms() ((void)0)
+ #elif _MSC_VER
+ #include <mmintrin.h>
+-#define x265_emms() _mm_empty()
++#define x265_emms() ((void)0)
+ #elif __GNUC__
+ // Cannot use _mm_empty() directly without compiling all the source with
+ // a fixed CPU arch, which we would like to avoid at the moment
+-#define x265_emms() PFX(cpu_emms)()
++#define x265_emms() ((void)0)
+ #else
+-#define x265_emms() PFX(cpu_emms)()
++#define x265_emms() ((void)0)
+ #endif
+ 
+ namespace X265_NS {
+diff --git a/source/common/x86/asm-primitives.cpp b/source/common/x86/asm-primitives.cpp
+index bb32f32..0025444 100644
+--- a/source/common/x86/asm-primitives.cpp
++++ b/source/common/x86/asm-primitives.cpp
+@@ -912,7 +912,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+     p.scanPosLast = PFX(scanPosLast_x64);
+ #endif
+ 
+-    if (cpuMask & X265_CPU_SSE2)
++    if (0)
+     {
+         /* We do not differentiate CPUs which support MMX and not SSE2. We only check
+          * for SSE2 and then use both MMX and SSE2 functions */
+@@ -1107,7 +1107,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         ALL_LUMA_TU(count_nonzero, count_nonzero, sse2);
+         p.propagateCost = PFX(mbtree_propagate_cost_sse2);
+     }
+-    if (cpuMask & X265_CPU_SSE3)
++    if (0)
+     {
+ #if X86_64
+         ALL_CHROMA_420_PU(filter_hpp, interp_4tap_horiz_pp, sse3);
+@@ -1118,7 +1118,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         ALL_CHROMA_444_PU(filter_hps, interp_4tap_horiz_ps, sse3);
+ #endif
+     }
+-    if (cpuMask & X265_CPU_SSSE3)
++    if (0)
+     {
+         ASSIGN2(p.scale1D_128to64, scale1D_128to64_ssse3);
+         p.scale2D_64to32 = PFX(scale2D_64to32_ssse3);
+@@ -1187,7 +1187,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.fix8Unpack = PFX(cutree_fix8_unpack_ssse3);
+         p.fix8Pack = PFX(cutree_fix8_pack_ssse3);
+     }
+-    if (cpuMask & X265_CPU_SSE4)
++    if (0)
+     {
+ #if X86_64
+         p.pelFilterLumaStrong[0] = PFX(pelFilterLumaStrong_V_sse4);
+@@ -1330,7 +1330,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+ #endif
+     }
+ #if X86_64
+-    if (cpuMask & X265_CPU_AVX)
++    #if defined(__AVX__)
++        static bool avx = true;
++    #else
++        static bool avx = false;
++    #endif
++    if (avx)
+     {
+         // p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_avx); fails tests
+         p.chroma[X265_CSP_I422].pu[CHROMA_422_16x24].satd = PFX(pixel_satd_16x24_avx);
+@@ -1456,17 +1461,17 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         // 64 X N
+         p.cu[BLOCK_64x64].copy_sp = (copy_sp_t)PFX(blockcopy_ss_64x64_avx);
+ 
+-        p.frameInitLowres = PFX(frame_init_lowres_core_avx);
+-        p.frameInitLowerRes = PFX(frame_init_lowres_core_avx);
++        //p.frameInitLowres = PFX(frame_init_lowres_core_avx);
++        //p.frameInitLowerRes = PFX(frame_init_lowres_core_avx);
+ 
+         p.pu[LUMA_64x16].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x16_avx);
+         p.pu[LUMA_64x32].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x32_avx);
+         p.pu[LUMA_64x48].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x48_avx);
+         p.pu[LUMA_64x64].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x64_avx);
+         p.propagateCost = PFX(mbtree_propagate_cost_avx);
+-        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
++        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
+     }
+-    if (cpuMask & X265_CPU_XOP)
++    if (0)
+     {
+         //p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_xop); this one is broken
+         ALL_LUMA_PU(satd, pixel_satd, xop);
+@@ -1478,7 +1483,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.frameInitLowerRes = PFX(frame_init_lowres_core_xop);
+         p.frameSubSampleLuma = PFX(frame_subsample_luma_xop);
+     }
+-    if (cpuMask & X265_CPU_AVX2)
++    #if defined(__AVX2__)
++        static bool avx2 = true;
++    #else
++        static bool avx2 = false;
++    #endif
++    if (avx2)
+     {
+ #if X265_DEPTH == 12
+         ASSIGN_SA8D(avx2);
+@@ -2303,10 +2313,10 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.chroma[X265_CSP_I444].pu[LUMA_64x48].filter_vsp = PFX(interp_4tap_vert_sp_64x48_avx2);
+         p.chroma[X265_CSP_I444].pu[LUMA_64x64].filter_vsp = PFX(interp_4tap_vert_sp_64x64_avx2);
+ 
+-        p.frameInitLowres = PFX(frame_init_lowres_core_avx2);
+-        p.frameInitLowerRes = PFX(frame_init_lowres_core_avx2);
++        //p.frameInitLowres = PFX(frame_init_lowres_core_avx2);
++        //p.frameInitLowerRes = PFX(frame_init_lowres_core_avx2);
+ 
+-        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
++        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
+ 
+         p.propagateCost = PFX(mbtree_propagate_cost_avx2);
+         p.fix8Unpack = PFX(cutree_fix8_unpack_avx2);
+@@ -2356,13 +2366,18 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.cu[LUMA_32x32].sa8d = PFX(pixel_sa8d_32x32_avx2);
+ #endif
+ 
+-        if (cpuMask & X265_CPU_BMI2)
++        if (1)
+         {
+             p.scanPosLast = PFX(scanPosLast_avx2_bmi2);
+             p.costCoeffNxN = PFX(costCoeffNxN_avx2_bmi2);
+         }
+     }
+-    if (cpuMask & X265_CPU_AVX512)
++    #if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512CD__)
++        static bool avx512 = true;
++    #else
++        static bool avx512 = false;
++    #endif
++    if (avx512)
+     {
+         p.cu[BLOCK_16x16].var = PFX(pixel_var_16x16_avx512);
+         p.cu[BLOCK_32x32].calcresidual[NONALIGNED] = PFX(getResidual32_avx512);
+@@ -3209,7 +3224,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+     p.scanPosLast = PFX(scanPosLast_x64);
+ #endif
+ 
+-    if (cpuMask & X265_CPU_SSE2)
++    if (0)
+     {
+         /* We do not differentiate CPUs which support MMX and not SSE2. We only check
+          * for SSE2 and then use both MMX and SSE2 functions */
+@@ -3386,7 +3401,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+         ALL_LUMA_TU(count_nonzero, count_nonzero, sse2);
+         p.propagateCost = PFX(mbtree_propagate_cost_sse2);
+     }
+-    if (cpuMask & X265_CPU_SSE3)
++    if (0)
+     {
+         ALL_CHROMA_420_PU(filter_hpp, interp_4tap_horiz_pp, sse3);
+         ALL_CHROMA_422_PU(filter_hpp, interp_4tap_horiz_pp, sse3);
+@@ -3395,7 +3410,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+         ALL_CHROMA_422_PU(filter_hps, interp_4tap_horiz_ps, sse3);
+         ALL_CHROMA_444_PU(filter_hps, interp_4tap_horiz_ps, sse3);
+     }
+-    if (cpuMask & X265_CPU_SSSE3)
++    if (0)
+     {
+         p.pu[LUMA_8x16].sad_x3 = PFX(pixel_sad_x3_8x16_ssse3);
+         p.pu[LUMA_8x32].sad_x3 = PFX(pixel_sad_x3_8x32_ssse3);
+@@ -3490,7 +3505,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+         p.fix8Unpack = PFX(cutree_fix8_unpack_ssse3);
+         p.fix8Pack = PFX(cutree_fix8_pack_ssse3);
+     }
+-    if (cpuMask & X265_CPU_SSE4)
++    if (0)
+     {
+         p.sign = PFX(calSign_sse4);
+         p.saoCuOrgE0 = PFX(saoCuOrgE0_sse4);
+@@ -3600,7 +3615,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+ #endif
+         p.costCoeffRemain = PFX(costCoeffRemain_sse4);
+     }
+-    if (cpuMask & X265_CPU_AVX)
++    #if defined(__AVX__)
++        static bool avx = true;
++    #else
++        static bool avx = false;
++    #endif
++    if (avx)
+     {
+         p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_avx);
+         p.chroma[X265_CSP_I422].pu[CHROMA_422_16x24].satd = PFX(pixel_satd_16x24_avx);
+@@ -3698,12 +3718,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+ 
+         p.pu[LUMA_48x64].copy_pp = PFX(blockcopy_pp_48x64_avx);
+ 
+-        p.frameInitLowres = PFX(frame_init_lowres_core_avx);
+-        p.frameInitLowerRes = PFX(frame_init_lowres_core_avx);
++        //p.frameInitLowres = PFX(frame_init_lowres_core_avx);
++        //p.frameInitLowerRes = PFX(frame_init_lowres_core_avx);
+         p.propagateCost = PFX(mbtree_propagate_cost_avx);
+-        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
++        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
+     }
+-    if (cpuMask & X265_CPU_XOP)
++    if (0)
+     {
+         //p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_xop); this one is broken
+         ALL_LUMA_PU(satd, pixel_satd, xop);
+@@ -3717,7 +3737,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+ 
+     }
+ #if X86_64
+-    if (cpuMask & X265_CPU_AVX2)
++    #if defined(__AVX2__)
++        static bool avx2 = true;
++    #else
++        static bool avx2 = false;
++    #endif
++    if (avx2)
+     {
+         p.cu[BLOCK_16x16].sse_ss = (pixel_sse_ss_t)PFX(pixel_ssd_ss_16x16_avx2);
+         p.cu[BLOCK_32x32].sse_ss = (pixel_sse_ss_t)PFX(pixel_ssd_ss_32x32_avx2);
+@@ -4688,17 +4713,17 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+         p.chroma[X265_CSP_I444].pu[LUMA_64x32].filter_vpp = PFX(interp_4tap_vert_pp_64x32_avx2);
+         p.chroma[X265_CSP_I444].pu[LUMA_64x16].filter_vpp = PFX(interp_4tap_vert_pp_64x16_avx2);
+ 
+-        p.frameInitLowres = PFX(frame_init_lowres_core_avx2);
+-        p.frameInitLowerRes = PFX(frame_init_lowres_core_avx2);
++        //p.frameInitLowres = PFX(frame_init_lowres_core_avx2);
++        //p.frameInitLowerRes = PFX(frame_init_lowres_core_avx2);
+         p.propagateCost = PFX(mbtree_propagate_cost_avx2);
+         p.saoCuStatsE0 = PFX(saoCuStatsE0_avx2);
+         p.saoCuStatsE1 = PFX(saoCuStatsE1_avx2);
+         p.saoCuStatsE2 = PFX(saoCuStatsE2_avx2);
+         p.saoCuStatsE3 = PFX(saoCuStatsE3_avx2);
+ 
+-        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
++        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
+ 
+-        if (cpuMask & X265_CPU_BMI2)
++        if (1)
+         {
+             p.scanPosLast = PFX(scanPosLast_avx2_bmi2);
+             p.costCoeffNxN = PFX(costCoeffNxN_avx2_bmi2);
+@@ -4754,7 +4779,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+         p.cu[BLOCK_64x64].normFact = PFX(normFact64_avx2);
+ 
+     }
+-    if (cpuMask & X265_CPU_AVX512)
++    #if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512CD__)
++        static bool avx512 = true;
++    #else
++        static bool avx512 = false;
++    #endif
++    if (avx512)
+     {
+         p.pu[LUMA_32x8].sad = PFX(pixel_sad_32x8_avx512);
+       //  p.pu[LUMA_32x16].sad = PFX(pixel_sad_32x16_avx512);
+diff --git a/source/common/x86/x86inc.asm b/source/common/x86/x86inc.asm
+index 4e0edf6..74ba5b7 100644
+--- a/source/common/x86/x86inc.asm
++++ b/source/common/x86/x86inc.asm
+@@ -357,7 +357,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+ %endmacro
+ 
+ %define required_stack_alignment ((mmsize + 15) & ~15)
+-%define vzeroupper_required (mmsize > 16 && (ARCH_X86_64 == 0 || xmm_regs_used > 16 || notcpuflag(avx512)))
++%define vzeroupper_required 0
+ %define high_mm_regs (16*cpuflag(avx512))
+ 
+ %macro ALLOC_STACK 1-2 0 ; stack_size, n_xmm_regs (for win64 only)
+@@ -688,9 +688,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
+ 
+ %define last_branch_adr $$
+ %macro AUTO_REP_RET 0
+-    %if notcpuflag(ssse3)
+-        times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
+-    %endif
++    ;%if notcpuflag(ssse3)
++    ;    times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
++    ;%endif
+     ret
+ %endmacro
+ 
+@@ -753,7 +753,8 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+     %if FORMAT_ELF
+         global %2:function %%VISIBILITY
+     %else
+-        global %2
++        section .text$%2 comdat=1:%2
++        %define last_branch_adr $$
+     %endif
+     align function_align
+     %2:
+@@ -968,7 +969,7 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+ %endmacro
+ 
+ %macro INIT_XMM 0-1+
+-    %assign avx_enabled 0
++    %assign avx_enabled 1
+     %define RESET_MM_PERMUTATION INIT_XMM %1
+     %define mmsize 16
+     %define mova movdqa
+-- 
+2.54.0
+

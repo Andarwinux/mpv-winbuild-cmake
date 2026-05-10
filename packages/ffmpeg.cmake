@@ -46,6 +46,7 @@ ExternalProject_Add(ffmpeg
         xz
         libsdl2
         whisper
+        x265
     GIT_REPOSITORY https://github.com/Andarwinux/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -117,6 +118,7 @@ ExternalProject_Add(ffmpeg
         --enable-libvorbis
         --enable-libvpl
         --enable-libwebp
+        --enable-libx265
         --enable-libxml2
         --enable-libzimg
         --enable-lzma

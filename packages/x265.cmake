@@ -1,17 +1,15 @@
 ExternalProject_Add(x265
-    GIT_REPOSITORY https://github.com/zhongflyTeam/x265_git.git
+    GIT_REPOSITORY https://github.com/Multicorewareinc/x265.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_REMOTE_NAME origin
     GIT_TAG master
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/x265-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} sed -i [['/mmx/d']] <SOURCE_DIR>/source/common/x86/mc.h
-    COMMAND ${EXEC} sed -i [['/mmx/d']] <SOURCE_DIR>/source/common/x86/pixel.h
-    COMMAND ${EXEC} sed -i [['/mmx/d']] <SOURCE_DIR>/source/common/x86/asm-primitives.cpp
-    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/12b
+    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/10b
         ${cmake_conf_args}
         -DENABLE_CLI=OFF
         -DENABLE_HDR10_PLUS=ON
@@ -21,42 +19,24 @@ ExternalProject_Add(x265
         -DENABLE_ALPHA=ON
         -DENABLE_MULTIVIEW=ON
         -DENABLE_SCC_EXT=ON
-        -DMAIN12=ON
-        -DLINKED_10BIT=ON
-        -DEXTRA_LIB=ON
-    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>/10b
-        ${cmake_conf_args}
-        -DENABLE_CLI=OFF
-        -DENABLE_HDR10_PLUS=ON
-        -DENABLE_SHARED=OFF
-        -DEXPORT_C_API=OFF
-        -DHIGH_BIT_DEPTH=ON
-        -DENABLE_ALPHA=ON
-        -DENABLE_MULTIVIEW=ON
-        -DENABLE_SCC_EXT=ON
-        -DLINKED_12BIT=ON
-        -DEXTRA_LIB=ON
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR>/source -B<BINARY_DIR>
         ${cmake_conf_args}
         -DENABLE_CLI=OFF
         -DENABLE_HDR10_PLUS=ON
         -DENABLE_SHARED=OFF
         -DLINKED_10BIT=ON
-        -DLINKED_12BIT=ON
         -DENABLE_ALPHA=ON
         -DENABLE_MULTIVIEW=ON
         -DENABLE_SCC_EXT=ON
         -DEXTRA_LIB=ON
-    ${novzeroupper} <SOURCE_DIR>/source/common/x86/x86inc.asm
-    ${x265_sse2avx}
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_RTTI_ALLOWED=set:1
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>/12b & ${EXEC} ninja -C <BINARY_DIR>/10b & ${EXEC} ninja -C <BINARY_DIR>
-    COMMAND ${EXEC} ${TARGET_ARCH}-llvm-lib /out:libx265.a {.,10b,12b}/libx265.a
+    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>/10b & ${EXEC} ninja -C <BINARY_DIR>
+    COMMAND ${EXEC} ${TARGET_ARCH}-llvm-lib /out:libx265.a {.,10b}/libx265.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
-    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
+    LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
 force_rebuild_git(x265)

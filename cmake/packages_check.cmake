@@ -11,7 +11,6 @@ if(TARGET_CPU STREQUAL "x86_64")
             COMMAND ${EXEC} sed -i [['/%macro INIT_XMM/,/%endmacro/ s/%assign avx_enabled 0/%assign avx_enabled 1/']] <SOURCE_DIR>/third_party/x86inc/x86inc.asm
         )
         set(x265_sse2avx
-            COMMAND ${EXEC} ninja -C <BINARY_DIR>/12b common/CMakeFiles/common.dir/x86/intrapred16.asm.obj
             COMMAND ${EXEC} sed -i [['/%macro INIT_XMM/,/%endmacro/ s/%assign avx_enabled 0/%assign avx_enabled 1/']] <SOURCE_DIR>/source/common/x86/x86inc.asm
         )
         set(novzeroupper

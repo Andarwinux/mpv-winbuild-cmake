@@ -1,0 +1,41 @@
+From cfb16710f7ffd34112333f26d8232c99d192f83d Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sun, 10 May 2026 00:00:00 +0000
+Subject: [PATCH] use static dispatch
+
+---
+ src/cpu.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/cpu.c b/src/cpu.c
+index 286bbb4..290574a 100644
+--- a/src/cpu.c
++++ b/src/cpu.c
+@@ -234,6 +234,7 @@ sixel_cpu_min(enum sixel_simd_level lhs, enum sixel_simd_level rhs)
+ int
+ sixel_cpu_simd_level(void)
+ {
++    /*
+     int cached;
+     int expected;
+     int resolved;
+@@ -260,6 +261,16 @@ sixel_cpu_simd_level(void)
+ 
+     SIXEL_CPU_CACHE_STORE(resolved);
+     return resolved;
++    */
++    #if defined(__x86_64__)
++        #if defined(__AVX__)
++            return SIXEL_SIMD_LEVEL_AVX;
++        #else
++            return SIXEL_SIMD_LEVEL_SSE2;
++        #endif
++    #elif defined(__aarch64__)
++        return SIXEL_SIMD_LEVEL_NEON;
++    #endif
+ }
+ 
+ 
+-- 
+2.54.0
+

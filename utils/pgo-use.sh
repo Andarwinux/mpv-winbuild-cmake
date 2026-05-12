@@ -12,7 +12,7 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DCLANG_PACKAGES_PGO=USE \
 -DCLANG_PACKAGES_PROFDATA_FILE="/build/pgo.profdata" \
 -DCLANG_FLAGS="" \
--DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather -Wl,-mllvm,-lv-strided-pointer-ivs" \
+-DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather -Wl,-mllvm,-lv-strided-pointer-ivs,-mllvm,-enable-loadstore-runtime-interleave=false" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \
 -DQT_DISABLE_CCACHE=ON \

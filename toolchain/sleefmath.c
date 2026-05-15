@@ -109,3 +109,15 @@ __attribute__((always_inline,hot))                    long long llroundf(float x
 
 __attribute__((always_inline,hot))                    void      sincos(double x, double *s, double *c){vdouble2_purecfma_scalar_sleef r = Sleef_sincosd1_u35purecfma(x); *s = r.x; *c = r.y;}
 __attribute__((always_inline,hot))                    void      sincosf(float x, float *s, float *c){vfloat2_purecfma_scalar_sleef r = Sleef_sincosf1_u35purecfma(x); *s = r.x; *c = r.y;}
+
+#if defined(__aarch64__)
+#include <arm_acle.h>
+static inline void __attribute__((constructor)) set_daz_ftz(void){
+    __arm_wsr64("fpcr", __arm_rsr64("fpcr")|0x1000000);
+}
+#elif defined(__x86_64__)
+#include <immintrin.h>
+static inline void __attribute__((constructor)) set_daz_ftz(void){
+    _mm_setcsr(_mm_getcsr()|0x8040);
+}
+#endif

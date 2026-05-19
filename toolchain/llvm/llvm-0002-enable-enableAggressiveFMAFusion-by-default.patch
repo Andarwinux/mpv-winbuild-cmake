@@ -1,0 +1,25 @@
+From f5eecb15bc471cba8c35180963a30d81ab975e6d Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Tue, 19 May 2026 00:00:00 +0000
+Subject: [PATCH] enable enableAggressiveFMAFusion by default
+
+---
+ llvm/include/llvm/CodeGen/TargetLowering.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/llvm/include/llvm/CodeGen/TargetLowering.h b/llvm/include/llvm/CodeGen/TargetLowering.h
+index 82c47cce0..4fab8c1a1 100644
+--- a/llvm/include/llvm/CodeGen/TargetLowering.h
++++ b/llvm/include/llvm/CodeGen/TargetLowering.h
+@@ -982,7 +982,7 @@ public:
+   /// Return true if target always benefits from combining into FMA for a
+   /// given value type. This must typically return false on targets where FMA
+   /// takes more cycles to execute than FADD.
+-  virtual bool enableAggressiveFMAFusion(EVT VT) const { return false; }
++  virtual bool enableAggressiveFMAFusion(EVT VT) const { return true; }
+ 
+   /// Return true if target always benefits from combining into FMA for a
+   /// given value type. This must typically return false on targets where FMA
+-- 
+2.54.0
+

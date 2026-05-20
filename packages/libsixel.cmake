@@ -39,6 +39,7 @@ ExternalProject_Add(libsixel
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _FORCE_HIDE_DLLEXPORT=set:1
+        _IS_REASSOC_ALLOWED=set:1
     BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${MINGW_INSTALL_PREFIX}/include/sixel ${MINGW_INSTALL_PREFIX}/include
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

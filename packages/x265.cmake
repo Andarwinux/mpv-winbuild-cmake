@@ -33,6 +33,7 @@ ExternalProject_Add(x265
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_RTTI_ALLOWED=set:1
+        _IS_REASSOC_ALLOWED=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>/10b & ${EXEC} ninja -C <BINARY_DIR>
     COMMAND ${EXEC} ${TARGET_ARCH}-llvm-lib /out:libx265.a {.,10b}/libx265.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>

@@ -75,6 +75,7 @@ ExternalProject_Add(sleef
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _FORCE_HIDE_DLLEXPORT=set:1
+        _IS_REASSOC_ALLOWED=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libsleef.a libsleefdft.a inline_headers_util
           COMMAND ${EXEC} _LTO_ENABLED=0 _PGO_ENABLED=0 ninja -C <BINARY_DIR> libsleefgnuabi.a
     INSTALL_ENVIRONMENT_MODIFICATION

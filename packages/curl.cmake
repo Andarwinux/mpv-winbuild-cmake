@@ -42,6 +42,7 @@ ExternalProject_Add(curl
         -DUSE_NGTCP2=ON
         -DUSE_WIN32_IDN=ON
         -DUSE_WINDOWS_SSPI=ON
+        -DUSE_ECH=ON
         -DUSE_HTTPSRR=ON
         -DUSE_SSLS_EXPORT=ON
         -DCURL_USE_PKGCONFIG=ON

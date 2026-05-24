@@ -1,4 +1,4 @@
-From c4826667b551562f55466d1820859b518115ff37 Mon Sep 17 00:00:00 2001
+From eadf20e2a6b9a0d3313f3c0408031a0f8b65d3e7 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 10 May 2026 00:00:00 +0000
 Subject: [PATCH] remove shit
@@ -12,7 +12,7 @@ Subject: [PATCH] remove shit
  5 files changed, 157 insertions(+), 239 deletions(-)
 
 diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
-index fea65b4..fcadcba 100644
+index c58e63a91..212a6c15d 100644
 --- a/source/common/aarch64/asm-primitives.cpp
 +++ b/source/common/aarch64/asm-primitives.cpp
 @@ -664,30 +664,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
@@ -131,10 +131,10 @@ index fea65b4..fcadcba 100644
 +    #endif
 +    if (SVE2)
      {
+         setupPixelPrimitives_sve2(p);
          setupSaoPrimitives_sve2(p);
-     }
 diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
-index 48b7403..af5a45b 100644
+index 48b740304..af5a45bda 100644
 --- a/source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
 @@ -158,194 +158,26 @@ bool detect512()
@@ -377,7 +377,7 @@ index 48b7403..af5a45b 100644
  
      return flags;
 diff --git a/source/common/cpu.h b/source/common/cpu.h
-index 52a9e9c..48d723b 100644
+index 52a9e9cba..48d723b58 100644
 --- a/source/common/cpu.h
 +++ b/source/common/cpu.h
 @@ -36,16 +36,16 @@ extern "C" void PFX(cpu_emms)(void);
@@ -402,7 +402,7 @@ index 52a9e9c..48d723b 100644
  
  namespace X265_NS {
 diff --git a/source/common/x86/asm-primitives.cpp b/source/common/x86/asm-primitives.cpp
-index bb32f32..0025444 100644
+index bb32f32cd..0025444bc 100644
 --- a/source/common/x86/asm-primitives.cpp
 +++ b/source/common/x86/asm-primitives.cpp
 @@ -912,7 +912,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
@@ -644,7 +644,7 @@ index bb32f32..0025444 100644
          p.pu[LUMA_32x8].sad = PFX(pixel_sad_32x8_avx512);
        //  p.pu[LUMA_32x16].sad = PFX(pixel_sad_32x16_avx512);
 diff --git a/source/common/x86/x86inc.asm b/source/common/x86/x86inc.asm
-index 4e0edf6..74ba5b7 100644
+index 4e0edf650..74ba5b773 100644
 --- a/source/common/x86/x86inc.asm
 +++ b/source/common/x86/x86inc.asm
 @@ -357,7 +357,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14

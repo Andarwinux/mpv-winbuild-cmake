@@ -44,6 +44,7 @@ ExternalProject_Add(curl
         -DUSE_WINDOWS_SSPI=ON
         -DUSE_ECH=ON
         -DUSE_HTTPSRR=ON
+        -DUSE_PROXY_HTTP3=ON
         -DUSE_SSLS_EXPORT=ON
         -DCURL_USE_PKGCONFIG=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Perl=ON

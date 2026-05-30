@@ -108,7 +108,8 @@ ExternalProject_Add(qt6-qtbase
         _IS_EXCEPTIONS_ALLOWED=set:1
         _IS_UNWIND_ALLOWED=set:1
         _NOCCACHE=set:${qt_disable_ccache}
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    BUILD_COMMAND ${EXEC} _IS_UNWIND_ALLOWED=0 ninja -C <BINARY_DIR> qsqlite
+          COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ninja -C <BINARY_DIR> install
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_PATCH 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

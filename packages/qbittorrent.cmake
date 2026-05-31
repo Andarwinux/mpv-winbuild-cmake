@@ -11,7 +11,7 @@ ExternalProject_Add(qbittorrent
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
-    GIT_TAG v5_1_x
+    GIT_TAG v5_2_x
     UPDATE_COMMAND ""
     PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/qbittorrent-*.patch
     CONFIGURE_ENVIRONMENT_MODIFICATION
@@ -28,6 +28,7 @@ ExternalProject_Add(qbittorrent
         -DQT_HOST_PATH=${CMAKE_INSTALL_PREFIX}/qt6
         -DTESTING=OFF
         -DSTACKTRACE=OFF
+        -DCMAKE_CXX_STANDARD=23
         "-DCMAKE_CXX_FLAGS='-lrpcrt4 -lusp10 -lbz2 -lbrotlicommon -lbrotlidec -lbrotlienc -lzstd -DQ_DECL_VECTORCALL=__vectorcall -DQT_VECTORCALL=__vectorcall'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

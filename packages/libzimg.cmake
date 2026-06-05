@@ -20,6 +20,7 @@ ExternalProject_Add(libzimg
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
         ${meson_conf_args}
         -Dcpp_rtti=true
+        "-Dcpp_args='-include exception'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

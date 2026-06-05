@@ -25,7 +25,7 @@ ExternalProject_Add(mimalloc
         -DMI_NO_OPT_ARCH=ON
         -DCMAKE_SHARED_LIBRARY_PREFIX_CXX=''
         "-DCMAKE_C_FLAGS='-DMI_DEBUG=0 ${mimalloc_macro}'"
-        "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${mimalloc_macro} -D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES'"
+        "-DCMAKE_CXX_FLAGS='-DMI_DEBUG=0 ${mimalloc_macro}'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

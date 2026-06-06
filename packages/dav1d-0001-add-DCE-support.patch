@@ -1,24 +1,25 @@
-From c64f9fa59b2b045465263d478615f2ac4d616e33 Mon Sep 17 00:00:00 2001
+From c9d61e8598351061a9e0015bb4611a9474a2173d Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Wed, 14 Jan 2026 00:00:00 +0000
 Subject: [PATCH] add DCE support
 
 ---
  src/arm/cpu.c            |  8 ++++----
- src/ext/x86/x86inc.asm   | 17 ++++++++++++++---
+ src/ext/x86/x86inc.asm   | 19 +++++++++++++++----
  src/x86/itx16_avx2.asm   |  2 ++
- src/x86/itx16_avx512.asm |  2 ++
+ src/x86/itx16_avx512.asm | 12 +++++++-----
  src/x86/itx16_sse.asm    |  2 ++
  src/x86/itx_avx2.asm     |  2 ++
- src/x86/itx_avx512.asm   |  2 ++
+ src/x86/itx_avx512.asm   |  6 ++++--
  src/x86/itx_sse.asm      |  2 ++
  src/x86/mc16_avx2.asm    |  2 ++
- src/x86/mc16_avx512.asm  |  2 ++
+ src/x86/mc16_avx512.asm  | 32 +++++++++++++++++---------------
  src/x86/mc16_sse.asm     |  2 ++
  src/x86/mc_avx2.asm      |  2 ++
- src/x86/mc_avx512.asm    |  2 ++
+ src/x86/mc_avx512.asm    | 40 +++++++++++++++++++++-------------------
  src/x86/mc_sse.asm       |  2 ++
- 14 files changed, 42 insertions(+), 7 deletions(-)
+ src/x86/msac.asm         |  2 +-
+ 15 files changed, 85 insertions(+), 50 deletions(-)
 
 diff --git a/src/arm/cpu.c b/src/arm/cpu.c
 index c895049..7dce9f8 100644
@@ -49,9 +50,18 @@ index c895049..7dce9f8 100644
          flags |= DAV1D_ARM_CPU_FLAG_I8MM;
  #endif
 diff --git a/src/ext/x86/x86inc.asm b/src/ext/x86/x86inc.asm
-index ece93f1..0398ad4 100644
+index ece93f1..f0c5339 100644
 --- a/src/ext/x86/x86inc.asm
 +++ b/src/ext/x86/x86inc.asm
+@@ -376,7 +376,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+ %endmacro
+ 
+ %define required_stack_alignment ((mmsize + 15) & ~15)
+-%define vzeroupper_required (mmsize > 16 && (ARCH_X86_64 == 0 || xmm_regs_used > 16 || notcpuflag(avx512)))
++%define vzeroupper_required 0
+ %define high_mm_regs (16*cpuflag(avx512))
+ 
+ ; Large stack allocations on Windows need to use stack probing in order
 @@ -778,9 +778,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
  
  %define last_branch_adr $$
@@ -110,7 +120,7 @@ index 0da970a..248aec6 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/itx16_avx512.asm b/src/x86/itx16_avx512.asm
-index 9f5f909..eb065c1 100644
+index 9f5f909..0dd5e89 100644
 --- a/src/x86/itx16_avx512.asm
 +++ b/src/x86/itx16_avx512.asm
 @@ -23,6 +23,8 @@
@@ -122,6 +132,51 @@ index 9f5f909..eb065c1 100644
  %include "config.asm"
  %include "ext/x86/x86inc.asm"
  
+@@ -1523,7 +1525,7 @@ cglobal idct_16x16_internal_10bpc, 0, 7, 16, dst, stride, c, eob, tx2
+     movaps             xmm6, [cq+16*0]
+     movaps             xmm7, [cq+16*1]
+ %endif
+-    vzeroupper
++    ;vzeroupper
+ .pass1_end2:
+     call .main_end3
+ .pass1_end3:
+@@ -2435,7 +2437,7 @@ cglobal inv_txfm_add_dct_dct_32x8_10bpc, 4, 7, 0, dst, stride, c, eob
+     movaps             xmm6, [cq+16*0]
+     movaps             xmm7, [cq+16*1]
+ %endif
+-    vzeroupper
++    ;vzeroupper
+     call .transpose_8x32
+     pxor                m14, m14
+ .zero_loop:
+@@ -2968,7 +2970,7 @@ cglobal inv_txfm_add_dct_dct_16x32_10bpc, 4, 7, 0, dst, stride, c, eob
+     movaps             xmm6, [rsp+ 8]
+     movaps             xmm7, [rsp+24]
+ %endif
+-    vzeroupper
++    ;vzeroupper
+     jmp m(idct_16x8_internal_10bpc).write_16x4
+ .pass1:
+     pmulld               m0, m12, [cq+128* 0]
+@@ -3226,7 +3228,7 @@ cglobal inv_txfm_add_dct_dct_32x16_10bpc, 4, 7, 0, dst, stride, c, eob
+     pmulhrsw             m1, m11, m19
+     pmulhrsw             m2, m11, m20
+     pmulhrsw             m3, m11, m21
+-    vzeroupper
++    ;vzeroupper
+     jmp m(inv_txfm_add_dct_dct_32x8_10bpc).write_32x4
+ .dconly:
+     imul                r6d, [cq], 181
+@@ -3743,7 +3745,7 @@ cglobal inv_txfm_add_dct_dct_32x32_10bpc, 4, 7, 0, dst, stride, c, eob
+     sub                 r6d, 16*4
+     jge .zero_loop
+     WIN64_RESTORE_XMM
+-    vzeroupper
++    ;vzeroupper
+     ret
+ .pass2_fast2_start:
+     call m(inv_txfm_add_dct_dct_32x8_10bpc).transpose_8x32
 diff --git a/src/x86/itx16_sse.asm b/src/x86/itx16_sse.asm
 index 3833e17..1d75513 100644
 --- a/src/x86/itx16_sse.asm
@@ -149,7 +204,7 @@ index a67f053..0bfb8b3 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/itx_avx512.asm b/src/x86/itx_avx512.asm
-index a3f25d3..8d4d28b 100644
+index a3f25d3..e1258a2 100644
 --- a/src/x86/itx_avx512.asm
 +++ b/src/x86/itx_avx512.asm
 @@ -23,6 +23,8 @@
@@ -161,6 +216,24 @@ index a3f25d3..8d4d28b 100644
  %include "config.asm"
  %include "ext/x86/x86inc.asm"
  
+@@ -3085,7 +3087,7 @@ cglobal_label .main_end
+     paddsw               m4, m18      ; out8  out9  out10 out11
+     psubsw               m1, m6, m13  ; out19 out18 out17 out16
+     paddsw               m6, m13      ; out12 out13 out14 out15
+-    vzeroupper
++    ;vzeroupper
+     ret
+ 
+ %macro LOAD_PACKED_16X2 3 ; dst, row[1-2]
+@@ -3148,7 +3150,7 @@ cglobal inv_txfm_add_dct_dct_32x8_8bpc, 4, 4, 0, dst, stride, c, eob
+     paddsw               m4, m2, m14       ; out4  out5  out13 out12
+     psubsw               m7, m1, m19       ; out28 out29 out21 out20
+     paddsw               m2, m1, m19       ; out3  out2  out10 out11
+-    vzeroupper
++    ;vzeroupper
+     vshufi32x4           m1, m0, m3, q1221 ; out1  out9  out17 out25
+     vshufi32x4           m0, m3, q0330     ; out0  out8  out16 out24
+     vshufi32x4           m3, m2, m5, q0330 ; out3  out11 out19 out27
 diff --git a/src/x86/itx_sse.asm b/src/x86/itx_sse.asm
 index ec7e3a5..a215e3f 100644
 --- a/src/x86/itx_sse.asm
@@ -188,7 +261,7 @@ index 98ca154..4680d1f 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/mc16_avx512.asm b/src/x86/mc16_avx512.asm
-index 3e352c5..d8ef5d8 100644
+index 3e352c5..ae68db0 100644
 --- a/src/x86/mc16_avx512.asm
 +++ b/src/x86/mc16_avx512.asm
 @@ -23,6 +23,8 @@
@@ -200,6 +273,141 @@ index 3e352c5..d8ef5d8 100644
  %include "config.asm"
  %include "ext/x86/x86inc.asm"
  
+@@ -556,7 +558,7 @@ cglobal put_bilin_16bpc, 4, 8, 13, dst, ds, src, ss, w, h, mxy
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w16:
+     movu                ym0, [srcq+ssq*0]
+@@ -1137,7 +1139,7 @@ cglobal prep_bilin_16bpc, 3, 7, 16, tmp, src, stride, w, h, mxy, stride3
+     add                tmpq, 32
+     sub                  hd, 4
+     jg .v_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w8:
+     movu                xm0, [srcq+strideq*0]
+@@ -1728,7 +1730,7 @@ cglobal put_6tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w8:
+     vbroadcasti32x4      m0, [srcq+ssq*0]
+@@ -1864,7 +1866,7 @@ cglobal put_6tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     movzx                hd, wb
+     sub                  wd, 1<<8
+     jg .v_w32_loop0
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv:
+     cmp                  wd, 4
+@@ -2071,7 +2073,7 @@ cglobal put_6tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .hv_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w16:
+     vbroadcasti32x4     m20, [spel_h_shufA]
+@@ -2169,7 +2171,7 @@ cglobal put_6tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .hv_w16_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w32:
+     WIN64_SPILL_XMM      28
+@@ -2450,7 +2452,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w8:
+     vbroadcasti32x4      m2, [srcq+ssq*2]
+@@ -2918,7 +2920,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .hv_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w8:
+     shr                 mxd, 16
+@@ -3036,7 +3038,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .hv_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w16:
+     WIN64_SPILL_XMM 26
+@@ -3522,7 +3524,7 @@ cglobal prep_6tap_16bpc, 3, 8, 0, tmp, src, ss, w, h, mx, my
+ %if WIN64
+     pop                  r8
+ %endif
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w4:
+     movzx               mxd, mxb
+@@ -3663,7 +3665,7 @@ cglobal prep_6tap_16bpc, 3, 8, 0, tmp, src, ss, w, h, mx, my
+     add                tmpq, 64
+     sub                  hd, 4
+     jg .hv_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv:
+     vpbroadcastd        m11, [pd_128]
+@@ -3785,7 +3787,7 @@ cglobal prep_6tap_16bpc, 3, 8, 0, tmp, src, ss, w, h, mx, my
+     add                tmpq, 64
+     sub                  hd, 2
+     jg .hv_w16_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w32:
+     WIN64_SPILL_XMM      29
+@@ -4438,7 +4440,7 @@ cglobal prep_8tap_16bpc, 3, 8, 0, tmp, src, stride, w, h, mx, my
+     add                tmpq, 32
+     sub                  hd, 4
+     jg .hv_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w8:
+     shr                 mxd, 16
+@@ -5281,7 +5283,7 @@ cglobal w_mask_420_16bpc, 4, 8, 16, dst, stride, tmp1, tmp2, w, h, mask, stride3
+     mova       [maskq+32*1], ym17
+     sub                  hd, 2
+     jg .w128_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ ALIGN function_align
+ .main:
+@@ -5677,7 +5679,7 @@ cglobal blend_16bpc, 3, 7, 7, dst, ds, tmp, w, h, mask
+     lea                dstq, [dstq+dsq*4]
+     sub                  hd, 4
+     jg .w4
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .w8:
+     pmovzxbw             m2, [maskq]
 diff --git a/src/x86/mc16_sse.asm b/src/x86/mc16_sse.asm
 index 319dd45..27d4be8 100644
 --- a/src/x86/mc16_sse.asm
@@ -227,7 +435,7 @@ index f15ea42..981e74e 100644
  %include "ext/x86/x86inc.asm"
  
 diff --git a/src/x86/mc_avx512.asm b/src/x86/mc_avx512.asm
-index 50e670e..fbb3aab 100644
+index 50e670e..0c6f275 100644
 --- a/src/x86/mc_avx512.asm
 +++ b/src/x86/mc_avx512.asm
 @@ -23,6 +23,8 @@
@@ -239,6 +447,177 @@ index 50e670e..fbb3aab 100644
  %include "config.asm"
  %include "ext/x86/x86inc.asm"
  
+@@ -586,7 +588,7 @@ cglobal put_bilin_8bpc, 4, 8, 0, dst, ds, src, ss, w, h, mxy
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w16_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w32:
+     movu                ym0, [srcq+ssq*0]
+@@ -1614,7 +1616,7 @@ cglobal put_6tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ns
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w16:
+     mova                 m5, [spel_v_perm16a]
+@@ -1805,7 +1807,7 @@ cglobal put_6tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ns
+     packssdw           ymm2, ymm1
+     psraw              ymm2, 2
+     vextracti128       xmm0, ymm2, 1
+-    vzeroupper
++    ;vzeroupper
+     palignr            xmm0, xmm2, 4
+     punpcklwd          xmm1, xmm2, xmm0 ; 01 12
+     punpckhwd          xmm2, xmm0       ; 23 34
+@@ -2038,7 +2040,7 @@ cglobal put_6tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ns
+     movzx                hd, r6b
+     sub                 r6d, 1<<8
+     jg .hv_w16_loop0
+-    vzeroupper
++    ;vzeroupper
+     RET
+ 
+ PUT_8TAP_FN smooth_sharp,   SMOOTH,  SHARP,   put_8tap_8bpc
+@@ -2197,7 +2199,7 @@ cglobal put_8tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ss3
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w16:
+     mova                m12, [spel_v_perm16a]
+@@ -2295,7 +2297,7 @@ cglobal put_8tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ss3
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .v_w32_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w64:
+ .v_w128:
+@@ -2386,7 +2388,7 @@ cglobal put_8tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ss3
+     mov                dstq, r7
+     sub                 r6d, 256
+     jg .v_loop0
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .h:
+     test                myd, 0xf00
+@@ -2601,7 +2603,7 @@ cglobal put_8tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ss3
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .hv_w2_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w4:
+     movq               xmm1, [r6+ssq*0]
+@@ -2743,7 +2745,7 @@ cglobal put_8tap_8bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my, ss3
+     lea                dstq, [dstq+dsq*2]
+     sub                  hd, 2
+     jg .hv_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w16:
+     WIN64_SPILL_XMM      23
+@@ -2938,7 +2940,7 @@ cglobal prep_6tap_8bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my, ss3
+     add                tmpq, 32
+     sub                  hd, 4
+     jg .v_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w8:
+     mova                 m6, [spel_v_perm8]
+@@ -3061,7 +3063,7 @@ cglobal prep_6tap_8bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my, ss3
+     add                tmpq, 64*2
+     sub                  hd, 2
+     jg .v_w32_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w64:
+ .v_w128:
+@@ -3130,7 +3132,7 @@ cglobal prep_6tap_8bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my, ss3
+     movzx                hd, r6b
+     sub                 r6d, 1<<8
+     jg .v_loop0
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .h:
+     test                myd, 0xf00
+@@ -3297,7 +3299,7 @@ cglobal prep_6tap_8bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my, ss3
+     add                tmpq, 64
+     sub                  hd, 4
+     jg .hv_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w16:
+     mova                m16, [spel_h_perm16]
+@@ -3394,7 +3396,7 @@ cglobal prep_6tap_8bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my, ss3
+     movzx                hd, r6b
+     sub                 r6d, 1<<8
+     jg .hv_w16_loop0
+-    vzeroupper
++    ;vzeroupper
+     RET
+ 
+ %macro PREP_8TAP_H 0
+@@ -3499,7 +3501,7 @@ cglobal prep_8tap_8bpc, 4, 8, 0, tmp, src, stride, w, h, mx, my, stride3
+     add                tmpq, 32
+     sub                  hd, 4
+     jg .v_w4_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w8:
+     mova                 m6, [spel_v_perm8]
+@@ -3647,7 +3649,7 @@ cglobal prep_8tap_8bpc, 4, 8, 0, tmp, src, stride, w, h, mx, my, stride3
+     add                tmpq, 64*2
+     sub                  hd, 2
+     jg .v_w32_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .v_w64:
+ .v_w128:
+@@ -4038,7 +4040,7 @@ cglobal prep_8tap_8bpc, 4, 8, 0, tmp, src, stride, w, h, mx, my, stride3
+     add                tmpq, 64
+     sub                  hd, 4
+     jg .hv_w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .hv_w16:
+     WIN64_SPILL_XMM      23
+@@ -5117,7 +5119,7 @@ cglobal blend_8bpc, 3, 7, 8, dst, ds, tmp, w, h, mask
+     lea                dstq, [dstq+dsq*4]
+     sub                  hd, 4
+     jg .w8
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .w16:
+     mova                xm1, [dstq+dsq*0]
+@@ -5348,7 +5350,7 @@ cglobal blend_h_8bpc, 3, 7, 6, dst, ds, tmp, w, h, mask
+     lea                dstq, [dstq+dsq*2]
+     add                  hq, 2
+     jl .w8_loop
+-    vzeroupper
++    ;vzeroupper
+     RET
+ .w16:
+     vbroadcasti32x4     ym4, [blend_shuf]
 diff --git a/src/x86/mc_sse.asm b/src/x86/mc_sse.asm
 index 9beb6c2..a8c5d16 100644
 --- a/src/x86/mc_sse.asm
@@ -252,6 +631,18 @@ index 9beb6c2..a8c5d16 100644
  %include "config.asm"
  %include "ext/x86/x86inc.asm"
  
+diff --git a/src/x86/msac.asm b/src/x86/msac.asm
+index 4156efe..a305500 100644
+--- a/src/x86/msac.asm
++++ b/src/x86/msac.asm
+@@ -666,6 +666,6 @@ cglobal msac_decode_symbol_adapt16, 3, 6, 6
+ %if WIN64
+     mov           rsp, r5
+ %endif
+-    vzeroupper
++    ;vzeroupper
+     jmp m(msac_decode_symbol_adapt4, _sse2).renorm2
+ %endif
 -- 
-2.53.0
+2.54.0
 

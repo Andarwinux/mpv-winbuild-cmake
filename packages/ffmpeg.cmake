@@ -143,7 +143,6 @@ ExternalProject_Add(ffmpeg
         --extra-libs=-lc++
         --host-cc=clang
         --nvcc=nvcc
-    ${novzeroupper} <SOURCE_DIR>/libavutil/x86/x86inc.asm
     ${trim_path} <BINARY_DIR>/config.h
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

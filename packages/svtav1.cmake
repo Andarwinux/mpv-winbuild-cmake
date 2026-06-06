@@ -18,7 +18,6 @@ ExternalProject_Add(svtav1
         -DC_FLAG_mno_avx=OFF
         -DCXX_FLAG_mno_avx=OFF
         -DCMAKE_OUTPUT_DIRECTORY=<BINARY_DIR>
-    ${novzeroupper} <SOURCE_DIR>/Source/Lib/ASM_SSE2/x86inc.asm
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

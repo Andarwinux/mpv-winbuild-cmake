@@ -1,0 +1,901 @@
+From 9aa1648a49faa73fdf9075d9443f7d4db80ddee4 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sat, 6 Jun 2026 00:00:00 +0000
+Subject: [PATCH] remove all vzeroupper
+
+---
+ crypto/aes/asm/aes-cfb-avx512.pl       |  4 ++--
+ crypto/aes/asm/aesni-mb-x86_64.pl      |  8 ++++----
+ crypto/aes/asm/aesni-xts-avx512.pl     |  4 ++--
+ crypto/bn/asm/rsaz-2k-avx512.pl        |  4 ++--
+ crypto/bn/asm/rsaz-2k-avxifma.pl       |  6 +++---
+ crypto/bn/asm/rsaz-3k-avx512.pl        |  4 ++--
+ crypto/bn/asm/rsaz-3k-avxifma.pl       |  6 +++---
+ crypto/bn/asm/rsaz-4k-avx512.pl        |  4 ++--
+ crypto/bn/asm/rsaz-4k-avxifma.pl       |  6 +++---
+ crypto/bn/asm/rsaz-avx2.pl             | 14 +++++++-------
+ crypto/chacha/asm/chacha-x86.pl        |  4 ++--
+ crypto/chacha/asm/chacha-x86_64.pl     | 10 +++++-----
+ crypto/ec/asm/ecp_nistz256-x86_64.pl   |  8 ++++----
+ crypto/modes/asm/aes-gcm-avx512.pl     |  6 +++---
+ crypto/modes/asm/aesni-gcm-x86_64.pl   |  8 ++++----
+ crypto/modes/asm/ghash-x86_64.pl       |  8 ++++----
+ crypto/poly1305/asm/poly1305-x86.pl    |  4 ++--
+ crypto/poly1305/asm/poly1305-x86_64.pl |  8 ++++----
+ crypto/sha/asm/keccak1600-avx2.pl      |  8 ++++----
+ crypto/sha/asm/keccak1600-avx512.pl    |  4 ++--
+ crypto/sha/asm/keccak1600-avx512vl.pl  |  8 ++++----
+ crypto/sha/asm/sha1-mb-x86_64.pl       |  8 ++++----
+ crypto/sha/asm/sha1-x86_64.pl          |  8 ++++----
+ crypto/sha/asm/sha256-mb-x86_64.pl     |  4 ++--
+ crypto/sha/asm/sha512-x86_64.pl        | 14 +++++++-------
+ 25 files changed, 85 insertions(+), 85 deletions(-)
+
+diff --git a/crypto/aes/asm/aes-cfb-avx512.pl b/crypto/aes/asm/aes-cfb-avx512.pl
+index d9e1815..1c2f158 100644
+--- a/crypto/aes/asm/aes-cfb-avx512.pl
++++ b/crypto/aes/asm/aes-cfb-avx512.pl
+@@ -611,7 +611,7 @@ $code.=<<___;
+ 
+     mov %rax,($nump)                 # num is in/out, update for future/chained calls
+ 
+-    vzeroupper
++
+ 
+ .Laes_cfb128_vaes_enc_done:
+     ret
+@@ -983,7 +983,7 @@ $code.=<<___;
+     vpxord %xmm1,%xmm1,%xmm1
+     vpxord %xmm2,%xmm2,%xmm2
+ 
+-    vzeroupper
++
+ ___
+ 
+ $code.=<<___ if($win64);
+diff --git a/crypto/aes/asm/aesni-mb-x86_64.pl b/crypto/aes/asm/aesni-mb-x86_64.pl
+index 99a3be2..601e8c2 100644
+--- a/crypto/aes/asm/aesni-mb-x86_64.pl
++++ b/crypto/aes/asm/aesni-mb-x86_64.pl
+@@ -729,7 +729,7 @@ $code.=<<___;
+ .cfi_cfa_expression	%rsp+16,deref,+8
+ 
+ .Lenc8x_body:
+-	vzeroupper
++
+ 	vmovdqu	($key),$zero			# 0-round key
+ 	lea	0x78($key),$key			# size optimization
+ 	lea	`$inp_elm_size*4`($inp),$inp
+@@ -944,7 +944,7 @@ $code.=<<___;
+ 	#jnz	.Lenc8x_loop_grande
+ 
+ .Lenc8x_done:
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xd8(%rax),%xmm6
+@@ -1028,7 +1028,7 @@ $code.=<<___;
+ .cfi_cfa_expression	%rsp+16,deref,+8
+ 
+ .Ldec8x_body:
+-	vzeroupper
++
+ 	vmovdqu	($key),$zero			# 0-round key
+ 	lea	0x78($key),$key			# size optimization
+ 	lea	`$inp_elm_size*4`($inp),$inp
+@@ -1274,7 +1274,7 @@ $code.=<<___;
+ 	#jnz	.Ldec8x_loop_grande
+ 
+ .Ldec8x_done:
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xd8(%rax),%xmm6
+diff --git a/crypto/aes/asm/aesni-xts-avx512.pl b/crypto/aes/asm/aesni-xts-avx512.pl
+index 16f2bbe..f080130 100644
+--- a/crypto/aes/asm/aesni-xts-avx512.pl
++++ b/crypto/aes/asm/aesni-xts-avx512.pl
+@@ -1555,7 +1555,7 @@ ___
+     $code .= <<___;
+     mov %rbp,$TW
+     pop %rbp
+-    vzeroupper
++
+     ret
+ 
+     .L_less_than_128_bytes_${rndsuffix}:
+@@ -2391,7 +2391,7 @@ ___
+     $code .= <<___;
+     mov %rbp,$TW
+     pop %rbp
+-    vzeroupper
++
+     ret
+ 
+     .L_less_than_128_bytes_${rndsuffix}:
+diff --git a/crypto/bn/asm/rsaz-2k-avx512.pl b/crypto/bn/asm/rsaz-2k-avx512.pl
+index 7e1db31..11284d6 100644
+--- a/crypto/bn/asm/rsaz-2k-avx512.pl
++++ b/crypto/bn/asm/rsaz-2k-avx512.pl
+@@ -380,7 +380,7 @@ $code.=<<___;
+     vmovdqu64   $R1_0h, `3*32`($res)
+     vmovdqu64   $R2_0,  `4*32`($res)
+ 
+-    vzeroupper
++
+     mov  0(%rsp),%r15
+ .cfi_restore    %r15
+     mov  8(%rsp),%r14
+@@ -497,7 +497,7 @@ $code.=<<___;
+     vmovdqu64   $R1_1h, `8*32`($res)
+     vmovdqu64   $R2_1,  `9*32`($res)
+ 
+-    vzeroupper
++
+     mov  0(%rsp),%r15
+ .cfi_restore    %r15
+     mov  8(%rsp),%r14
+diff --git a/crypto/bn/asm/rsaz-2k-avxifma.pl b/crypto/bn/asm/rsaz-2k-avxifma.pl
+index 652d659..a64d311 100644
+--- a/crypto/bn/asm/rsaz-2k-avxifma.pl
++++ b/crypto/bn/asm/rsaz-2k-avxifma.pl
+@@ -424,7 +424,7 @@ $code.=<<___;
+     vmovdqu   $R1_0h, `3*32`($res)
+     vmovdqu   $R2_0,  `4*32`($res)
+ 
+-    vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+     vmovapd `16*0`(%rsp), %xmm6
+@@ -661,7 +661,7 @@ $code.=<<___;
+     vmovdqu   $R1_1h, `8*32`($res)
+     vmovdqu   $R2_1,  `9*32`($res)
+ 
+-    vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+     vmovapd `16*0`(%rsp), %xmm6
+@@ -801,7 +801,7 @@ foreach (0..9) {
+     $code.="vmovdqu   $t[$_], `${_}*32`($out) \n";
+ }
+ $code.=<<___;
+-    vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+     vmovapd `16*0`(%rsp), %xmm6
+diff --git a/crypto/bn/asm/rsaz-3k-avx512.pl b/crypto/bn/asm/rsaz-3k-avx512.pl
+index 403e090..d82364b 100644
+--- a/crypto/bn/asm/rsaz-3k-avx512.pl
++++ b/crypto/bn/asm/rsaz-3k-avx512.pl
+@@ -455,7 +455,7 @@ $code.=<<___;
+     vmovdqu64   $R3_0,  `6*32`($res)
+     vmovdqu64   $R3_0h, `7*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+@@ -619,7 +619,7 @@ $code.=<<___;
+     vmovdqu64   $R3_1,  `14*32`($res)
+     vmovdqu64   $R3_1h, `15*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+diff --git a/crypto/bn/asm/rsaz-3k-avxifma.pl b/crypto/bn/asm/rsaz-3k-avxifma.pl
+index 9141e55..f1ce989 100644
+--- a/crypto/bn/asm/rsaz-3k-avxifma.pl
++++ b/crypto/bn/asm/rsaz-3k-avxifma.pl
+@@ -510,7 +510,7 @@ $code.=<<___;
+     vmovdqu   $R3_0,  `6*32`($res)
+     vmovdqu   $R3_0h, `7*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+@@ -784,7 +784,7 @@ $code.=<<___;
+     vmovdqu   $R3_0,  `14*32`($res)
+     vmovdqu   $R3_0h, `15*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+@@ -953,7 +953,7 @@ foreach (8..15) {
+ }
+ 
+ $code.=<<___;
+-    vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+     vmovapd `16*0`(%rsp), %xmm6
+diff --git a/crypto/bn/asm/rsaz-4k-avx512.pl b/crypto/bn/asm/rsaz-4k-avx512.pl
+index f41c1c6..774343b 100644
+--- a/crypto/bn/asm/rsaz-4k-avx512.pl
++++ b/crypto/bn/asm/rsaz-4k-avx512.pl
+@@ -495,7 +495,7 @@ $code.=<<___;
+     vmovdqu64   $R4_0,  `8*32`($res)
+     vmovdqu64   $R4_0h, `9*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+@@ -666,7 +666,7 @@ $code.=<<___;
+     vmovdqu64   $R4_1,  `18*32`($res)
+     vmovdqu64   $R4_1h, `19*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+diff --git a/crypto/bn/asm/rsaz-4k-avxifma.pl b/crypto/bn/asm/rsaz-4k-avxifma.pl
+index 2f7b036..014ad07 100644
+--- a/crypto/bn/asm/rsaz-4k-avxifma.pl
++++ b/crypto/bn/asm/rsaz-4k-avxifma.pl
+@@ -599,7 +599,7 @@ $code.=<<___;
+     vmovdqu   $R4_0,  `8*32`($res)
+     vmovdqu   $R4_0h, `9*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+@@ -880,7 +880,7 @@ $code.=<<___;
+     vmovdqu   $R4_0,  `18*32`($res)
+     vmovdqu   $R4_0h, `19*32`($res)
+ 
+-    vzeroupper
++
+     lea     (%rsp),%rax
+ .cfi_def_cfa_register   %rax
+ ___
+@@ -1024,7 +1024,7 @@ foreach (0..9) {
+     $code.="vmovdqu   $t[$_], `(10+$_)*32`($out) \n";
+ }
+ $code.=<<___;
+-    vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+     vmovapd `16*0`(%rsp), %xmm6
+diff --git a/crypto/bn/asm/rsaz-avx2.pl b/crypto/bn/asm/rsaz-avx2.pl
+index 239ffb7..48e0c2c 100755
+--- a/crypto/bn/asm/rsaz-avx2.pl
++++ b/crypto/bn/asm/rsaz-avx2.pl
+@@ -155,7 +155,7 @@ rsaz_1024_sqr_avx2:		# 702 cycles, 14% faster than rsaz_1024_mul_avx2
+ .cfi_push	%r14
+ 	push	%r15
+ .cfi_push	%r15
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	lea	-0xa8(%rsp),%rsp
+@@ -908,7 +908,7 @@ rsaz_1024_mul_avx2:
+ .cfi_push	%r15
+ ___
+ $code.=<<___ if ($win64);
+-	vzeroupper
++
+ 	lea	-0xa8(%rsp),%rsp
+ 	vmovaps	%xmm6,-0xd8(%rax)
+ 	vmovaps	%xmm7,-0xc8(%rax)
+@@ -1454,7 +1454,7 @@ $code.=<<___;
+ 	vmovdqu		$ACC6, 192-128($rp)
+ 	vmovdqu		$ACC7, 224-128($rp)
+ 	vmovdqu		$ACC8, 256-128($rp)
+-	vzeroupper
++
+ 
+ 	mov	%rbp, %rax
+ .cfi_def_cfa_register	%rax
+@@ -1588,7 +1588,7 @@ $code.=<<___;
+ .align	32
+ rsaz_1024_scatter5_avx2:
+ .cfi_startproc
+-	vzeroupper
++
+ 	vmovdqu	.Lscatter_permd(%rip),%ymm5
+ 	shl	\$4,$power
+ 	lea	($out,$power),$out
+@@ -1605,7 +1605,7 @@ rsaz_1024_scatter5_avx2:
+ 	dec	%eax
+ 	jnz	.Loop_scatter_1024
+ 
+-	vzeroupper
++
+ 	ret
+ .cfi_endproc
+ .size	rsaz_1024_scatter5_avx2,.-rsaz_1024_scatter5_avx2
+@@ -1615,7 +1615,7 @@ rsaz_1024_scatter5_avx2:
+ .align	32
+ rsaz_1024_gather5_avx2:
+ .cfi_startproc
+-	vzeroupper
++
+ 	mov	%rsp,%r11
+ .cfi_def_cfa_register	%r11
+ ___
+@@ -1742,7 +1742,7 @@ $code.=<<___;
+ 
+ 	vpxor	%ymm0,%ymm0,%ymm0
+ 	vmovdqu	%ymm0,($out)
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xa8(%r11),%xmm6
+diff --git a/crypto/chacha/asm/chacha-x86.pl b/crypto/chacha/asm/chacha-x86.pl
+index 6a64a57..5f9993e 100755
+--- a/crypto/chacha/asm/chacha-x86.pl
++++ b/crypto/chacha/asm/chacha-x86.pl
+@@ -861,7 +861,7 @@ my ($ap,$bp,$cp,$dp)=map(($_&~3)+(($_-1)&3),($ai,$bi,$ci,$di));	# previous
+ 	&mov		($len,&wparam(2));
+ 	&mov		("edx",&wparam(3));		# key
+ 	&mov		("ebx",&wparam(4));		# counter and nonce
+-	&vzeroupper	();
++
+ 
+ 	&mov		("ebp","esp");
+ 	&stack_push	(131);
+@@ -1148,7 +1148,7 @@ sub XOPROUND {
+ 	&jnz		(&label("tail_loop"));
+ }
+ &set_label("done");
+-	&vzeroupper	();
++
+ 	&mov		("esp",&DWP(512,"esp"));
+ &function_end("ChaCha20_xop");
+ }
+diff --git a/crypto/chacha/asm/chacha-x86_64.pl b/crypto/chacha/asm/chacha-x86_64.pl
+index ed54836..2d57526 100755
+--- a/crypto/chacha/asm/chacha-x86_64.pl
++++ b/crypto/chacha/asm/chacha-x86_64.pl
+@@ -1481,7 +1481,7 @@ $code.=<<___	if ($win64);
+ .L4xop_body:
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	vmovdqa		.Lsigma(%rip),$xa3	# key[0]
+ 	vmovdqu		($key),$xb3		# key[1]
+@@ -1803,7 +1803,7 @@ $code.=<<___;
+ 	jnz		.Loop_tail4xop
+ 
+ .Ldone4xop:
+-	vzeroupper
++
+ ___
+ $code.=<<___	if ($win64);
+ 	movaps		-0xa8(%r9),%xmm6
+@@ -1976,7 +1976,7 @@ $code.=<<___	if ($win64);
+ .L8x_body:
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	################ stack layout
+ 	# +0x00		SIMD equivalent of @x[8-12]
+@@ -2991,7 +2991,7 @@ $code.=<<___	if ($win64);
+ .L16x_body:
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	lea		.Lsigma(%rip),%r10
+ 	vbroadcasti32x4	(%r10),$xa3		# key[0]
+@@ -3431,7 +3431,7 @@ $code.=<<___	if ($win64);
+ .L8xvl_body:
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	lea		.Lsigma(%rip),%r10
+ 	vbroadcasti128	(%r10),$xa3		# key[0]
+diff --git a/crypto/ec/asm/ecp_nistz256-x86_64.pl b/crypto/ec/asm/ecp_nistz256-x86_64.pl
+index 43a7129..0e7a160 100755
+--- a/crypto/ec/asm/ecp_nistz256-x86_64.pl
++++ b/crypto/ec/asm/ecp_nistz256-x86_64.pl
+@@ -2819,7 +2819,7 @@ $code.=<<___;
+ ecp_nistz256_avx2_gather_w5:
+ .cfi_startproc
+ .Lavx2_gather_w5:
+-	vzeroupper
++
+ ___
+ $code.=<<___	if ($win64);
+ 	lea	-0x88(%rsp), %rax
+@@ -2888,7 +2888,7 @@ $code.=<<___;
+ 	vmovdqu $Ra, 32*0($val)
+ 	vmovdqu $Rb, 32*1($val)
+ 	vmovdqu $Rc, 32*2($val)
+-	vzeroupper
++
+ ___
+ $code.=<<___	if ($win64);
+ 	movaps	(%rsp), %xmm6
+@@ -2927,7 +2927,7 @@ $code.=<<___;
+ ecp_nistz256_avx2_gather_w7:
+ .cfi_startproc
+ .Lavx2_gather_w7:
+-	vzeroupper
++
+ ___
+ $code.=<<___	if ($win64);
+ 	mov	%rsp,%r11
+@@ -3011,7 +3011,7 @@ $code.=<<___;
+ 
+ 	vmovdqu $Ra, 32*0($val)
+ 	vmovdqu $Rb, 32*1($val)
+-	vzeroupper
++
+ ___
+ $code.=<<___	if ($win64);
+ 	movaps	(%rsp), %xmm6
+diff --git a/crypto/modes/asm/aes-gcm-avx512.pl b/crypto/modes/asm/aes-gcm-avx512.pl
+index ad6461f..c503d26 100644
+--- a/crypto/modes/asm/aes-gcm-avx512.pl
++++ b/crypto/modes/asm/aes-gcm-avx512.pl
+@@ -439,7 +439,7 @@ ___
+     &clear_scratch_gps_asm();
+     &clear_scratch_zmms_asm();
+   } else {
+-    $code .= "vzeroupper\n";
++
+   }
+ 
+   if ($win64) {
+@@ -4361,7 +4361,7 @@ ___
+     &clear_scratch_gps_asm();
+     &clear_scratch_zmms_asm();
+   } else {
+-    $code .= "vzeroupper\n";
++
+   }
+   $code .= <<___;
+ .Labort_init:
+@@ -4721,7 +4721,7 @@ if ($CLEAR_SCRATCH_REGISTERS) {
+   &clear_scratch_gps_asm();
+   &clear_scratch_zmms_asm();
+ } else {
+-  $code .= "vzeroupper\n";
++
+ }
+ $code .= <<___;
+ .Labort_gmult:
+diff --git a/crypto/modes/asm/aesni-gcm-x86_64.pl b/crypto/modes/asm/aesni-gcm-x86_64.pl
+index f3b920b..090515d 100644
+--- a/crypto/modes/asm/aesni-gcm-x86_64.pl
++++ b/crypto/modes/asm/aesni-gcm-x86_64.pl
+@@ -457,7 +457,7 @@ $code.=<<___ if ($win64);
+ .Lgcm_dec_body:
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	vmovdqu		($ivp),$T1		# input counter value
+ 	add		\$-128,%rsp
+@@ -516,7 +516,7 @@ $code.=<<___;
+ 	vpshufb		($const),$Xi,$Xi	# .Lbswap_mask
+ 	vmovdqu		$Xi,-0x40($Xip)		# output Xi
+ 
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xd8(%rax),%xmm6
+@@ -685,7 +685,7 @@ $code.=<<___ if ($win64);
+ .Lgcm_enc_body:
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	vmovdqu		($ivp),$T1		# input counter value
+ 	add		\$-128,%rsp
+@@ -915,7 +915,7 @@ $code.=<<___;
+ 	vpshufb		($const),$Xi,$Xi	# .Lbswap_mask
+ 	vmovdqu		$Xi,-0x40($Xip)		# output Xi
+ 
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xd8(%rax),%xmm6
+diff --git a/crypto/modes/asm/ghash-x86_64.pl b/crypto/modes/asm/ghash-x86_64.pl
+index 0798927..6a2638c 100644
+--- a/crypto/modes/asm/ghash-x86_64.pl
++++ b/crypto/modes/asm/ghash-x86_64.pl
+@@ -1048,7 +1048,7 @@ $code.=<<___ if ($win64);
+ 	movaps	%xmm6,(%rsp)
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	vmovdqu		($Xip),$Hkey
+ 	vpshufd		\$0b01001110,$Hkey,$Hkey	# dword swap
+@@ -1155,7 +1155,7 @@ $code.=<<___;
+ 	vpalignr	\$8,$T2,$T1,$T3		# last "salt" is flipped
+ 	vmovdqu		$T3,-0x10($Htbl)
+ 
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	(%rsp),%xmm6
+@@ -1219,7 +1219,7 @@ $code.=<<___ if ($win64);
+ 	movaps	%xmm15,0x70(%rax)
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	vmovdqu		($Xip),$Xi		# load $Xi
+ 	lea		.L0x1c2_polynomial(%rip),%r10
+@@ -1588,7 +1588,7 @@ $code.=<<___;
+ 
+ 	vpshufb		$bswap,$Xi,$Xi
+ 	vmovdqu		$Xi,($Xip)
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	(%rsp),%xmm6
+diff --git a/crypto/poly1305/asm/poly1305-x86.pl b/crypto/poly1305/asm/poly1305-x86.pl
+index 42e5755..ca137f2 100755
+--- a/crypto/poly1305/asm/poly1305-x86.pl
++++ b/crypto/poly1305/asm/poly1305-x86.pl
+@@ -1461,7 +1461,7 @@ sub X { my $reg=shift; $reg=~s/^ymm/xmm/; $reg; }
+ 	&jz	(&label("enter_blocks"));
+ 
+ &set_label("enter_avx2");
+-	&vzeroupper	();
++
+ 
+ 	&call	(&label("pic_point"));
+ &set_label("pic_point");
+@@ -1802,7 +1802,7 @@ sub vlazy_reduction {
+ 	&vmovd		(&DWP(-16*3+4*2,"edi"),&X($D2));
+ 	&vmovd		(&DWP(-16*3+4*3,"edi"),&X($D3));
+ 	&vmovd		(&DWP(-16*3+4*4,"edi"),&X($D4));
+-	&vzeroupper	();
++
+ 	&mov	("esp","ebp");
+ &set_label("nodata");
+ &function_end("_poly1305_blocks_avx2");
+diff --git a/crypto/poly1305/asm/poly1305-x86_64.pl b/crypto/poly1305/asm/poly1305-x86_64.pl
+index a70ec0f..7ab65d9 100755
+--- a/crypto/poly1305/asm/poly1305-x86_64.pl
++++ b/crypto/poly1305/asm/poly1305-x86_64.pl
+@@ -544,7 +544,7 @@ poly1305_blocks_avx:
+ 	and	\$-16,$len
+ 	jz	.Lno_data_avx
+ 
+-	vzeroupper
++
+ 
+ 	test	%r8d,%r8d
+ 	jz	.Lbase2_64_avx
+@@ -1385,7 +1385,7 @@ $code.=<<___	if (!$win64);
+ .cfi_def_cfa		%rsp,8
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 	ret
+ .cfi_endproc
+ .size	poly1305_blocks_avx,.-poly1305_blocks_avx
+@@ -1470,7 +1470,7 @@ poly1305_blocks_avx2:
+ 	and	\$-16,$len
+ 	jz	.Lno_data_avx2
+ 
+-	vzeroupper
++
+ 
+ 	test	%r8d,%r8d
+ 	jz	.Lbase2_64_avx2
+@@ -2129,7 +2129,7 @@ $code.=<<___	if (!$win64);
+ .cfi_def_cfa		%rsp,8
+ ___
+ $code.=<<___;
+-	vzeroupper
++
+ 	ret
+ .cfi_endproc
+ .size	poly1305_blocks_avx2,.-poly1305_blocks_avx2
+diff --git a/crypto/sha/asm/keccak1600-avx2.pl b/crypto/sha/asm/keccak1600-avx2.pl
+index 5c4bc28..a880531 100755
+--- a/crypto/sha/asm/keccak1600-avx2.pl
++++ b/crypto/sha/asm/keccak1600-avx2.pl
+@@ -295,7 +295,7 @@ SHA3_absorb:
+ 	lea	96($inp),$inp
+ 	lea	96(%rsp),%r10
+ 
+-	vzeroupper
++
+ 
+ 	vpbroadcastq	-96($A_flat),$A00	# load A[5][5]
+ 	vmovdqu		8+32*0-96($A_flat),$A01
+@@ -356,7 +356,7 @@ $code.=<<___;
+ 	vmovdqu	$A41,8+32*4-96($A_flat)
+ 	vmovdqu	$A11,8+32*5-96($A_flat)
+ 
+-	vzeroupper
++
+ 
+ 	lea	(%r11),%rsp
+ 	lea	($len,$bsz),%rax		# return value
+@@ -372,7 +372,7 @@ SHA3_squeeze:
+ 	lea	96($A_flat),$A_flat
+ 	shr	\$3,$bsz
+ 
+-	vzeroupper
++
+ 
+ 	vpbroadcastq	-96($A_flat),$A00
+ 	vpxor		@T[0],@T[0],@T[0]
+@@ -426,7 +426,7 @@ $code.=<<___;
+ 	jnz	.Loop_tail_avx2
+ 
+ .Ldone_squeeze_avx2:
+-	vzeroupper
++
+ 
+ 	lea	(%r11),%rsp
+ 	ret
+diff --git a/crypto/sha/asm/keccak1600-avx512.pl b/crypto/sha/asm/keccak1600-avx512.pl
+index 2a295d1..481a1ad 100755
+--- a/crypto/sha/asm/keccak1600-avx512.pl
++++ b/crypto/sha/asm/keccak1600-avx512.pl
+@@ -379,7 +379,7 @@ $code.=<<___;
+ 	vmovdqu64	$A30,40*3-96($A_flat){$k11111}
+ 	vmovdqu64	$A40,40*4-96($A_flat){$k11111}
+ 
+-	vzeroupper
++
+ 
+ 	lea	(%r11),%rsp
+ 	lea	($len,$bsz),%rax		# return value
+@@ -480,7 +480,7 @@ SHA3_squeeze:
+ 	.byte	0xf3,0xa4		# rep movsb
+ 
+ .Ldone_squeeze_avx512:
+-	vzeroupper
++
+ 
+ 	lea	(%r11),%rsp
+ 	ret
+diff --git a/crypto/sha/asm/keccak1600-avx512vl.pl b/crypto/sha/asm/keccak1600-avx512vl.pl
+index 5a78024..2c99947 100755
+--- a/crypto/sha/asm/keccak1600-avx512vl.pl
++++ b/crypto/sha/asm/keccak1600-avx512vl.pl
+@@ -197,7 +197,7 @@ SHA3_absorb:
+ 	lea	96(%rsp),%r10
+ 	lea	rhotates_left(%rip),%r8
+ 
+-	vzeroupper
++
+ 
+ 	vpbroadcastq	-96($A_flat),$A00	# load A[5][5]
+ 	vmovdqu		8+32*0-96($A_flat),$A01
+@@ -265,7 +265,7 @@ $code.=<<___;
+ 	vmovdqu	$A41,8+32*4-96($A_flat)
+ 	vmovdqu	$A11,8+32*5-96($A_flat)
+ 
+-	vzeroupper
++
+ 
+ 	lea	(%r11),%rsp
+ 	lea	($len,$bsz),%rax		# return value
+@@ -282,7 +282,7 @@ SHA3_squeeze:
+ 	lea	rhotates_left(%rip),%r8
+ 	shr	\$3,$bsz
+ 
+-	vzeroupper
++
+ 
+ 	vpbroadcastq	-96($A_flat),$A00
+ 	vpxor		@T[0],@T[0],@T[0]
+@@ -343,7 +343,7 @@ $code.=<<___;
+ 	jnz	.Loop_tail_avx512vl
+ 
+ .Ldone_squeeze_avx512vl:
+-	vzeroupper
++
+ 
+ 	lea	(%r11),%rsp
+ 	ret
+diff --git a/crypto/sha/asm/sha1-mb-x86_64.pl b/crypto/sha/asm/sha1-mb-x86_64.pl
+index 5a8c075..96f14fc 100644
+--- a/crypto/sha/asm/sha1-mb-x86_64.pl
++++ b/crypto/sha/asm/sha1-mb-x86_64.pl
+@@ -1084,7 +1084,7 @@ $code.=<<___;
+ 	lea	K_XX_XX(%rip),$Tbl
+ 	lea	`$REG_SZ*16`(%rsp),%rbx
+ 
+-	vzeroupper
++
+ .Loop_grande_avx:
+ 	mov	$num,`$REG_SZ*17+8`(%rsp)	# original $num
+ 	xor	$num,$num
+@@ -1173,7 +1173,7 @@ $code.=<<___;
+ .Ldone_avx:
+ 	mov	`$REG_SZ*17`(%rsp),%rax		# original %rsp
+ .cfi_def_cfa	%rax,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xb8(%rax),%xmm6
+@@ -1255,7 +1255,7 @@ $code.=<<___;
+ 	lea	K_XX_XX(%rip),$Tbl
+ 	shr	\$1,$num
+ 
+-	vzeroupper
++
+ .Loop_grande_avx2:
+ 	mov	$num,`$REG_SZ*17+8`(%rsp)	# original $num
+ 	xor	$num,$num
+@@ -1345,7 +1345,7 @@ $code.=<<___;
+ .Ldone_avx2:
+ 	mov	`$REG_SZ*17`(%rsp),%rax		# original %rsp
+ .cfi_def_cfa	%rax,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xd8(%rax),%xmm6
+diff --git a/crypto/sha/asm/sha1-x86_64.pl b/crypto/sha/asm/sha1-x86_64.pl
+index af9d172..0e70d7c 100755
+--- a/crypto/sha/asm/sha1-x86_64.pl
++++ b/crypto/sha/asm/sha1-x86_64.pl
+@@ -1001,7 +1001,7 @@ _avx_shortcut:
+ 	push	%r14
+ .cfi_push	%r14
+ 	lea	`-64-($win64?6*16:0)`(%rsp),%rsp
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	vmovaps	%xmm6,-40-6*16($fp)
+@@ -1306,7 +1306,7 @@ ___
+ 	&Xtail_avx(\&body_20_39);
+ 
+ $code.=<<___;
+-	vzeroupper
++
+ 
+ 	add	0($ctx),$A			# update context
+ 	add	4($ctx),@T[0]
+@@ -1379,7 +1379,7 @@ _avx2_shortcut:
+ .cfi_push	%r13
+ 	push	%r14
+ .cfi_push	%r14
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	lea	-6*16(%rsp),%rsp
+@@ -1808,7 +1808,7 @@ $code.=<<___;
+ 	jbe	.Loop_avx2
+ 
+ .Ldone_avx2:
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-40-6*16($fp),%xmm6
+diff --git a/crypto/sha/asm/sha256-mb-x86_64.pl b/crypto/sha/asm/sha256-mb-x86_64.pl
+index 0175f5b..f7a3749 100644
+--- a/crypto/sha/asm/sha256-mb-x86_64.pl
++++ b/crypto/sha/asm/sha256-mb-x86_64.pl
+@@ -1118,7 +1118,7 @@ $code.=<<___;
+ .Ldone_avx:
+ 	mov	`$REG_SZ*17`(%rsp),%rax		# original %rsp
+ .cfi_def_cfa	%rax,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xb8(%rax),%xmm6
+@@ -1311,7 +1311,7 @@ $code.=<<___;
+ .Ldone_avx2:
+ 	mov	`$REG_SZ*17`(%rsp),%rax		# original %rsp
+ .cfi_def_cfa	%rax,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	-0xd8(%rax),%xmm6
+diff --git a/crypto/sha/asm/sha512-x86_64.pl b/crypto/sha/asm/sha512-x86_64.pl
+index 4db4b1b..da0ed08 100755
+--- a/crypto/sha/asm/sha512-x86_64.pl
++++ b/crypto/sha/asm/sha512-x86_64.pl
+@@ -1266,7 +1266,7 @@ ___
+ $code.=<<___;
+ .Lprologue_xop:
+ 
+-	vzeroupper
++
+ 	mov	$SZ*0($ctx),$A
+ 	mov	$SZ*1($ctx),$B
+ 	mov	$SZ*2($ctx),$C
+@@ -1579,7 +1579,7 @@ $code.=<<___;
+ 
+ 	mov	$_rsp,%rsi
+ .cfi_def_cfa	%rsi,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	16*$SZ+32(%rsp),%xmm6
+@@ -1660,7 +1660,7 @@ ___
+ $code.=<<___;
+ .Lprologue_avx:
+ 
+-	vzeroupper
++
+ 	mov	$SZ*0($ctx),$A
+ 	mov	$SZ*1($ctx),$B
+ 	mov	$SZ*2($ctx),$C
+@@ -1905,7 +1905,7 @@ $code.=<<___;
+ 
+ 	mov	$_rsp,%rsi
+ .cfi_def_cfa	%rsi,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	16*$SZ+32(%rsp),%xmm6
+@@ -2030,7 +2030,7 @@ ___
+ $code.=<<___;
+ .Lprologue_avx2:
+ 
+-	vzeroupper
++
+ 	sub	\$-16*$SZ,$inp		# inp++, size optimization
+ 	mov	$SZ*0($ctx),$A
+ 	mov	$inp,%r12		# borrow $T1
+@@ -2355,7 +2355,7 @@ $code.=<<___;
+ .Ldone_avx2:
+ 	mov	`16*$SZ+3*8`($Tbl),%rsi
+ .cfi_def_cfa	%rsi,8
+-	vzeroupper
++
+ ___
+ $code.=<<___ if ($win64);
+ 	movaps	16*$SZ+32($Tbl),%xmm6
+@@ -2613,7 +2613,7 @@ $code.=<<___;
+     vmovdqu %ymm1,0x00($arg_hash)
+     vmovdqu %ymm2,0x20($arg_hash)
+ 
+-    vzeroupper
++
+ ___
+ 
+ $code.=<<___ if($win64);
+-- 
+2.54.0
+

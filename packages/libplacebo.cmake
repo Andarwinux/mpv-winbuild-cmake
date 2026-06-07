@@ -37,7 +37,7 @@ ExternalProject_Add(libplacebo
         -Dxxhash=enabled
         -Dvulkan-registry='${MINGW_INSTALL_PREFIX}/share/vulkan/registry/vk.xml'
         -Dvulkan=enabled
-        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
+        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE -DXXH_NO_PREFETCH'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

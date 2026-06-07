@@ -16,7 +16,7 @@ ExternalProject_Add(dav1d
         -Denable_tests=false
         -Dxxhash_muxer=enabled
         -Dtrim_dsp=true
-        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE'"
+        "-Dc_args='-DXXH_ENABLE_AUTOVECTORIZE -DXXH_NO_PREFETCH'"
     COMMAND ${EXEC} sed -i [['/__USE_MINGW_ANSI_STDIO/d']] <BINARY_DIR>/build/config.h
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

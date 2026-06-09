@@ -81,6 +81,7 @@ set(SINGLE_SOURCE_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/src_packages" CACHE PATH
 cmake_path(GET CMAKE_INSTALL_PREFIX FILENAME CMAKE_INSTALL_PREFIX_NAME)
 cmake_path(GET MINGW_INSTALL_PREFIX FILENAME MINGW_INSTALL_PREFIX_NAME)
 option(ENABLE_LEGACY_MPV "Build legacy mpv.exe without consoleAllocationPolicy" OFF)
+option(FORCE_UNWINDV3 "force enable x64 SEH unwindv3 for non-APX" OFF)
 set(LLVM_ENABLE_LTO "OFF" CACHE STRING "OFF, ON, Thin and Full")
 set(LLVM_ENABLE_PGO "OFF" CACHE STRING "OFF, GEN, CSGEN, USE")
 option(LLVM_ENABLE_UNSAFE_X86_AVX512_VFABI "Allow use of avx512 veclib variants, will lead to miscompilation on non-avx512 target!!!!!" OFF)

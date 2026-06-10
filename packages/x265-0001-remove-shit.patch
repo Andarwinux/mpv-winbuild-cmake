@@ -1,4 +1,4 @@
-From 015bda2f2756e5676a58041930f6b514898838d6 Mon Sep 17 00:00:00 2001
+From a0acb6e3c6cbdf91909f3bea55ed305ceb1102f9 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 10 May 2026 00:00:00 +0000
 Subject: [PATCH] remove shit
@@ -134,14 +134,14 @@ index c58e63a..212a6c1 100644
          setupPixelPrimitives_sve2(p);
          setupSaoPrimitives_sve2(p);
 diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
-index f197e42..174cb9b 100644
+index 882467b..7423799 100644
 --- a/source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
-@@ -175,194 +175,26 @@ bool detect512()
+@@ -178,194 +178,26 @@ bool detect512()
  uint32_t cpu_detect(bool benableavx512 )
  {
  
--    uint32_t cpu = 0; 
+-    uint32_t cpu = 0;
 -    uint32_t eax, ebx, ecx, edx;
 -    uint32_t vendor[4] = { 0 };
 -    uint32_t max_extended_cap, max_basic_cap;
@@ -352,7 +352,7 @@ index f197e42..174cb9b 100644
  
      return cpu;
  }
-@@ -432,7 +264,22 @@ uint32_t cpu_detect(bool benableavx512)
+@@ -435,7 +267,22 @@ uint32_t cpu_detect(bool benableavx512)
      int flags = 0;
  
  #ifdef ENABLE_ASSEMBLY

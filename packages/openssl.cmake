@@ -5,10 +5,11 @@ ExternalProject_Add(openssl
         brotli
     GIT_REPOSITORY https://github.com/openssl/openssl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
     GIT_SUBMODULES ""
+    GIT_RESET 38e1580fa6de89fd4c0a9822e96dca95a531ee6e
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

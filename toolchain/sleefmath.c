@@ -22,7 +22,7 @@ __attribute__((always_inline,hot))                    double    fabs(double x){r
 __attribute__((always_inline,hot))                    double    floor(double x){return __builtin_elementwise_floor(x);}
 __attribute__((always_inline,hot))                    double    fmod(double x, double y){return Sleef_fmodd1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    double    frexp(double x, int *exp){return (*exp = Sleef_expfrexpd1_purecfma(x), Sleef_frfrexpd1_purecfma(x));}
-__attribute__((always_inline,hot))                    double    hypot(double x, double y){return Sleef_hypotd1_u35purecfma(x, y);}
+__attribute__((always_inline,hot))                    double    hypot(double x, double y){return __builtin_elementwise_sqrt(x*x+y*y);}
                                                       #if       defined(__ARM_FEATURE_SVE) || defined(__AVX512F__)
 __attribute__((always_inline,hot))                    double    ldexp(double x, int exp){return __builtin_elementwise_ldexp(x, exp);}
                                                       #else
@@ -70,7 +70,7 @@ __attribute__((always_inline,hot))                    float     fabsf(float x){r
 __attribute__((always_inline,hot))                    float     floorf(float x){return __builtin_elementwise_floor(x);}
 __attribute__((always_inline,hot))                    float     fmodf(float x, float y){return Sleef_fmodf1_purecfma(x, y);}
 __attribute__((always_inline,hot))                    float     frexpf(float x, int *exp){return (*exp = Sleef_expfrexpf1_purecfma(x), Sleef_frfrexpf1_purecfma(x));}
-__attribute__((always_inline,hot))                    float     hypotf(float x, float y){return Sleef_hypotf1_u35purecfma(x, y);}
+__attribute__((always_inline,hot))                    float     hypotf(float x, float y){return __builtin_elementwise_sqrt(x*x+y*y);}
                                                       #if       defined(__ARM_FEATURE_SVE) || defined(__AVX512F__)
 __attribute__((always_inline,hot))                    float     ldexpf(float x, int exp){return __builtin_elementwise_ldexp(x, exp);}
                                                       #else

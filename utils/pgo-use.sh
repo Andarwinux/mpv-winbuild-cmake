@@ -2,6 +2,7 @@
 cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DMARCH=native \
 -DMTUNE=native \
+-DFORCE_UNWINDV3=OFF \
 -DMARCH_EXTRA_FEATURES="" \
 -DMARCH_NAME=-native \
 -DCOMPILER_TOOLCHAIN=clang \

@@ -15,7 +15,7 @@ ExternalProject_Add(llvm-host-libcxx
         -DCMAKE_ASM_COMPILER_WORKS=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_LLVM=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Clang=ON
-        -DLLVM_ENABLE_RUNTIMES='libunwind^^libcxxabi^^libcxx'
+        -DLLVM_ENABLE_RUNTIMES='libcxxabi^^libcxx'
         -DLIBUNWIND_USE_COMPILER_RT=ON
         -DLIBUNWIND_ENABLE_SHARED=OFF
         -DLIBUNWIND_ENABLE_STATIC=ON
@@ -31,16 +31,19 @@ ExternalProject_Add(llvm-host-libcxx
         -DLIBUNWIND_INCLUDE_TESTS=OFF
         -DLIBCXX_ENABLE_ABI_LINKER_SCRIPT=OFF
         -DLIBCXXABI_USE_COMPILER_RT=ON
-        -DLIBCXXABI_USE_LLVM_UNWINDER=ON
+        -DLIBCXXABI_USE_LLVM_UNWINDER=OFF
         -DLIBCXXABI_ENABLE_SHARED=OFF
         -DLIBUNWIND_INCLUDE_DOCS=OFF
         -DLIBCXX_INCLUDE_DOCS=OFF
+        -DLIBCXX_ENABLE_EXCEPTIONS=OFF
+        -DLIBCXXABI_ENABLE_EXCEPTIONS=OFF
+        -DLIBCXX_ENABLE_RTTI=OFF
         -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON
         -DLIBCXXABI_ENABLE_ASSERTIONS=OFF
         -DLIBUNWIND_ENABLE_ASSERTIONS=OFF
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
         "-DCMAKE_C_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
-        "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
+        "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo} -frtti'"
         "-DCMAKE_ASM_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
     BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} --install <BINARY_DIR>

@@ -1,6 +1,6 @@
 #!/bin/bash
 cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
--DMARCH=native \
+-DMARCH=diamondrapids \
 -DCOMPILER_TOOLCHAIN=clang \
 -DLLVM_ENABLE_LTO=Thin \
 -DLLVM_ENABLE_UNSAFE_X86_AVX512_VFABI=ON \

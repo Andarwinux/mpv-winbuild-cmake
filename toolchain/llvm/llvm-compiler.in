@@ -32,7 +32,7 @@ else
         else
             LTO_FLAGS="-flto=full"
         fi
-        LTO_FLAGS+=" -fwhole-program-vtables -funique-source-file-names"
+        LTO_FLAGS+=" -fwhole-program-vtables -funique-source-file-names -mllvm -unroll-full-max-count=0"
     else
         FLAGS+=" @MLLVM_FLAGS@"
     fi

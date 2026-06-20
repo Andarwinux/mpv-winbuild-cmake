@@ -71,7 +71,6 @@ ExternalProject_Add(ffmpeg
         --disable-schannel
         --disable-stripping
         --disable-symver
-        --disable-unstable
         --enable-amf
         --enable-avisynth
         --enable-bzlib

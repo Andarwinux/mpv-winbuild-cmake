@@ -7,7 +7,8 @@ ExternalProject_Add(zlib-host
     UPDATE_COMMAND ""
     GIT_REMOTE_NAME origin
     GIT_TAG develop
-    CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} echo > <SOURCE_DIR>/utils/CMakeLists.txt
+    COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS=OFF

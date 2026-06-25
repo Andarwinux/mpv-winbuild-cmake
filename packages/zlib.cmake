@@ -9,7 +9,8 @@ ExternalProject_Add(zlib
     GIT_TAG develop
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} echo > <SOURCE_DIR>/utils/CMakeLists.txt
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         ${zlib_force_skip_check}
         -DINSTALL_PKGCONFIG_DIR=${MINGW_INSTALL_PREFIX}/lib/pkgconfig

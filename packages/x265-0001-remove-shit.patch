@@ -1,4 +1,4 @@
-From a0acb6e3c6cbdf91909f3bea55ed305ceb1102f9 Mon Sep 17 00:00:00 2001
+From f72728f6e3306707f8b59aeab35c30594dd4f114 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 10 May 2026 00:00:00 +0000
 Subject: [PATCH] remove shit
@@ -12,7 +12,7 @@ Subject: [PATCH] remove shit
  5 files changed, 157 insertions(+), 239 deletions(-)
 
 diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
-index c58e63a..212a6c1 100644
+index c58e63a91..212a6c15d 100644
 --- a/source/common/aarch64/asm-primitives.cpp
 +++ b/source/common/aarch64/asm-primitives.cpp
 @@ -664,30 +664,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
@@ -134,7 +134,7 @@ index c58e63a..212a6c1 100644
          setupPixelPrimitives_sve2(p);
          setupSaoPrimitives_sve2(p);
 diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
-index 882467b..7423799 100644
+index 800f51f9f..c2b624af6 100644
 --- a/source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
 @@ -178,194 +178,26 @@ bool detect512()
@@ -353,7 +353,7 @@ index 882467b..7423799 100644
      return cpu;
  }
 @@ -435,7 +267,22 @@ uint32_t cpu_detect(bool benableavx512)
-     int flags = 0;
+     uint32_t flags = 0;
  
  #ifdef ENABLE_ASSEMBLY
 -    flags = aarch64_cpu_detect();
@@ -377,7 +377,7 @@ index 882467b..7423799 100644
  
      return flags;
 diff --git a/source/common/cpu.h b/source/common/cpu.h
-index ec62eb3..c39c719 100644
+index ec62eb312..c39c71967 100644
 --- a/source/common/cpu.h
 +++ b/source/common/cpu.h
 @@ -36,16 +36,16 @@ extern "C" void PFX(cpu_emms)(void);
@@ -402,7 +402,7 @@ index ec62eb3..c39c719 100644
  
  unsigned long x265_getauxval(unsigned long);
 diff --git a/source/common/x86/asm-primitives.cpp b/source/common/x86/asm-primitives.cpp
-index bb32f32..0025444 100644
+index bb32f32cd..0025444bc 100644
 --- a/source/common/x86/asm-primitives.cpp
 +++ b/source/common/x86/asm-primitives.cpp
 @@ -912,7 +912,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
@@ -644,7 +644,7 @@ index bb32f32..0025444 100644
          p.pu[LUMA_32x8].sad = PFX(pixel_sad_32x8_avx512);
        //  p.pu[LUMA_32x16].sad = PFX(pixel_sad_32x16_avx512);
 diff --git a/source/common/x86/x86inc.asm b/source/common/x86/x86inc.asm
-index 4e0edf6..74ba5b7 100644
+index 4e0edf650..74ba5b773 100644
 --- a/source/common/x86/x86inc.asm
 +++ b/source/common/x86/x86inc.asm
 @@ -357,7 +357,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14

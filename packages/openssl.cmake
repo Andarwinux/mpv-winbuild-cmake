@@ -17,6 +17,7 @@ ExternalProject_Add(openssl
     COMMAND ${CMAKE_COMMAND} -E make_directory <BINARY_DIR>/apps/include
     COMMAND ${EXEC} ${GIT_EXECUTABLE} -C <BINARY_DIR>/source/${package} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
     COMMAND ${EXEC} <BINARY_DIR>/source/${package}/Configure
+        CFLAGS=-DOPENSSL_NO_INLINE_ASM
         --cross-compile-prefix=${TARGET_ARCH}-
         --prefix=${MINGW_INSTALL_PREFIX}
         --libdir=lib

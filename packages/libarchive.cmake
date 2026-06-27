@@ -39,6 +39,7 @@ ExternalProject_Add(libarchive
         -DENABLE_TEST=OFF
         -DWINDOWS_VERSION=WIN10
         -DPOSIX_REGEX_LIB=OFF
+        -DENABLE_UNZIP=OFF
         -DCMAKE_INSTALL_LIBDIR=lib
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}

@@ -12,6 +12,7 @@ ExternalProject_Add(brotli
         -DSHARE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}
         -DBROTLI_EMSCRIPTEN=OFF
         -DBROTLI_BUILD_TOOLS=OFF
+        "-DCMAKE_C_FLAGS='-DBROTLI_BUILD_NO_RBIT -DBROTLI_RBIT=__builtin_bitreverseg -DBrotliRBit=BrotliSuppressUnusedFunctions'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

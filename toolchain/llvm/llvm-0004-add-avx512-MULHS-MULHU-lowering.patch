@@ -1,0 +1,139 @@
+From 3f8b52266856a1d399b1e3cd7c92144fa1b2055b Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sun, 28 Jun 2026 00:00:00 +0000
+Subject: [PATCH] add avx512 MULHS/MULHU lowering
+
+---
+ .../CodeGen/SelectionDAG/TargetLowering.cpp   |  2 +-
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 13 ++++++
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 42 +++++++++++++++----
+ 3 files changed, 48 insertions(+), 9 deletions(-)
+
+diff --git a/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp b/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
+index 00153ef66..0937df04c 100644
+--- a/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
++++ b/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
+@@ -12650,7 +12650,7 @@ void TargetLowering::forceExpandMultiply(SelectionDAG &DAG, const SDLoc &dl,
+   // Hacker's Delight (itself derived from Knuth's Algorithm M from section
+   // 4.3.1). If Signed is set, we can use arithmetic right shifts to propagate
+   // sign bits while calculating the Hi half.
+-  unsigned Bits = VT.getSizeInBits();
++  unsigned Bits = VT.getScalarSizeInBits();
+   unsigned HalfBits = Bits / 2;
+   SDValue Mask = DAG.getConstant(APInt::getLowBitsSet(Bits, HalfBits), dl, VT);
+   SDValue LL = DAG.getNode(ISD::AND, dl, VT, LHS, Mask);
+diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
+index 7a382490c..0445a5462 100644
+--- a/llvm/lib/Target/X86/X86ISelLowering.cpp
++++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
+@@ -1749,6 +1749,10 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+     }
+ 
+     if (HasInt256) {
++      if (Subtarget.hasVLX()) {
++        setOperationAction(ISD::MULHS,   MVT::v4i64, Custom);
++      }
++      setOperationAction(ISD::MULHU,   MVT::v4i64, Custom);
+       setOperationAction(ISD::VSELECT, MVT::v32i8, Legal);
+ 
+       // Custom legalize 2x32 to get a little better code.
+@@ -2022,6 +2026,8 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+     setOperationAction(ISD::MUL, MVT::v32i16, HasBWI ? Legal : Custom);
+     setOperationAction(ISD::MUL, MVT::v64i8,  Custom);
+ 
++    setOperationAction(ISD::MULHS, MVT::v8i64,  Custom);
++    setOperationAction(ISD::MULHU, MVT::v8i64,  Custom);
+     setOperationAction(ISD::MULHU, MVT::v16i32, Custom);
+     setOperationAction(ISD::MULHS, MVT::v16i32, Custom);
+     setOperationAction(ISD::MULHS, MVT::v32i16, HasBWI ? Legal : Custom);
+@@ -30662,6 +30668,13 @@ static SDValue LowerMULH(SDValue Op, const X86Subtarget &Subtarget,
+   if ((VT == MVT::v32i16 || VT == MVT::v64i8) && !Subtarget.hasBWI())
+     return splitVectorIntBinary(Op, DAG, dl);
+ 
++  if (VT.isVector() && VT.getVectorElementType() == MVT::i64) {
++    SDValue Lo, Hi;
++    const TargetLowering &TLI = DAG.getTargetLoweringInfo();
++    TLI.forceExpandMultiply(DAG, dl, IsSigned, Lo, Hi, A, B);
++    return Hi;
++  }
++
+   if (VT == MVT::v4i32 || VT == MVT::v8i32 || VT == MVT::v16i32) {
+     assert((VT == MVT::v4i32 && Subtarget.hasSSE2()) ||
+            (VT == MVT::v8i32 && Subtarget.hasInt256()) ||
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+index b588fdfc9..1f3a5685c 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+@@ -450,6 +450,16 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::SREM, MVT::v16i32, {  8 } }, // pmuludq+mul+sub sequence
+     { ISD::UDIV, MVT::v16i32, {  5 } }, // pmuludq sequence
+     { ISD::UREM, MVT::v16i32, {  7 } }, // pmuludq+mul+sub sequence
++
++    { ISD::SDIV, MVT::v8i64,  {  6 } },
++    { ISD::SREM, MVT::v8i64,  {  8 } },
++    { ISD::UDIV, MVT::v8i64,  {  5 } },
++    { ISD::UREM, MVT::v8i64,  {  7 } },
++
++    { ISD::SDIV, MVT::v4i64,  {  6 } },
++    { ISD::SREM, MVT::v4i64,  {  8 } },
++    { ISD::UDIV, MVT::v4i64,  {  5 } },
++    { ISD::UREM, MVT::v4i64,  {  7 } },
+   };
+ 
+   if (Op2Info.isUniform() && Op2Info.isConstant() && ST->hasAVX512())
+@@ -491,6 +501,9 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::SREM, MVT::v8i32, {  8 } }, // pmuludq+mul+sub sequence
+     { ISD::UDIV, MVT::v8i32, {  5 } }, // pmuludq sequence
+     { ISD::UREM, MVT::v8i32, {  7 } }, // pmuludq+mul+sub sequence
++
++    { ISD::UDIV, MVT::v4i64, {  5 } },
++    { ISD::UREM, MVT::v4i64, {  7 } },
+   };
+ 
+   if (Op2Info.isUniform() && Op2Info.isConstant() && ST->hasAVX2())
+@@ -602,10 +615,20 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::UDIV, MVT::v32i16, { 12 } }, // 2*vpmulhuw sequence
+     { ISD::UREM, MVT::v32i16, { 16 } }, // 2*vpmulhuw+mul+sub sequence
+ 
+-    { ISD::SDIV, MVT::v16i32, { 15 } }, // vpmuldq sequence
+-    { ISD::SREM, MVT::v16i32, { 17 } }, // vpmuldq+mul+sub sequence
+-    { ISD::UDIV, MVT::v16i32, { 15 } }, // vpmuludq sequence
+-    { ISD::UREM, MVT::v16i32, { 17 } }, // vpmuludq+mul+sub sequence
++    { ISD::SDIV, MVT::v16i32, {  6 } }, // vpmuldq sequence
++    { ISD::SREM, MVT::v16i32, {  8 } }, // vpmuldq+mul+sub sequence
++    { ISD::UDIV, MVT::v16i32, {  5 } }, // vpmuludq sequence
++    { ISD::UREM, MVT::v16i32, {  7 } }, // vpmuludq+mul+sub sequence
++
++    { ISD::SDIV, MVT::v8i64,  {  6 } },
++    { ISD::SREM, MVT::v8i64,  {  8 } },
++    { ISD::UDIV, MVT::v8i64,  {  5 } },
++    { ISD::UREM, MVT::v8i64,  {  7 } },
++
++    { ISD::SDIV, MVT::v4i64,  {  6 } },
++    { ISD::SREM, MVT::v4i64,  {  8 } },
++    { ISD::UDIV, MVT::v4i64,  {  5 } },
++    { ISD::UREM, MVT::v4i64,  {  7 } },
+   };
+ 
+   if (Op2Info.isConstant() && ST->hasAVX512())
+@@ -625,10 +648,13 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::UDIV, MVT::v16i16, {  6 } }, // vpmulhuw sequence
+     { ISD::UREM, MVT::v16i16, {  8 } }, // vpmulhuw+mul+sub sequence
+ 
+-    { ISD::SDIV, MVT::v8i32,  { 15 } }, // vpmuldq sequence
+-    { ISD::SREM, MVT::v8i32,  { 19 } }, // vpmuldq+mul+sub sequence
+-    { ISD::UDIV, MVT::v8i32,  { 15 } }, // vpmuludq sequence
+-    { ISD::UREM, MVT::v8i32,  { 19 } }, // vpmuludq+mul+sub sequence
++    { ISD::SDIV, MVT::v8i32,  {  6 } }, // vpmuldq sequence
++    { ISD::SREM, MVT::v8i32,  {  8 } }, // vpmuldq+mul+sub sequence
++    { ISD::UDIV, MVT::v8i32,  {  5 } }, // vpmuludq sequence
++    { ISD::UREM, MVT::v8i32,  {  7 } }, // vpmuludq+mul+sub sequence
++
++    { ISD::UDIV, MVT::v4i64,  {  5 } },
++    { ISD::UREM, MVT::v4i64,  {  7 } },
+   };
+ 
+   if (Op2Info.isConstant() && ST->hasAVX2())
+-- 
+2.54.0
+

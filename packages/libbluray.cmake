@@ -21,7 +21,7 @@ ExternalProject_Add(libbluray
         -Dbdj_jar=disabled
         -Dfreetype=enabled
         -Dlibxml2=enabled
-        "-Dc_args='-Ddec_init=libbluray_dec_init'"
+        "-Dc_args='-Ddec_init=libbluray_dec_init -Ddir_open_default=libbluray_dir_open_default -Dfile_open_default=libbluray_file_open_default'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

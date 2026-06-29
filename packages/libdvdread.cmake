@@ -12,6 +12,7 @@ ExternalProject_Add(libdvdread
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
         ${meson_conf_args}
         -Dlibdvdcss=enabled
+        "-Dc_args='-Ddir_open_default=libdvdread_dir_open_default -Dfile_open_default=libdvdread_file_open_default'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

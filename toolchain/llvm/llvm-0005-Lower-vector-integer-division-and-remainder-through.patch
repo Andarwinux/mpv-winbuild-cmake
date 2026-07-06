@@ -1,4 +1,4 @@
-From f844b0d13ca7d40a1ff9f3735705d09a3625c591 Mon Sep 17 00:00:00 2001
+From 703aeea43430eca4895cfdc3ca37f636fad1a477 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Fri, 3 Jul 2026 08:32:52 +0000
 Subject: [PATCH] Lower vector integer division and remainder through float
@@ -10,10 +10,10 @@ Subject: [PATCH] Lower vector integer division and remainder through float
  2 files changed, 273 insertions(+)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index 06df6d7895..f62a702751 100644
+index ebd957bfc..82f4f349e 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -2837,6 +2837,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+@@ -2841,6 +2841,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
                         ISD::FP_TO_UINT_SAT,
                         ISD::SETCC,
                         ISD::MUL,
@@ -28,7 +28,7 @@ index 06df6d7895..f62a702751 100644
                         ISD::XOR,
                         ISD::MSCATTER,
                         ISD::MGATHER,
-@@ -50449,6 +50457,155 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50457,6 +50465,155 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -184,7 +184,7 @@ index 06df6d7895..f62a702751 100644
  static SDValue combineMul(SDNode *N, SelectionDAG &DAG,
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
-@@ -62921,6 +63078,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
+@@ -62929,6 +63086,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
    case X86ISD::SBB:         return combineSBB(N, DAG);
    case X86ISD::ADC:         return combineADC(N, DAG, DCI);
    case ISD::MUL:            return combineMul(N, DAG, DCI, Subtarget);
@@ -200,7 +200,7 @@ index 06df6d7895..f62a702751 100644
    case ISD::SRA:            return combineShiftRightArithmetic(N, DAG, Subtarget);
    case ISD::SRL:            return combineShiftRightLogical(N, DAG, DCI, Subtarget);
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index de2fa9d19b..5e3b2a3206 100644
+index af9eba09e..88203b6e0 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -1012,6 +1012,60 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(

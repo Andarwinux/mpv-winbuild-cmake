@@ -1,4 +1,4 @@
-From 5c48430356c7f85b9b099919c0279d31c11d524f Mon Sep 17 00:00:00 2001
+From a0d5066cef1dbc8ae0b305d8cc7f3554d8b6c089 Mon Sep 17 00:00:00 2001
 From: Simon Pilgrim <llvm-dev@redking.me.uk>
 Date: Thu, 27 Nov 2025 15:03:10 +0000
 Subject: [PATCH] add avx512 MULHS/MULHU lowering
@@ -10,7 +10,7 @@ Subject: [PATCH] add avx512 MULHS/MULHU lowering
  3 files changed, 59 insertions(+), 9 deletions(-)
 
 diff --git a/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp b/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
-index a4bcc8cb01..0c95588ef0 100644
+index a4bcc8cb0..0c95588ef 100644
 --- a/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
 +++ b/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
 @@ -12650,7 +12650,7 @@ void TargetLowering::forceExpandMultiply(SelectionDAG &DAG, const SDLoc &dl,
@@ -23,10 +23,10 @@ index a4bcc8cb01..0c95588ef0 100644
    SDValue Mask = DAG.getConstant(APInt::getLowBitsSet(Bits, HalfBits), dl, VT);
    SDValue LL = DAG.getNode(ISD::AND, dl, VT, LHS, Mask);
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index b33b01f804..06df6d7895 100644
+index d3c636393..ebd957bfc 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -1749,6 +1749,15 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+@@ -1751,6 +1751,15 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
      }
  
      if (HasInt256) {
@@ -42,7 +42,7 @@ index b33b01f804..06df6d7895 100644
        setOperationAction(ISD::VSELECT, MVT::v32i8, Legal);
  
        // Custom legalize 2x32 to get a little better code.
-@@ -2022,6 +2031,12 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+@@ -2024,6 +2033,12 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
      setOperationAction(ISD::MUL, MVT::v32i16, HasBWI ? Legal : Custom);
      setOperationAction(ISD::MUL, MVT::v64i8,  Custom);
  
@@ -55,7 +55,7 @@ index b33b01f804..06df6d7895 100644
      setOperationAction(ISD::MULHU, MVT::v16i32, Custom);
      setOperationAction(ISD::MULHS, MVT::v16i32, Custom);
      setOperationAction(ISD::MULHS, MVT::v32i16, HasBWI ? Legal : Custom);
-@@ -30259,6 +30274,13 @@ static SDValue LowerMULH(SDValue Op, const X86Subtarget &Subtarget,
+@@ -30263,6 +30278,13 @@ static SDValue LowerMULH(SDValue Op, const X86Subtarget &Subtarget,
    if ((VT == MVT::v32i16 || VT == MVT::v64i8) && !Subtarget.hasBWI())
      return splitVectorIntBinary(Op, DAG, dl);
  
@@ -69,7 +69,7 @@ index b33b01f804..06df6d7895 100644
    if (VT == MVT::v4i32 || VT == MVT::v8i32 || VT == MVT::v16i32) {
      assert((VT == MVT::v4i32 && Subtarget.hasSSE2()) ||
             (VT == MVT::v8i32 && Subtarget.hasInt256()) ||
-@@ -34317,6 +34339,8 @@ SDValue X86TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
+@@ -34321,6 +34343,8 @@ SDValue X86TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
    case ISD::MUL:                return LowerMUL(Op, Subtarget, DAG);
    case ISD::MULHS:
    case ISD::MULHU:              return LowerMULH(Op, Subtarget, DAG);
@@ -79,7 +79,7 @@ index b33b01f804..06df6d7895 100644
    case ISD::ROTR:               return LowerRotate(Op, Subtarget, DAG);
    case ISD::SRA:
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 717725652b..de2fa9d19b 100644
+index e629bbb60..af9eba09e 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -450,6 +450,16 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(

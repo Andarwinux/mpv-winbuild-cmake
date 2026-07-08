@@ -42,6 +42,7 @@ ExternalProject_Add(llvm-host-libcxx
         -DLIBCXXABI_ENABLE_ASSERTIONS=OFF
         -DLIBUNWIND_ENABLE_ASSERTIONS=OFF
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
+        -DLIBCXX_EXTRA_SITE_DEFINES='_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS^^_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS'
         "-DCMAKE_C_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"
         "-DCMAKE_CXX_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo} -frtti'"
         "-DCMAKE_ASM_FLAGS='${tc_cflags} ${tc_compiler_rt} ${llvm_pgo}'"

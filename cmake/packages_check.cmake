@@ -49,9 +49,9 @@ if(TARGET_CPU STREQUAL "x86_64")
         -DHAVE_SMMINTRIN_H=ON
         -DHAVE_SSE_INTRINSICS=ON
         -DHAVE_XMMINTRIN_H=ON
-        -DHAVE_GCC_GET_CPUID=ON
-        -DHAVE_CPUID_H=ON
-        -DHAVE_CPUID_INTRINSIC=ON
+        -DHAVE_GCC_GET_CPUID=OFF
+        -DHAVE_CPUID_H=OFF
+        -DHAVE_CPUID_INTRINSIC=OFF
     )
     set(libwebp_force_skip_check
         -DWEBP_HAVE_FLAG_AVX2=ON

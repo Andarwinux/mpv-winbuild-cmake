@@ -7,7 +7,7 @@ cmake -DTARGET_ARCH=x86_64-w64-mingw32 \
 -DENABLE_CCACHE=OFF \
 -DCLANG_PACKAGES_PGO=GEN \
 -DCLANG_FLAGS="" \
--DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather -Xclang -target-feature -Xclang +fast-dpwssd -Wl,-mllvm,-lv-strided-pointer-ivs,-mllvm,-enable-loadstore-runtime-interleave=false" \
+-DTOOLCHAIN_FLAGS="-mprefer-vector-width=256 -mno-gather -Xclang -target-feature -Xclang +fast-dpwssd -Xclang -target-feature -Xclang +fast-lzcnt -Xclang -target-feature -Xclang +fast-bextr -Xclang -target-feature -Xclang +fast-movbe -Xclang -target-feature -Xclang +fast-imm16 -Wl,-mllvm,-lv-strided-pointer-ivs,-mllvm,-enable-loadstore-runtime-interleave=false" \
 -DCUSTOM_LIBCXX=ON \
 -DCUSTOM_COMPILER_RT=ON \
 -G Ninja \

@@ -5,7 +5,7 @@ ExternalProject_Add(libtorrent
         openssl
     GIT_REPOSITORY https://github.com/arvidn/libtorrent.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --shallow-submodules --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --shallow-submodules --filter=tree:0"
     GIT_CONFIG "submodule.recurse=true"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin

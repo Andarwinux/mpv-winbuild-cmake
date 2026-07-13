@@ -25,7 +25,6 @@ ExternalProject_Add(ffmpeg
         libxml2
         libvpl
         libjxl
-        shaderc
         libplacebo
         libaribcaption
         aom
@@ -108,7 +107,6 @@ ExternalProject_Add(ffmpeg
         --enable-libopus
         --enable-libplacebo
         --enable-librubberband
-        --enable-libshaderc
         --enable-libspeex
         --enable-libsrt
         --enable-libssh

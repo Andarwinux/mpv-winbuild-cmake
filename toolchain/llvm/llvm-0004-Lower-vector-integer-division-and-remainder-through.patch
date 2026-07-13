@@ -1,4 +1,4 @@
-From 703aeea43430eca4895cfdc3ca37f636fad1a477 Mon Sep 17 00:00:00 2001
+From 618eeb86a0204c2d2e5cdfd1761f9c0fa7940465 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Fri, 3 Jul 2026 08:32:52 +0000
 Subject: [PATCH] Lower vector integer division and remainder through float
@@ -6,14 +6,14 @@ Subject: [PATCH] Lower vector integer division and remainder through float
 
 ---
  llvm/lib/Target/X86/X86ISelLowering.cpp       | 165 ++++++++++++++++++
- .../lib/Target/X86/X86TargetTransformInfo.cpp | 108 ++++++++++++
- 2 files changed, 273 insertions(+)
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 120 ++++++++++++-
+ 2 files changed, 279 insertions(+), 6 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index ebd957bfc..82f4f349e 100644
+index 7bcd9d6b80..b110512e75 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -2841,6 +2841,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+@@ -2825,6 +2825,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
                         ISD::FP_TO_UINT_SAT,
                         ISD::SETCC,
                         ISD::MUL,
@@ -28,7 +28,7 @@ index ebd957bfc..82f4f349e 100644
                         ISD::XOR,
                         ISD::MSCATTER,
                         ISD::MGATHER,
-@@ -50457,6 +50465,155 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50511,6 +50519,155 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -184,7 +184,7 @@ index ebd957bfc..82f4f349e 100644
  static SDValue combineMul(SDNode *N, SelectionDAG &DAG,
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
-@@ -62929,6 +63086,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
+@@ -63000,6 +63157,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
    case X86ISD::SBB:         return combineSBB(N, DAG);
    case X86ISD::ADC:         return combineADC(N, DAG, DCI);
    case ISD::MUL:            return combineMul(N, DAG, DCI, Subtarget);
@@ -200,10 +200,47 @@ index ebd957bfc..82f4f349e 100644
    case ISD::SRA:            return combineShiftRightArithmetic(N, DAG, Subtarget);
    case ISD::SRL:            return combineShiftRightLogical(N, DAG, DCI, Subtarget);
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index af9eba09e..88203b6e0 100644
+index d486659b51..a4b1af65a5 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-@@ -1012,6 +1012,60 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+@@ -424,14 +424,14 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+ 
+   static const CostKindTblEntry AVX512DQUniformConstCostTable[] = {
+     { ISD::SDIV, MVT::v4i64, { 9 } }, // vpmullq-based MULHS sequence
+-    { ISD::SREM, MVT::v4i64, { 17 } }, // vpmullq-based MULHS+mul+sub sequence
++    { ISD::SREM, MVT::v4i64, { 9 } }, // vpmullq-based MULHS+mul+sub sequence
+     { ISD::SDIV, MVT::v8i64, { 9 } }, // vpmullq-based MULHS sequence
+-    { ISD::SREM, MVT::v8i64, { 17 } }, // vpmullq-based MULHS+mul+sub sequence
++    { ISD::SREM, MVT::v8i64, { 9 } }, // vpmullq-based MULHS+mul+sub sequence
+     // The remainder's multiply-back is a single vpmullq with DQ, just like the
+     // pmulld the vXi32 entries above rely on. Without DQ it is another
+     // vpmuludq schoolbook, so the AVX512/AVX2 tables charge more.
+-    { ISD::UREM, MVT::v4i64, { 17 } }, // MULHU + vpmullq + sub sequence
+-    { ISD::UREM, MVT::v8i64, { 17 } }, // MULHU + vpmullq + sub sequence
++    { ISD::UREM, MVT::v4i64, { 9 } }, // MULHU + vpmullq + sub sequence
++    { ISD::UREM, MVT::v8i64, { 9 } }, // MULHU + vpmullq + sub sequence
+   };
+ 
+   if (Op2Info.isUniform() && Op2Info.isConstant() && ST->hasDQI())
+@@ -470,7 +470,7 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::UREM, MVT::v16i32, {  7 } }, // pmuludq+mul+sub sequence
+ 
+     { ISD::UDIV, MVT::v8i64,  { 9 } }, // pmuludq-based MULHU sequence
+-    { ISD::UREM, MVT::v8i64,  { 21 } }, // pmuludq-based MULHU+mul+sub sequence
++    { ISD::UREM, MVT::v8i64,  { 9 } }, // pmuludq-based MULHU+mul+sub sequence
+   };
+ 
+   if (Op2Info.isUniform() && Op2Info.isConstant() && ST->hasAVX512())
+@@ -514,7 +514,7 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::UREM, MVT::v8i32, {  7 } }, // pmuludq+mul+sub sequence
+ 
+     { ISD::UDIV, MVT::v4i64, { 9 } }, // pmuludq-based MULHU sequence
+-    { ISD::UREM, MVT::v4i64, { 21 } }, // pmuludq-based MULHU+mul+sub sequence
++    { ISD::UREM, MVT::v4i64, { 9 } }, // pmuludq-based MULHU+mul+sub sequence
+   };
+ 
+   if (Op2Info.isUniform() && Op2Info.isConstant() && ST->hasAVX2())
+@@ -1033,6 +1033,60 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
      { ISD::FDIV,    MVT::v4f32,   {  3, 11, 1, 1 } }, // Skylake from http://www.agner.org/
      { ISD::FDIV,    MVT::v8f32,   {  5, 11, 1, 1 } }, // Skylake from http://www.agner.org/
      { ISD::FDIV,    MVT::v16f32,  { 10, 18, 1, 3 } }, // Skylake from http://www.agner.org/
@@ -264,7 +301,7 @@ index af9eba09e..88203b6e0 100644
    };
  
    if (ST->hasAVX512())
-@@ -1215,6 +1269,60 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+@@ -1236,6 +1290,60 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
      { ISD::FDIV, MVT::f64,     { 14, 20, 1, 1 } }, // vdivsd
      { ISD::FDIV, MVT::v2f64,   { 14, 20, 1, 1 } }, // vdivpd
      { ISD::FDIV, MVT::v4f64,   { 28, 35, 1, 3 } }, // vdivpd

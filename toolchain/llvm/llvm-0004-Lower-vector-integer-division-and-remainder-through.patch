@@ -1,4 +1,4 @@
-From 618eeb86a0204c2d2e5cdfd1761f9c0fa7940465 Mon Sep 17 00:00:00 2001
+From 845a1aefa5c78463c257ee834ab65cf0717d906a Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Fri, 3 Jul 2026 08:32:52 +0000
 Subject: [PATCH] Lower vector integer division and remainder through float
@@ -10,10 +10,10 @@ Subject: [PATCH] Lower vector integer division and remainder through float
  2 files changed, 279 insertions(+), 6 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index 7bcd9d6b80..b110512e75 100644
+index bb4b13e4fe..80827e3a7f 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -2825,6 +2825,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+@@ -2830,6 +2830,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
                         ISD::FP_TO_UINT_SAT,
                         ISD::SETCC,
                         ISD::MUL,
@@ -28,7 +28,7 @@ index 7bcd9d6b80..b110512e75 100644
                         ISD::XOR,
                         ISD::MSCATTER,
                         ISD::MGATHER,
-@@ -50511,6 +50519,155 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50516,6 +50524,155 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -184,7 +184,7 @@ index 7bcd9d6b80..b110512e75 100644
  static SDValue combineMul(SDNode *N, SelectionDAG &DAG,
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
-@@ -63000,6 +63157,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
+@@ -63002,6 +63159,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
    case X86ISD::SBB:         return combineSBB(N, DAG);
    case X86ISD::ADC:         return combineADC(N, DAG, DCI);
    case ISD::MUL:            return combineMul(N, DAG, DCI, Subtarget);
@@ -200,7 +200,7 @@ index 7bcd9d6b80..b110512e75 100644
    case ISD::SRA:            return combineShiftRightArithmetic(N, DAG, Subtarget);
    case ISD::SRL:            return combineShiftRightLogical(N, DAG, DCI, Subtarget);
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index d486659b51..a4b1af65a5 100644
+index d486659b51..998b8c4e85 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -424,14 +424,14 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
@@ -245,23 +245,23 @@ index d486659b51..a4b1af65a5 100644
      { ISD::FDIV,    MVT::v8f32,   {  5, 11, 1, 1 } }, // Skylake from http://www.agner.org/
      { ISD::FDIV,    MVT::v16f32,  { 10, 18, 1, 3 } }, // Skylake from http://www.agner.org/
 +
-+    { ISD::SDIV,        MVT::v8i64,   { 16 } },
-+    { ISD::SREM,        MVT::v8i64,   { 16 } },
-+    { ISD::UDIV,        MVT::v8i64,   { 16 } },
-+    { ISD::UREM,        MVT::v8i64,   { 16 } },
-+    { ISD::MASKED_SDIV, MVT::v8i64,   { 16 } },
-+    { ISD::MASKED_SREM, MVT::v8i64,   { 16 } },
-+    { ISD::MASKED_UDIV, MVT::v8i64,   { 16 } },
-+    { ISD::MASKED_UREM, MVT::v8i64,   { 16 } },
++    { ISD::SDIV,        MVT::v8i64,   {  8 } },
++    { ISD::SREM,        MVT::v8i64,   {  8 } },
++    { ISD::UDIV,        MVT::v8i64,   {  8 } },
++    { ISD::UREM,        MVT::v8i64,   {  8 } },
++    { ISD::MASKED_SDIV, MVT::v8i64,   {  8 } },
++    { ISD::MASKED_SREM, MVT::v8i64,   {  8 } },
++    { ISD::MASKED_UDIV, MVT::v8i64,   {  8 } },
++    { ISD::MASKED_UREM, MVT::v8i64,   {  8 } },
 +
-+    { ISD::SDIV,        MVT::v4i64,   {  8 } },
-+    { ISD::SREM,        MVT::v4i64,   {  8 } },
-+    { ISD::UDIV,        MVT::v4i64,   {  8 } },
-+    { ISD::UREM,        MVT::v4i64,   {  8 } },
-+    { ISD::MASKED_SDIV, MVT::v4i64,   {  8 } },
-+    { ISD::MASKED_SREM, MVT::v4i64,   {  8 } },
-+    { ISD::MASKED_UDIV, MVT::v4i64,   {  8 } },
-+    { ISD::MASKED_UREM, MVT::v4i64,   {  8 } },
++    { ISD::SDIV,        MVT::v4i64,   {  4 } },
++    { ISD::SREM,        MVT::v4i64,   {  4 } },
++    { ISD::UDIV,        MVT::v4i64,   {  4 } },
++    { ISD::UREM,        MVT::v4i64,   {  4 } },
++    { ISD::MASKED_SDIV, MVT::v4i64,   {  4 } },
++    { ISD::MASKED_SREM, MVT::v4i64,   {  4 } },
++    { ISD::MASKED_UDIV, MVT::v4i64,   {  4 } },
++    { ISD::MASKED_UREM, MVT::v4i64,   {  4 } },
 +
 +    { ISD::SDIV,        MVT::v2i64,   {  4 } },
 +    { ISD::SREM,        MVT::v2i64,   {  4 } },
@@ -272,32 +272,32 @@ index d486659b51..a4b1af65a5 100644
 +    { ISD::MASKED_UDIV, MVT::v2i64,   {  4 } },
 +    { ISD::MASKED_UREM, MVT::v2i64,   {  4 } },
 +
-+    { ISD::SDIV,        MVT::v16i32,  { 16 } },
-+    { ISD::SREM,        MVT::v16i32,  { 16 } },
-+    { ISD::UDIV,        MVT::v16i32,  { 16 } },
-+    { ISD::UREM,        MVT::v16i32,  { 16 } },
-+    { ISD::MASKED_SDIV, MVT::v16i32,  { 16 } },
-+    { ISD::MASKED_SREM, MVT::v16i32,  { 16 } },
-+    { ISD::MASKED_UDIV, MVT::v16i32,  { 16 } },
-+    { ISD::MASKED_UREM, MVT::v16i32,  { 16 } },
++    { ISD::SDIV,        MVT::v16i32,  {  8 } },
++    { ISD::SREM,        MVT::v16i32,  {  8 } },
++    { ISD::UDIV,        MVT::v16i32,  {  8 } },
++    { ISD::UREM,        MVT::v16i32,  {  8 } },
++    { ISD::MASKED_SDIV, MVT::v16i32,  {  8 } },
++    { ISD::MASKED_SREM, MVT::v16i32,  {  8 } },
++    { ISD::MASKED_UDIV, MVT::v16i32,  {  8 } },
++    { ISD::MASKED_UREM, MVT::v16i32,  {  8 } },
 +
-+    { ISD::SDIV,        MVT::v32i16,  { 16 } },
-+    { ISD::SREM,        MVT::v32i16,  { 16 } },
-+    { ISD::UDIV,        MVT::v32i16,  { 16 } },
-+    { ISD::UREM,        MVT::v32i16,  { 16 } },
-+    { ISD::MASKED_SDIV, MVT::v32i16,  { 16 } },
-+    { ISD::MASKED_SREM, MVT::v32i16,  { 16 } },
-+    { ISD::MASKED_UDIV, MVT::v32i16,  { 16 } },
-+    { ISD::MASKED_UREM, MVT::v32i16,  { 16 } },
++    { ISD::SDIV,        MVT::v32i16,  {  8 } },
++    { ISD::SREM,        MVT::v32i16,  {  8 } },
++    { ISD::UDIV,        MVT::v32i16,  {  8 } },
++    { ISD::UREM,        MVT::v32i16,  {  8 } },
++    { ISD::MASKED_SDIV, MVT::v32i16,  {  8 } },
++    { ISD::MASKED_SREM, MVT::v32i16,  {  8 } },
++    { ISD::MASKED_UDIV, MVT::v32i16,  {  8 } },
++    { ISD::MASKED_UREM, MVT::v32i16,  {  8 } },
 +
-+    { ISD::SDIV,        MVT::v64i8,   { 16 } },
-+    { ISD::SREM,        MVT::v64i8,   { 16 } },
-+    { ISD::UDIV,        MVT::v64i8,   { 16 } },
-+    { ISD::UREM,        MVT::v64i8,   { 16 } },
-+    { ISD::MASKED_SDIV, MVT::v64i8,   { 16 } },
-+    { ISD::MASKED_SREM, MVT::v64i8,   { 16 } },
-+    { ISD::MASKED_UDIV, MVT::v64i8,   { 16 } },
-+    { ISD::MASKED_UREM, MVT::v64i8,   { 16 } },
++    { ISD::SDIV,        MVT::v64i8,   {  8 } },
++    { ISD::SREM,        MVT::v64i8,   {  8 } },
++    { ISD::UDIV,        MVT::v64i8,   {  8 } },
++    { ISD::UREM,        MVT::v64i8,   {  8 } },
++    { ISD::MASKED_SDIV, MVT::v64i8,   {  8 } },
++    { ISD::MASKED_SREM, MVT::v64i8,   {  8 } },
++    { ISD::MASKED_UDIV, MVT::v64i8,   {  8 } },
++    { ISD::MASKED_UREM, MVT::v64i8,   {  8 } },
    };
  
    if (ST->hasAVX512())
@@ -306,32 +306,32 @@ index d486659b51..a4b1af65a5 100644
      { ISD::FDIV, MVT::v2f64,   { 14, 20, 1, 1 } }, // vdivpd
      { ISD::FDIV, MVT::v4f64,   { 28, 35, 1, 3 } }, // vdivpd
 +
-+    { ISD::SDIV,        MVT::v8i32,   {  8 } },
-+    { ISD::SREM,        MVT::v8i32,   {  8 } },
-+    { ISD::UDIV,        MVT::v8i32,   {  8 } },
-+    { ISD::UREM,        MVT::v8i32,   {  8 } },
-+    { ISD::MASKED_SDIV, MVT::v8i32,   {  8 } },
-+    { ISD::MASKED_SREM, MVT::v8i32,   {  8 } },
-+    { ISD::MASKED_UDIV, MVT::v8i32,   {  8 } },
-+    { ISD::MASKED_UREM, MVT::v8i32,   {  8 } },
++    { ISD::SDIV,        MVT::v8i32,   {  4 } },
++    { ISD::SREM,        MVT::v8i32,   {  4 } },
++    { ISD::UDIV,        MVT::v8i32,   {  4 } },
++    { ISD::UREM,        MVT::v8i32,   {  4 } },
++    { ISD::MASKED_SDIV, MVT::v8i32,   {  4 } },
++    { ISD::MASKED_SREM, MVT::v8i32,   {  4 } },
++    { ISD::MASKED_UDIV, MVT::v8i32,   {  4 } },
++    { ISD::MASKED_UREM, MVT::v8i32,   {  4 } },
 +
-+    { ISD::SDIV,        MVT::v16i16,  {  8 } },
-+    { ISD::SREM,        MVT::v16i16,  {  8 } },
-+    { ISD::UDIV,        MVT::v16i16,  {  8 } },
-+    { ISD::UREM,        MVT::v16i16,  {  8 } },
-+    { ISD::MASKED_SDIV, MVT::v16i16,  {  8 } },
-+    { ISD::MASKED_SREM, MVT::v16i16,  {  8 } },
-+    { ISD::MASKED_UDIV, MVT::v16i16,  {  8 } },
-+    { ISD::MASKED_UREM, MVT::v16i16,  {  8 } },
++    { ISD::SDIV,        MVT::v16i16,  {  4 } },
++    { ISD::SREM,        MVT::v16i16,  {  4 } },
++    { ISD::UDIV,        MVT::v16i16,  {  4 } },
++    { ISD::UREM,        MVT::v16i16,  {  4 } },
++    { ISD::MASKED_SDIV, MVT::v16i16,  {  4 } },
++    { ISD::MASKED_SREM, MVT::v16i16,  {  4 } },
++    { ISD::MASKED_UDIV, MVT::v16i16,  {  4 } },
++    { ISD::MASKED_UREM, MVT::v16i16,  {  4 } },
 +
-+    { ISD::SDIV,        MVT::v32i8,   {  8 } },
-+    { ISD::SREM,        MVT::v32i8,   {  8 } },
-+    { ISD::UDIV,        MVT::v32i8,   {  8 } },
-+    { ISD::UREM,        MVT::v32i8,   {  8 } },
-+    { ISD::MASKED_SDIV, MVT::v32i8,   {  8 } },
-+    { ISD::MASKED_SREM, MVT::v32i8,   {  8 } },
-+    { ISD::MASKED_UDIV, MVT::v32i8,   {  8 } },
-+    { ISD::MASKED_UREM, MVT::v32i8,   {  8 } },
++    { ISD::SDIV,        MVT::v32i8,   {  4 } },
++    { ISD::SREM,        MVT::v32i8,   {  4 } },
++    { ISD::UDIV,        MVT::v32i8,   {  4 } },
++    { ISD::UREM,        MVT::v32i8,   {  4 } },
++    { ISD::MASKED_SDIV, MVT::v32i8,   {  4 } },
++    { ISD::MASKED_SREM, MVT::v32i8,   {  4 } },
++    { ISD::MASKED_UDIV, MVT::v32i8,   {  4 } },
++    { ISD::MASKED_UREM, MVT::v32i8,   {  4 } },
 +
 +    { ISD::SDIV,        MVT::v4i32,   {  4 } },
 +    { ISD::SREM,        MVT::v4i32,   {  4 } },

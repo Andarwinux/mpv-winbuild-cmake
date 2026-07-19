@@ -1,4 +1,4 @@
-From 1ad08afa434144b42a6d08e7555b1b1f42714f92 Mon Sep 17 00:00:00 2001
+From 41419fa94ed7e5c897b36a8f632f76a88a392171 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 26 May 2026 00:00:00 +0000
 Subject: [PATCH] increase avx512 gather/scatter costs
@@ -8,15 +8,15 @@ Subject: [PATCH] increase avx512 gather/scatter costs
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index ad281af05..2e0e448d5 100644
+index e80fd692df..b97911b7a6 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-@@ -6370,14 +6370,14 @@ int X86TTIImpl::getGatherOverhead() const {
+@@ -6435,14 +6435,14 @@ int X86TTIImpl::getGatherOverhead() const {
    // TODO: Remove the explicit hasAVX512()?, That would mean we would only
    // enable gather with a -march.
    if (ST->hasAVX512() || (ST->hasAVX2() && ST->hasFastGather()))
 -    return 2;
-+    return 8;
++    return 16;
  
    return 1024;
  }
@@ -24,10 +24,10 @@ index ad281af05..2e0e448d5 100644
  int X86TTIImpl::getScatterOverhead() const {
    if (ST->hasAVX512())
 -    return 2;
-+    return 4;
++    return 8;
  
    return 1024;
  }
 -- 
-2.54.0
+2.55.0
 

@@ -1,16 +1,16 @@
-From 81afea4e23a70a9b67560093fc1a5c9824c1a65e Mon Sep 17 00:00:00 2001
+From 83f309d903a32dfbf62f189d979c093e9a347ea2 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Fri, 3 Jul 2026 08:32:52 +0000
 Subject: [PATCH] Lower vector integer division and remainder through float
  division
 
 ---
- llvm/lib/Target/X86/X86ISelLowering.cpp       | 200 ++++++++++++++++++
- .../lib/Target/X86/X86TargetTransformInfo.cpp | 120 ++++++++++-
- 2 files changed, 314 insertions(+), 6 deletions(-)
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 210 ++++++++++++++++++
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 120 +++++++++-
+ 2 files changed, 324 insertions(+), 6 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index 791e04deb9..6084afc47c 100644
+index 791e04deb9..2bf05fe889 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
 @@ -2837,6 +2837,14 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
@@ -28,7 +28,7 @@ index 791e04deb9..6084afc47c 100644
                         ISD::XOR,
                         ISD::MSCATTER,
                         ISD::MGATHER,
-@@ -50545,6 +50553,190 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50545,6 +50553,200 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -67,19 +67,26 @@ index 791e04deb9..6084afc47c 100644
 +  if (DAG.isConstantIntBuildVectorOrConstantInt(Divisor))
 +    return SDValue();
 +
-+  // i8/i16/i32: the operands fit the float mantissa exactly so one float
-+  // divide recovers the exact quotient.
-+  if (VT.getScalarSizeInBits() <= 32) {
++  unsigned EltBits = VT.getScalarSizeInBits();
++  auto FitsFP = [&](SDValue V, const fltSemantics &Sem) {
++    unsigned Precision = APFloat::semanticsPrecision(Sem);
++    return IsSigned ? DAG.ComputeNumSignBits(V) + Precision > EltBits
++                    : DAG.computeKnownBits(V).countMaxActiveBits() <= Precision;
++  };
++  auto BothFitFP = [&](const fltSemantics &Sem) {
++    return FitsFP(Dividend, Sem) && FitsFP(Divisor, Sem);
++  };
++  // i64 needs the qq converts which is AVX512DQ only
++  bool NarrowI64 = EltBits == 64 && Subtarget.hasDQI() &&
++                   Subtarget.useAVX512Regs() &&
++                   BothFitFP(APFloat::IEEEdouble());
++
++  // i8/i16/i32 and narrow value i64: the operands fit the float mantissa
++  // exactly so one float divide recovers the exact quotient.
++  if (EltBits <= 32 || NarrowI64) {
 +    // f32 recovers the quotient exactly when both operands fit in 24 bits
-+    unsigned EltBits = VT.getScalarSizeInBits();
-+    unsigned Precision = APFloat::semanticsPrecision(APFloat::IEEEsingle());
-+    auto FitsF32 = [&](SDValue V) {
-+      return IsSigned
-+                 ? DAG.ComputeNumSignBits(V) + Precision > EltBits
-+                 : DAG.computeKnownBits(V).countMaxActiveBits() <= Precision;
-+    };
 +    MVT FPSclVT = MVT::f64;
-+    if (EltBits <= 16 || (FitsF32(Dividend) && FitsF32(Divisor)))
++    if (EltBits <= 16 || BothFitFP(APFloat::IEEEsingle()))
 +      FPSclVT = MVT::f32;
 +    EVT FPVT = VT.changeVectorElementType(*DAG.getContext(), FPSclVT);
 +
@@ -113,7 +120,9 @@ index 791e04deb9..6084afc47c 100644
 +      // raise flags.
 +      unsigned WideElts = 512 / FPSclVT.getSizeInBits(); // 16 f32 or 8 f64
 +      MVT WideFP = MVT::getVectorVT(FPSclVT, WideElts);
-+      MVT WideI = MVT::getVectorVT(MVT::i32, WideElts);
++      // Narrow i64 quotients can pass 2^31 so the f64 tier lands on i64.
++      MVT WideIScl = EltBits == 64 && FPSclVT == MVT::f64 ? MVT::i64 : MVT::i32;
++      MVT WideI = MVT::getVectorVT(WideIScl, WideElts);
 +      SDValue RN = DAG.getTargetConstant(X86::STATIC_ROUNDING::TO_NEAREST_INT,
 +                                         DL, MVT::i32); // {rn-sae}
 +      SDValue Quot =
@@ -121,10 +130,11 @@ index 791e04deb9..6084afc47c 100644
 +                      widenSubVector(X, false, Subtarget, DAG, DL, 512),
 +                      widenSubVector(Y, false, Subtarget, DAG, DL, 512), RN);
 +      unsigned FromFP = IsSigned ? X86ISD::CVTTP2SI_SAE : X86ISD::CVTTP2UI_SAE;
-+      Q = DAG.getNode(FromFP, DL, WideI, Quot); // vcvttp*2dq {sae}
-+      MVT NarrowI = MVT::getVectorVT(MVT::i32, VT.getVectorNumElements());
++      Q = DAG.getNode(FromFP, DL, WideI, Quot); // vcvttp*2dq/qq {sae}
++      MVT NarrowI = MVT::getVectorVT(WideIScl, VT.getVectorNumElements());
 +      Q = extractSubVector(Q, 0, DAG, DL, NarrowI.getSizeInBits());
-+      Q = DAG.getNode(ISD::TRUNCATE, DL, VT, Q);
++      Q = IsSigned ? DAG.getSExtOrTrunc(Q, DL, VT)
++                   : DAG.getZExtOrTrunc(Q, DL, VT);
 +    } else {
 +      unsigned FromFP = IsSigned ? ISD::FP_TO_SINT : ISD::FP_TO_UINT;
 +      Q = DAG.getNode(FromFP, DL, VT, DAG.getNode(ISD::FDIV, DL, FPVT, X, Y));
@@ -219,7 +229,7 @@ index 791e04deb9..6084afc47c 100644
  static SDValue combineMul(SDNode *N, SelectionDAG &DAG,
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
-@@ -63008,6 +63200,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
+@@ -63008,6 +63210,14 @@ SDValue X86TargetLowering::PerformDAGCombine(SDNode *N,
    case X86ISD::SBB:         return combineSBB(N, DAG);
    case X86ISD::ADC:         return combineADC(N, DAG, DCI);
    case ISD::MUL:            return combineMul(N, DAG, DCI, Subtarget);
@@ -235,7 +245,7 @@ index 791e04deb9..6084afc47c 100644
    case ISD::SRA:            return combineShiftRightArithmetic(N, DAG, Subtarget);
    case ISD::SRL:            return combineShiftRightLogical(N, DAG, DCI, Subtarget);
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index d486659b51..998b8c4e85 100644
+index b97911b7a6..77d61fab67 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -424,14 +424,14 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(

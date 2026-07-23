@@ -26,6 +26,7 @@ ExternalProject_Add(libzimg
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
         _FORCE_HIDE_DLLEXPORT=set:1
+        _IS_HONOR_NANS_ENABLED=set:1
         _IS_REASSOC_ALLOWED=set:1
     BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ""

@@ -3,11 +3,10 @@ PROG=@CMAKE_INSTALL_PREFIX@/llvmbin/ld.lld
 POLICY="cache_size_bytes=2g:prune_interval=1m"
 FLAGS="-m @ld_m_flag@"
 FLAGS+=" --no-insert-timestamp --major-os-version=10 --minor-os-version=0 --major-subsystem-version=6 --minor-subsystem-version=2 --file-alignment=4096 --disable-auto-import --disable-runtime-pseudo-reloc -mllvm -disable-auto-upgrade-debug-info -s -Xlink=-debug:none,nodwarf,symtab --stack=1048576,1048576 --thinlto-jobs=all -Xlink=-prefetch-inputs -Xlink=-merge:.buildid=.rdata -Xlink=-merge:.rodata=.rdata"
-unset FLAGS_INIT
+FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o @MINGW_INSTALL_PREFIX@/lib/llvmlibc.a -lsleefgnuabi"
 
 if [ "$_IS_CONFIGURE" == "1" ]; then
     SKIP_OPT="-O0 --lto-O0 --lto-CGO0 -mllvm -import-instr-limit=0 -mllvm -inline-threshold=0 -mllvm -inlinedefault-threshold=0 -mllvm -inlinehint-threshold=0 --no-guard-cf --build-id=none"
-    FLAGS_INIT="-lsleefgnuabi"
     FLAGS+=" @MLLVM_FLAGS_WHEN_CONF@"
 else
     FLAGS+=" --thinlto-cache-dir=@MINGW_INSTALL_PREFIX@/thinlto --thinlto-cache-policy=$POLICY"
@@ -23,7 +22,6 @@ else
         export LLD_IN_TEST=1 #https://github.com/llvm/llvm-project/issues/52861
     fi
     FLAGS+=" @LLD_FLAGS@ $EXTRA_LDFLAGS"
-    FLAGS_INIT="@MINGW_INSTALL_PREFIX@/lib/sleefmath.o @MINGW_INSTALL_PREFIX@/lib/llvmlibc.a -lsleefgnuabi"
 fi
 
 if [ "@CLANG_PACKAGES_PGO@" == "CSGEN" ]; then

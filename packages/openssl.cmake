@@ -8,6 +8,7 @@ ExternalProject_Add(openssl
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
+    GIT_RESET d8bf6cdd4849925c30e4f1911c7acb49cb34b702
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""

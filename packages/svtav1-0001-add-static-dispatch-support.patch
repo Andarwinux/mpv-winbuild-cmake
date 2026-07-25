@@ -1,4 +1,4 @@
-From 7b52ced98e5637748c5a3096175ba034dbffd0d5 Mon Sep 17 00:00:00 2001
+From 4d70f4c7f17dc0c8738b8ba8b6dafd4629e4a6e7 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Wed, 31 Dec 2025 00:00:00 +0000
 Subject: [PATCH] add static dispatch support
@@ -277,7 +277,7 @@ index 3dd97b3..4eda70b 100644
      %define mmsize 16
      %define num_mmregs 8
 diff --git a/Source/Lib/Codec/aom_dsp_rtcd.c b/Source/Lib/Codec/aom_dsp_rtcd.c
-index 59cbac0..430b062 100644
+index d1f4713..7100ecf 100644
 --- a/Source/Lib/Codec/aom_dsp_rtcd.c
 +++ b/Source/Lib/Codec/aom_dsp_rtcd.c
 @@ -41,13 +41,13 @@
@@ -301,7 +301,7 @@ index 59cbac0..430b062 100644
      SET_FUNCTION(ptr, avx, EB_CPU_FLAGS_AVX)                                                   \
      SET_FUNCTION(ptr, avx2, EB_CPU_FLAGS_AVX2)                                                 \
      SET_FUNCTION_AVX512(ptr, avx512)
-@@ -189,7 +189,37 @@ void svt_aom_setup_rtcd_internal(EbCpuFlags flags) {
+@@ -223,7 +223,37 @@ void svt_aom_setup_rtcd_internal(EbCpuFlags flags) {
      /** Should be done during library initialization,
          but for safe limiting cpu flags again. */
  #if defined ARCH_X86_64 || defined ARCH_AARCH64
@@ -341,7 +341,7 @@ index 59cbac0..430b062 100644
      flags = 0;
      //to use C: flags=0
 diff --git a/Source/Lib/Codec/common_dsp_rtcd.c b/Source/Lib/Codec/common_dsp_rtcd.c
-index a457b39..5637e26 100644
+index eee4ebe..78a3df4 100644
 --- a/Source/Lib/Codec/common_dsp_rtcd.c
 +++ b/Source/Lib/Codec/common_dsp_rtcd.c
 @@ -257,10 +257,26 @@ EbCpuFlags svt_aom_get_cpu_flags() {
@@ -432,17 +432,17 @@ index a457b39..5637e26 100644
  #else
      flags = 0;
      //to use C: flags=0
-@@ -575,8 +621,8 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
-     SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_2d_copy, svt_av1_jnt_convolve_2d_copy_c, svt_av1_jnt_convolve_2d_copy_sse2, svt_av1_jnt_convolve_2d_copy_avx2, svt_av1_jnt_convolve_2d_copy_avx512);
+@@ -587,8 +633,8 @@ void svt_aom_setup_common_rtcd_internal(EbCpuFlags flags) {
      SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_x, svt_av1_jnt_convolve_x_c, svt_av1_jnt_convolve_x_sse2, svt_av1_jnt_convolve_x_avx2, svt_av1_jnt_convolve_x_avx512);
      SET_SSE2_AVX2_AVX512(svt_av1_jnt_convolve_y, svt_av1_jnt_convolve_y_c, svt_av1_jnt_convolve_y_sse2, svt_av1_jnt_convolve_y_avx2, svt_av1_jnt_convolve_y_avx512);
+ #endif // CONFIG_ENABLE_INTER_COMPOUND
 -    SET_SSSE3_AVX2(svt_aom_convolve8_horiz, svt_aom_convolve8_horiz_c, svt_aom_convolve8_horiz_ssse3, svt_aom_convolve8_horiz_avx2);
 -    SET_SSSE3_AVX2(svt_aom_convolve8_vert, svt_aom_convolve8_vert_c, svt_aom_convolve8_vert_ssse3, svt_aom_convolve8_vert_avx2);
 +    SET_ONLY_C(svt_aom_convolve8_horiz, svt_aom_convolve8_horiz_c);
 +    SET_ONLY_C(svt_aom_convolve8_vert, svt_aom_convolve8_vert_c);
+ #if CONFIG_ENABLE_INTER_COMPOUND
      SET_SSE41_AVX2(svt_av1_build_compound_diffwtd_mask, svt_av1_build_compound_diffwtd_mask_c, svt_av1_build_compound_diffwtd_mask_sse4_1, svt_av1_build_compound_diffwtd_mask_avx2);
- #if CONFIG_ENABLE_HIGH_BIT_DEPTH
-     SET_SSSE3_AVX2(svt_av1_build_compound_diffwtd_mask_highbd, svt_av1_build_compound_diffwtd_mask_highbd_c, svt_av1_build_compound_diffwtd_mask_highbd_ssse3, svt_av1_build_compound_diffwtd_mask_highbd_avx2);
+ #endif
 -- 
-2.54.0
+2.55.0
 

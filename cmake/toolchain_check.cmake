@@ -66,6 +66,10 @@ if(TARGET_CPU STREQUAL "x86_64")
             if(MARCH_HAS_AVX512VNNI)
                 set(OPT_FLAGS "${OPT_FLAGS} -Xclang -target-feature -Xclang +fast-dpwssd")
             endif()
+            set(libcxx_vector_width
+                COMMAND ${EXEC} sed -i [['s/__native_vector_size = 32/__native_vector_size = 64/g']] <SOURCE_DIR>/libcxx/include/__algorithm/simd_utils.h
+                COMMAND ${EXEC} sed -i [['s/__native_vector_size = 32/__native_vector_size = 64/g']] <SOURCE_DIR>/libcxx/include/__cxx03/__algorithm/simd_utils.h
+            )
         else()
             set(MLLVM_FLAGS "${MLLVM_FLAGS} -mllvm -enable-loadstore-runtime-interleave=false")
             set(LLVM_ENABLE_UNSAFE_X86_AVX512_VFABI OFF)
@@ -74,6 +78,9 @@ if(TARGET_CPU STREQUAL "x86_64")
             else()
                 set(OPT_FLAGS "${OPT_FLAGS} -Xclang -target-feature -Xclang +fast-dpwssd")
             endif()
+            set(libcxx_vector_width
+                COMMAND true
+            )
         endif()
     endif()
     if(MARCH_HAS_APX)
@@ -137,6 +144,9 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     if(MARCH_HAS_CSSC)
         set(ARCH_FLAGS_FORCE "${ARCH_FLAGS_FORCE} -Xclang -target-feature -Xclang +cssc")
     endif()
+    set(libcxx_vector_width
+        COMMAND true
+    )
 endif()
 
 if(LLVM_ENABLE_UNSAFE_X86_AVX512_VFABI)

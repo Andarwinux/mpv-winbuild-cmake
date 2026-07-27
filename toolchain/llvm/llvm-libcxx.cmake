@@ -42,7 +42,9 @@ ExternalProject_Add(llvm-libcxx
         _IS_EXCEPTIONS_ALLOWED=set:1
         _FULL_DEBUGINFO=set:1
         _NOCCACHE=set:1
-    BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+    BUILD_COMMAND ""
+    ${libcxx_vector_width}
+    COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libc++.a ${MINGW_INSTALL_PREFIX}/lib/libstdc++.a
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

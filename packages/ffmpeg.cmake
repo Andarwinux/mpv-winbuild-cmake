@@ -46,6 +46,7 @@ ExternalProject_Add(ffmpeg
         libsdl2
         whisper
         x265
+        curl
     GIT_REPOSITORY https://github.com/Andarwinux/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -91,6 +92,7 @@ ExternalProject_Add(ffmpeg
         --enable-libass
         --enable-libbluray
         --enable-libcodec2
+        --enable-libcurl
         --enable-libdav1d
         --enable-libdvdnav
         --enable-libdvdread

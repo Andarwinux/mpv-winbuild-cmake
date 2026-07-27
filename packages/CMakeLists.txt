@@ -84,13 +84,13 @@ list(APPEND ep
     codec2
     ggml
     whisper
-    ffmpeg
     ngtcp2
     nghttp3
     nghttp2
     c-ares
     libpsl
     curl
+    ffmpeg
     mpv
     mpv-debug-plugin
     mpv-menu-plugin

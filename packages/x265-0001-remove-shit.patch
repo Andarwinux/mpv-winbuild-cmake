@@ -1,4 +1,4 @@
-From f72728f6e3306707f8b59aeab35c30594dd4f114 Mon Sep 17 00:00:00 2001
+From af673b1372f9f70e8b874ca61f76950b4a429c3d Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 10 May 2026 00:00:00 +0000
 Subject: [PATCH] remove shit
@@ -7,12 +7,13 @@ Subject: [PATCH] remove shit
  source/common/aarch64/asm-primitives.cpp |  60 +++++-
  source/common/cpu.cpp                    | 225 ++++-------------------
  source/common/cpu.h                      |   8 +-
- source/common/x86/asm-primitives.cpp     |  90 ++++++---
+ source/common/vec/vec-primitives.cpp     |   8 +-
+ source/common/x86/asm-primitives.cpp     |  74 ++++----
  source/common/x86/x86inc.asm             |  13 +-
- 5 files changed, 157 insertions(+), 239 deletions(-)
+ 6 files changed, 143 insertions(+), 245 deletions(-)
 
 diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
-index c58e63a91..212a6c15d 100644
+index c58e63a..3b4ef33 100644
 --- a/source/common/aarch64/asm-primitives.cpp
 +++ b/source/common/aarch64/asm-primitives.cpp
 @@ -664,30 +664,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
@@ -27,9 +28,9 @@ index c58e63a91..212a6c15d 100644
  #ifdef HAVE_NEON_DOTPROD
 -    if (cpuMask & X265_CPU_NEON_DOTPROD)
 +    #if defined(__ARM_FEATURE_DOTPROD)
-+        static bool DOTPROD = true;
++        constexpr bool DOTPROD = true;
 +    #else
-+        static bool DOTPROD = false;
++        constexpr bool DOTPROD = false;
 +    #endif
 +    if (DOTPROD)
      {
@@ -39,9 +40,9 @@ index c58e63a91..212a6c15d 100644
  #ifdef HAVE_SVE
 -    if (cpuMask & X265_CPU_SVE)
 +    #if defined(__ARM_FEATURE_SVE)
-+        static bool SVE = true;
++        constexpr bool SVE = true;
 +    #else
-+        static bool SVE = false;
++        constexpr bool SVE = false;
 +    #endif
 +    if (SVE)
      {
@@ -51,9 +52,9 @@ index c58e63a91..212a6c15d 100644
  #ifdef HAVE_SVE2
 -    if (cpuMask & X265_CPU_SVE2)
 +    #if defined(__ARM_FEATURE_SVE2)
-+        static bool SVE2 = true;
++        constexpr bool SVE2 = true;
 +    #else
-+        static bool SVE2 = false;
++        constexpr bool SVE2 = false;
 +    #endif
 +    if (SVE2)
      {
@@ -63,9 +64,9 @@ index c58e63a91..212a6c15d 100644
  #ifdef HAVE_SVE2_BITPERM
 -    if (cpuMask & X265_CPU_SVE2_BITPERM)
 +    #if defined(__ARM_FEATURE_SVE2_BITPERM)
-+        static bool SVE2_BITPERM = true;
++        constexpr bool SVE2_BITPERM = true;
 +    #else
-+        static bool SVE2_BITPERM = false;
++        constexpr bool SVE2_BITPERM = false;
 +    #endif
 +    if (SVE2_BITPERM)
      {
@@ -86,9 +87,9 @@ index c58e63a91..212a6c15d 100644
  #ifdef HAVE_NEON_DOTPROD
 -    if (cpuMask & X265_CPU_NEON_DOTPROD)
 +    #if defined(__ARM_FEATURE_DOTPROD)
-+        static bool DOTPROD = true;
++        constexpr bool DOTPROD = true;
 +    #else
-+        static bool DOTPROD = false;
++        constexpr bool DOTPROD = false;
 +    #endif
 +    if (DOTPROD)
      {
@@ -99,9 +100,9 @@ index c58e63a91..212a6c15d 100644
  #ifdef HAVE_NEON_I8MM
 -    if (cpuMask & X265_CPU_NEON_I8MM)
 +    #if defined(__ARM_FEATURE_MATMUL_INT8)
-+        static bool NEON_I8MM = true;
++        constexpr bool NEON_I8MM = true;
 +    #else
-+        static bool NEON_I8MM = false;
++        constexpr bool NEON_I8MM = false;
 +    #endif
 +    if (NEON_I8MM)
      {
@@ -111,9 +112,9 @@ index c58e63a91..212a6c15d 100644
  #if defined(HAVE_SVE) && HAVE_SVE_BRIDGE
 -    if (cpuMask & X265_CPU_SVE)
 +    #if defined(__ARM_FEATURE_SVE)
-+        static bool SVE = true;
++        constexpr bool SVE = true;
 +    #else
-+        static bool SVE = false;
++        constexpr bool SVE = false;
 +    #endif
 +    if (SVE)
      {
@@ -125,16 +126,16 @@ index c58e63a91..212a6c15d 100644
  #if defined(HAVE_SVE2) && HAVE_SVE_BRIDGE
 -    if (cpuMask & X265_CPU_SVE2)
 +    #if defined(__ARM_FEATURE_SVE2)
-+        static bool SVE2 = true;
++        constexpr bool SVE2 = true;
 +    #else
-+        static bool SVE2 = false;
++        constexpr bool SVE2 = false;
 +    #endif
 +    if (SVE2)
      {
          setupPixelPrimitives_sve2(p);
          setupSaoPrimitives_sve2(p);
 diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
-index 800f51f9f..c2b624af6 100644
+index 3022ae4..3d16e68 100644
 --- a/source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
 @@ -178,194 +178,26 @@ bool detect512()
@@ -377,7 +378,7 @@ index 800f51f9f..c2b624af6 100644
  
      return flags;
 diff --git a/source/common/cpu.h b/source/common/cpu.h
-index ec62eb312..c39c71967 100644
+index ec62eb3..c39c719 100644
 --- a/source/common/cpu.h
 +++ b/source/common/cpu.h
 @@ -36,16 +36,16 @@ extern "C" void PFX(cpu_emms)(void);
@@ -401,8 +402,42 @@ index ec62eb312..c39c71967 100644
  #endif
  
  unsigned long x265_getauxval(unsigned long);
+diff --git a/source/common/vec/vec-primitives.cpp b/source/common/vec/vec-primitives.cpp
+index c1d951c..9bc83d6 100644
+--- a/source/common/vec/vec-primitives.cpp
++++ b/source/common/vec/vec-primitives.cpp
+@@ -64,25 +64,25 @@ void setupIntrinsicMCSTF_avx2(MCSTFPrimitives&);
+ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
+ {
+ #ifdef HAVE_SSE3
+-    if (cpuMask & X265_CPU_SSE3)
++    if (0)
+     {
+         setupIntrinsicDCT_sse3(p);
+     }
+ #endif
+ #ifdef HAVE_SSSE3
+-    if (cpuMask & X265_CPU_SSSE3)
++    if (0)
+     {
+         setupIntrinsicDCT_ssse3(p);
+     }
+ #endif
+ #ifdef HAVE_SSE4
+-    if (cpuMask & X265_CPU_SSE4)
++    if (1)
+     {
+         setupIntrinsicDCT_sse41(p);
+     }
+ #endif
+ #ifdef HAVE_AVX2
+-    if (cpuMask & X265_CPU_AVX2)
++    if (1)
+         setupIntrinsicMCSTF_avx2(mcstfPrim);
+ #endif
+     (void)p;
 diff --git a/source/common/x86/asm-primitives.cpp b/source/common/x86/asm-primitives.cpp
-index bb32f32cd..0025444bc 100644
+index 72a2078..2e24e2e 100644
 --- a/source/common/x86/asm-primitives.cpp
 +++ b/source/common/x86/asm-primitives.cpp
 @@ -912,7 +912,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
@@ -432,7 +467,7 @@ index bb32f32cd..0025444bc 100644
      {
          ASSIGN2(p.scale1D_128to64, scale1D_128to64_ssse3);
          p.scale2D_64to32 = PFX(scale2D_64to32_ssse3);
-@@ -1187,7 +1187,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+@@ -1186,7 +1186,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
          p.fix8Unpack = PFX(cutree_fix8_unpack_ssse3);
          p.fix8Pack = PFX(cutree_fix8_pack_ssse3);
      }
@@ -441,21 +476,16 @@ index bb32f32cd..0025444bc 100644
      {
  #if X86_64
          p.pelFilterLumaStrong[0] = PFX(pelFilterLumaStrong_V_sse4);
-@@ -1330,7 +1330,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+@@ -1329,7 +1329,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
  #endif
      }
  #if X86_64
 -    if (cpuMask & X265_CPU_AVX)
-+    #if defined(__AVX__)
-+        static bool avx = true;
-+    #else
-+        static bool avx = false;
-+    #endif
-+    if (avx)
++    if (1)
      {
          // p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_avx); fails tests
          p.chroma[X265_CSP_I422].pu[CHROMA_422_16x24].satd = PFX(pixel_satd_16x24_avx);
-@@ -1456,17 +1461,17 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+@@ -1455,8 +1455,8 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
          // 64 X N
          p.cu[BLOCK_64x64].copy_sp = (copy_sp_t)PFX(blockcopy_ss_64x64_avx);
  
@@ -466,32 +496,25 @@ index bb32f32cd..0025444bc 100644
  
          p.pu[LUMA_64x16].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x16_avx);
          p.pu[LUMA_64x32].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x32_avx);
-         p.pu[LUMA_64x48].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x48_avx);
+@@ -1464,7 +1464,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
          p.pu[LUMA_64x64].copy_pp = (copy_pp_t)PFX(blockcopy_ss_64x64_avx);
          p.propagateCost = PFX(mbtree_propagate_cost_avx);
--        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
-+        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
      }
 -    if (cpuMask & X265_CPU_XOP)
 +    if (0)
      {
          //p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_xop); this one is broken
          ALL_LUMA_PU(satd, pixel_satd, xop);
-@@ -1478,7 +1483,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+@@ -1475,7 +1475,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.frameInitLowres = PFX(frame_init_lowres_core_xop);
          p.frameInitLowerRes = PFX(frame_init_lowres_core_xop);
-         p.frameSubSampleLuma = PFX(frame_subsample_luma_xop);
      }
 -    if (cpuMask & X265_CPU_AVX2)
-+    #if defined(__AVX2__)
-+        static bool avx2 = true;
-+    #else
-+        static bool avx2 = false;
-+    #endif
-+    if (avx2)
++    if (1)
      {
  #if X265_DEPTH == 12
          ASSIGN_SA8D(avx2);
-@@ -2303,10 +2313,10 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+@@ -2300,8 +2300,8 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
          p.chroma[X265_CSP_I444].pu[LUMA_64x48].filter_vsp = PFX(interp_4tap_vert_sp_64x48_avx2);
          p.chroma[X265_CSP_I444].pu[LUMA_64x64].filter_vsp = PFX(interp_4tap_vert_sp_64x64_avx2);
  
@@ -500,12 +523,9 @@ index bb32f32cd..0025444bc 100644
 +        //p.frameInitLowres = PFX(frame_init_lowres_core_avx2);
 +        //p.frameInitLowerRes = PFX(frame_init_lowres_core_avx2);
  
--        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
-+        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
- 
          p.propagateCost = PFX(mbtree_propagate_cost_avx2);
          p.fix8Unpack = PFX(cutree_fix8_unpack_avx2);
-@@ -2356,13 +2366,18 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+@@ -2351,13 +2351,18 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
          p.cu[LUMA_32x32].sa8d = PFX(pixel_sa8d_32x32_avx2);
  #endif
  
@@ -518,15 +538,41 @@ index bb32f32cd..0025444bc 100644
      }
 -    if (cpuMask & X265_CPU_AVX512)
 +    #if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512CD__)
-+        static bool avx512 = true;
++        constexpr bool avx512 = true;
 +    #else
-+        static bool avx512 = false;
++        constexpr bool avx512 = false;
 +    #endif
 +    if (avx512)
      {
          p.cu[BLOCK_16x16].var = PFX(pixel_var_16x16_avx512);
          p.cu[BLOCK_32x32].calcresidual[NONALIGNED] = PFX(getResidual32_avx512);
-@@ -3209,7 +3224,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -2421,9 +2426,9 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.pu[LUMA_32x64].convert_p2s[NONALIGNED] = PFX(filterPixelToShort_32x64_avx512);
+         p.pu[LUMA_48x64].convert_p2s[NONALIGNED] = PFX(filterPixelToShort_48x64_avx512);
+ 
+-        p.chroma[X265_CSP_I420].pu[CHROMA_420_2x4].p2s[ALIGNED] = PFX(filterPixelToShort_2x4_sse4);
+-        p.chroma[X265_CSP_I420].pu[CHROMA_420_2x8].p2s[ALIGNED] = PFX(filterPixelToShort_2x8_sse4);
+-        p.chroma[X265_CSP_I420].pu[CHROMA_420_6x8].p2s[ALIGNED] = PFX(filterPixelToShort_6x8_sse4);
++        //p.chroma[X265_CSP_I420].pu[CHROMA_420_2x4].p2s[ALIGNED] = PFX(filterPixelToShort_2x4_sse4);
++        //p.chroma[X265_CSP_I420].pu[CHROMA_420_2x8].p2s[ALIGNED] = PFX(filterPixelToShort_2x8_sse4);
++        //p.chroma[X265_CSP_I420].pu[CHROMA_420_6x8].p2s[ALIGNED] = PFX(filterPixelToShort_6x8_sse4);
+         p.chroma[X265_CSP_I420].pu[CHROMA_420_32x8].p2s[NONALIGNED] = PFX(filterPixelToShort_32x8_avx512);
+         p.chroma[X265_CSP_I420].pu[CHROMA_420_32x16].p2s[NONALIGNED] = PFX(filterPixelToShort_32x16_avx512);
+         p.chroma[X265_CSP_I420].pu[CHROMA_420_32x24].p2s[NONALIGNED] = PFX(filterPixelToShort_32x24_avx512);
+@@ -2432,9 +2437,9 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
+         p.chroma[X265_CSP_I422].pu[CHROMA_422_32x32].p2s[NONALIGNED] = PFX(filterPixelToShort_32x32_avx512);
+         p.chroma[X265_CSP_I422].pu[CHROMA_422_32x48].p2s[NONALIGNED] = PFX(filterPixelToShort_32x48_avx512);
+         p.chroma[X265_CSP_I422].pu[CHROMA_422_32x64].p2s[NONALIGNED] = PFX(filterPixelToShort_32x64_avx512);
+-        p.chroma[X265_CSP_I422].pu[CHROMA_422_2x8].p2s[ALIGNED] = PFX(filterPixelToShort_2x8_sse4);
+-        p.chroma[X265_CSP_I422].pu[CHROMA_422_2x16].p2s[ALIGNED] = PFX(filterPixelToShort_2x16_sse4);
+-        p.chroma[X265_CSP_I422].pu[CHROMA_422_6x16].p2s[ALIGNED] = PFX(filterPixelToShort_6x16_sse4);
++        //p.chroma[X265_CSP_I422].pu[CHROMA_422_2x8].p2s[ALIGNED] = PFX(filterPixelToShort_2x8_sse4);
++        //p.chroma[X265_CSP_I422].pu[CHROMA_422_2x16].p2s[ALIGNED] = PFX(filterPixelToShort_2x16_sse4);
++        //p.chroma[X265_CSP_I422].pu[CHROMA_422_6x16].p2s[ALIGNED] = PFX(filterPixelToShort_6x16_sse4);
+         p.chroma[X265_CSP_I444].pu[LUMA_32x8].p2s[NONALIGNED] = PFX(filterPixelToShort_32x8_avx512);
+         p.chroma[X265_CSP_I444].pu[LUMA_32x16].p2s[NONALIGNED] = PFX(filterPixelToShort_32x16_avx512);
+         p.chroma[X265_CSP_I444].pu[LUMA_32x24].p2s[NONALIGNED] = PFX(filterPixelToShort_32x24_avx512);
+@@ -3204,7 +3209,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
      p.scanPosLast = PFX(scanPosLast_x64);
  #endif
  
@@ -535,7 +581,7 @@ index bb32f32cd..0025444bc 100644
      {
          /* We do not differentiate CPUs which support MMX and not SSE2. We only check
           * for SSE2 and then use both MMX and SSE2 functions */
-@@ -3386,7 +3401,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -3380,7 +3385,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
          ALL_LUMA_TU(count_nonzero, count_nonzero, sse2);
          p.propagateCost = PFX(mbtree_propagate_cost_sse2);
      }
@@ -544,7 +590,7 @@ index bb32f32cd..0025444bc 100644
      {
          ALL_CHROMA_420_PU(filter_hpp, interp_4tap_horiz_pp, sse3);
          ALL_CHROMA_422_PU(filter_hpp, interp_4tap_horiz_pp, sse3);
-@@ -3395,7 +3410,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -3389,7 +3394,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
          ALL_CHROMA_422_PU(filter_hps, interp_4tap_horiz_ps, sse3);
          ALL_CHROMA_444_PU(filter_hps, interp_4tap_horiz_ps, sse3);
      }
@@ -553,7 +599,7 @@ index bb32f32cd..0025444bc 100644
      {
          p.pu[LUMA_8x16].sad_x3 = PFX(pixel_sad_x3_8x16_ssse3);
          p.pu[LUMA_8x32].sad_x3 = PFX(pixel_sad_x3_8x32_ssse3);
-@@ -3490,7 +3505,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -3482,7 +3487,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
          p.fix8Unpack = PFX(cutree_fix8_unpack_ssse3);
          p.fix8Pack = PFX(cutree_fix8_pack_ssse3);
      }
@@ -562,21 +608,16 @@ index bb32f32cd..0025444bc 100644
      {
          p.sign = PFX(calSign_sse4);
          p.saoCuOrgE0 = PFX(saoCuOrgE0_sse4);
-@@ -3600,7 +3615,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -3592,7 +3597,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
  #endif
          p.costCoeffRemain = PFX(costCoeffRemain_sse4);
      }
 -    if (cpuMask & X265_CPU_AVX)
-+    #if defined(__AVX__)
-+        static bool avx = true;
-+    #else
-+        static bool avx = false;
-+    #endif
-+    if (avx)
++    if (1)
      {
          p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_avx);
          p.chroma[X265_CSP_I422].pu[CHROMA_422_16x24].satd = PFX(pixel_satd_16x24_avx);
-@@ -3698,12 +3718,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -3690,11 +3695,11 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
  
          p.pu[LUMA_48x64].copy_pp = PFX(blockcopy_pp_48x64_avx);
  
@@ -585,29 +626,22 @@ index bb32f32cd..0025444bc 100644
 +        //p.frameInitLowres = PFX(frame_init_lowres_core_avx);
 +        //p.frameInitLowerRes = PFX(frame_init_lowres_core_avx);
          p.propagateCost = PFX(mbtree_propagate_cost_avx);
--        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
-+        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx);
      }
 -    if (cpuMask & X265_CPU_XOP)
 +    if (0)
      {
          //p.pu[LUMA_4x4].satd = p.cu[BLOCK_4x4].sa8d = PFX(pixel_satd_4x4_xop); this one is broken
          ALL_LUMA_PU(satd, pixel_satd, xop);
-@@ -3717,7 +3737,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -3707,7 +3712,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
  
      }
  #if X86_64
 -    if (cpuMask & X265_CPU_AVX2)
-+    #if defined(__AVX2__)
-+        static bool avx2 = true;
-+    #else
-+        static bool avx2 = false;
-+    #endif
-+    if (avx2)
++    if (1)
      {
          p.cu[BLOCK_16x16].sse_ss = (pixel_sse_ss_t)PFX(pixel_ssd_ss_16x16_avx2);
          p.cu[BLOCK_32x32].sse_ss = (pixel_sse_ss_t)PFX(pixel_ssd_ss_32x32_avx2);
-@@ -4688,17 +4713,17 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -4678,15 +4683,15 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
          p.chroma[X265_CSP_I444].pu[LUMA_64x32].filter_vpp = PFX(interp_4tap_vert_pp_64x32_avx2);
          p.chroma[X265_CSP_I444].pu[LUMA_64x16].filter_vpp = PFX(interp_4tap_vert_pp_64x16_avx2);
  
@@ -621,30 +655,27 @@ index bb32f32cd..0025444bc 100644
          p.saoCuStatsE2 = PFX(saoCuStatsE2_avx2);
          p.saoCuStatsE3 = PFX(saoCuStatsE3_avx2);
  
--        p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
-+        //p.frameSubSampleLuma = PFX(frame_subsample_luma_avx2);
- 
 -        if (cpuMask & X265_CPU_BMI2)
 +        if (1)
          {
              p.scanPosLast = PFX(scanPosLast_avx2_bmi2);
              p.costCoeffNxN = PFX(costCoeffNxN_avx2_bmi2);
-@@ -4754,7 +4779,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
+@@ -4742,7 +4747,12 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main
          p.cu[BLOCK_64x64].normFact = PFX(normFact64_avx2);
  
      }
 -    if (cpuMask & X265_CPU_AVX512)
 +    #if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512CD__)
-+        static bool avx512 = true;
++        constexpr bool avx512 = true;
 +    #else
-+        static bool avx512 = false;
++        constexpr bool avx512 = false;
 +    #endif
 +    if (avx512)
      {
          p.pu[LUMA_32x8].sad = PFX(pixel_sad_32x8_avx512);
        //  p.pu[LUMA_32x16].sad = PFX(pixel_sad_32x16_avx512);
 diff --git a/source/common/x86/x86inc.asm b/source/common/x86/x86inc.asm
-index 4e0edf650..74ba5b773 100644
+index 4e0edf6..74ba5b7 100644
 --- a/source/common/x86/x86inc.asm
 +++ b/source/common/x86/x86inc.asm
 @@ -357,7 +357,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
@@ -689,5 +720,5 @@ index 4e0edf650..74ba5b773 100644
      %define mmsize 16
      %define mova movdqa
 -- 
-2.54.0
+2.55.0
 

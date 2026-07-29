@@ -218,8 +218,8 @@ index 14327197c..29c12353f 100644
 +TLI_DEFINE_VECFUNC("fmod", "_ZGVbN2vv_fmod", FIXED(2), "_ZGV_LLVM_N2vv")
 +TLI_DEFINE_VECFUNC("fmod", "_ZGVdN4vv_fmod", FIXED(4), "_ZGV_LLVM_N4vv")
 +
-+TLI_DEFINE_VECFUNC("fmodf", "_ZGVbN4vv_fmod", FIXED(4), "_ZGV_LLVM_N4vv")
-+TLI_DEFINE_VECFUNC("fmodf", "_ZGVdN8vv_fmod", FIXED(8), "_ZGV_LLVM_N8vv")
++TLI_DEFINE_VECFUNC("fmodf", "_ZGVbN4vv_fmodf", FIXED(4), "_ZGV_LLVM_N4vv")
++TLI_DEFINE_VECFUNC("fmodf", "_ZGVdN8vv_fmodf", FIXED(8), "_ZGV_LLVM_N8vv")
 +
 +TLI_DEFINE_VECFUNC("sincos", "_ZGVbN2vl8l8_sincos_u35", FIXED(2), "_ZGV_LLVM_N2vl8l8")
 +TLI_DEFINE_VECFUNC("sincos", "_ZGVdN4vl8l8_sincos_u35", FIXED(4), "_ZGV_LLVM_N4vl8l8")

@@ -87,7 +87,7 @@ ExternalProject_Add(sleef
             COMMAND ${EXEC} "echo 'Libs: -lsleef -lsleefdft' >> ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc"
             COMMAND ${EXEC} cp ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleef.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/sleefdft.pc
             COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/sleefmath.c <BINARY_DIR>/sleefmath.c
-            COMMAND ${EXEC} ${TARGET_ARCH}-clang -c sleefmath.c -o ${MINGW_INSTALL_PREFIX}/lib/sleefmath.o
+            COMMAND ${EXEC} _IS_FP_CONTRACT_FAST=0 ${TARGET_ARCH}-clang -c sleefmath.c -o ${MINGW_INSTALL_PREFIX}/lib/sleefmath.o
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

@@ -1,9 +1,10 @@
 ExternalProject_Add(libpsl
     GIT_REPOSITORY https://github.com/rockdaboot/libpsl.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/fuzz !tests !tools tools/meson.build"
+    GIT_RESET aa3a80e18f25caf3916636c8668dcc0fff7c016d
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

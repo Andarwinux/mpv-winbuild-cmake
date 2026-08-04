@@ -18,7 +18,7 @@ ExternalProject_Add(cppwinrt
         "-DCMAKE_CXX_FLAGS='-include algorithm -include functional -include chrono'"
     BUILD_COMMAND ${EXEC_HOST} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} --install <BINARY_DIR>
-            COMMAND ${EXEC_HOST} wget -O <BINARY_DIR>/Windows.winmd  https://github.com/microsoft/windows-rs/raw/master/crates/libs/bindgen/default/Windows.winmd
+            COMMAND ${EXEC_HOST} wget -O <BINARY_DIR>/Windows.winmd  https://github.com/microsoft/windows-rs/raw/master/crates/libs/default/Windows.winmd
             COMMAND ${EXEC_HOST} cppwinrt -input <BINARY_DIR>/Windows.winmd -output ${MINGW_INSTALL_PREFIX}/include/
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )

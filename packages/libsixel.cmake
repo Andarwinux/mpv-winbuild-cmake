@@ -3,11 +3,12 @@ ExternalProject_Add(libsixel
         lcms2
     GIT_REPOSITORY https://github.com/saitoha/libsixel.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !php !python !perl !wic !quicklook-extension !assessment !build-aux !m4 !tests !fuzz !examples !images images/meson.build fuzz/meson.build examples/meson.build python/meson.build assessment/meson.build"
     PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/libsixel-*.patch
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    GIT_RESET e14efd31500ebde3e669e2cf45fadbc85fc58fd5
     GIT_REMOTE_NAME origin
     GIT_TAG develop
     CONFIGURE_ENVIRONMENT_MODIFICATION

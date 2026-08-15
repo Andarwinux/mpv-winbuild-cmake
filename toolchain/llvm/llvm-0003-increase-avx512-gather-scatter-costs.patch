@@ -16,7 +16,7 @@ index e80fd692df..b97911b7a6 100644
    // enable gather with a -march.
    if (ST->hasAVX512() || (ST->hasAVX2() && ST->hasFastGather()))
 -    return 2;
-+    return 16;
++    return 10;
  
    return 1024;
  }
@@ -24,7 +24,7 @@ index e80fd692df..b97911b7a6 100644
  int X86TTIImpl::getScatterOverhead() const {
    if (ST->hasAVX512())
 -    return 2;
-+    return 16;
++    return 10;
  
    return 1024;
  }

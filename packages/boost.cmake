@@ -1,6 +1,6 @@
 ExternalProject_Add(boost
-    URL https://github.com/boostorg/boost/releases/download/boost-1.92.0.beta1/boost-1.92.0.beta1-b2-nodocs.tar.xz
-    URL_HASH SHA256=97bcc12929a59c83d4c9505bc46790f0fef4ef5d1749ce9499d770ada0ef1b82
+    URL https://github.com/boostorg/boost/releases/download/boost-1.92.0/boost-1.92.0-b2-nodocs.tar.xz
+    URL_HASH SHA256=ea7b982002cc9dfbe59b0b217b206f470dc75f3de0bb2973d844118934d82411
     DOWNLOAD_DIR ${SOURCE_LOCATION}
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

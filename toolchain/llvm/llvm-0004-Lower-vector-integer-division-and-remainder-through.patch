@@ -1,18 +1,18 @@
-From d8a03b28ff8c9f786aedeb4f99f1f7853013847f Mon Sep 17 00:00:00 2001
+From b365903b45e3621e5076c8711ee394ac38fcbaa9 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Sat, 8 Aug 2026 23:34:33 +0000
 Subject: [PATCH] Lower i64 vector div/rem through FP reciprocal
 
 ---
- llvm/lib/Target/X86/X86ISelLowering.cpp       | 207 +++++++++++++----
- .../lib/Target/X86/X86TargetTransformInfo.cpp | 214 ++++++++++++++++++
- 2 files changed, 371 insertions(+), 50 deletions(-)
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 235 +++++++++++++-----
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 214 ++++++++++++++++
+ 2 files changed, 385 insertions(+), 64 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index 0dc3340a13..a3a2d86551 100644
+index 922657ca9..13391a8df 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -50711,59 +50711,16 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50716,73 +50716,16 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -48,10 +48,24 @@ index 0dc3340a13..a3a2d86551 100644
 -  bool IsSigned = Opc == ISD::SDIV || Opc == ISD::SREM;
 -
 -  // If the result is only read back as scalar extracts, scalarization computes
--  // just the demanded lanes.
--  if (all_of(N->users(), [](const SDNode *U) {
--        return U->getOpcode() == ISD::EXTRACT_VECTOR_ELT;
--      }))
+-  // just the demanded lanes. Keep the vector operation when every lane is
+-  // extracted, which occurs when non-power-of-two vectors are returned.
+-  APInt ExtractedElts = APInt::getZero(VT.getVectorNumElements());
+-  bool OnlyExtracts = true;
+-  for (const SDNode *U : N->users()) {
+-    if (U->getOpcode() != ISD::EXTRACT_VECTOR_ELT) {
+-      OnlyExtracts = false;
+-      break;
+-    }
+-    auto *Idx = dyn_cast<ConstantSDNode>(U->getOperand(1));
+-    if (!Idx)
+-      continue;
+-    const APInt &IdxVal = Idx->getAPIntValue();
+-    if (IdxVal.uge(VT.getVectorNumElements()))
+-      continue;
+-    ExtractedElts.setBit(IdxVal.getZExtValue());
+-  }
+-  if (OnlyExtracts && !ExtractedElts.isAllOnes())
 -    return SDValue();
 -
 -  // Magic multiply lowers constant divisors cheaper than a divide.
@@ -79,7 +93,7 @@ index 0dc3340a13..a3a2d86551 100644
    EVT FPVT = VT.changeVectorElementType(*DAG.getContext(), FPSclVT);
  
    bool IsStrict = DAG.getMachineFunction().getFunction().hasFnAttribute(
-@@ -50831,6 +50788,156 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
+@@ -50850,6 +50793,170 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
                       DAG.getNode(ISD::MUL, DL, VT, Q, Divisor));
  }
  
@@ -190,10 +204,24 @@ index 0dc3340a13..a3a2d86551 100644
 +  bool IsSigned = Opc == ISD::SDIV || Opc == ISD::SREM;
 +
 +  // If the result is only read back as scalar extracts, scalarization computes
-+  // just the demanded lanes.
-+  if (all_of(N->users(), [](const SDNode *U) {
-+        return U->getOpcode() == ISD::EXTRACT_VECTOR_ELT;
-+      }))
++  // just the demanded lanes. Keep the vector operation when every lane is
++  // extracted, which occurs when non-power-of-two vectors are returned.
++  APInt ExtractedElts = APInt::getZero(VT.getVectorNumElements());
++  bool OnlyExtracts = true;
++  for (const SDNode *U : N->users()) {
++    if (U->getOpcode() != ISD::EXTRACT_VECTOR_ELT) {
++      OnlyExtracts = false;
++      break;
++    }
++    auto *Idx = dyn_cast<ConstantSDNode>(U->getOperand(1));
++    if (!Idx)
++      continue;
++    const APInt &IdxVal = Idx->getAPIntValue();
++    if (IdxVal.uge(VT.getVectorNumElements()))
++      continue;
++    ExtractedElts.setBit(IdxVal.getZExtValue());
++  }
++  if (OnlyExtracts && !ExtractedElts.isAllOnes())
 +    return SDValue();
 +
 +  // Magic multiply lowers constant divisors cheaper than a divide.
@@ -237,7 +265,7 @@ index 0dc3340a13..a3a2d86551 100644
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 1a138c7e26..416efadb75 100644
+index 9ba3d7036..3e61d2f9e 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -753,6 +753,220 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(

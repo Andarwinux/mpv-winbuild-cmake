@@ -1,18 +1,18 @@
-From b365903b45e3621e5076c8711ee394ac38fcbaa9 Mon Sep 17 00:00:00 2001
+From b7be8bbc51e6fa007cee6c5e5667bd9393f43ee4 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
-Date: Sat, 8 Aug 2026 23:34:33 +0000
+Date: Thu, 20 Aug 2026 00:00:00 +0000
 Subject: [PATCH] Lower i64 vector div/rem through FP reciprocal
 
 ---
- llvm/lib/Target/X86/X86ISelLowering.cpp       | 235 +++++++++++++-----
- .../lib/Target/X86/X86TargetTransformInfo.cpp | 214 ++++++++++++++++
- 2 files changed, 385 insertions(+), 64 deletions(-)
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 250 +++++++++++++-----
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 217 +++++++++++++++
+ 2 files changed, 403 insertions(+), 64 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index 922657ca9..13391a8df 100644
+index bf435b0c2..35b4afe2d 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -50716,73 +50716,16 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50643,73 +50643,16 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -93,7 +93,7 @@ index 922657ca9..13391a8df 100644
    EVT FPVT = VT.changeVectorElementType(*DAG.getContext(), FPSclVT);
  
    bool IsStrict = DAG.getMachineFunction().getFunction().hasFnAttribute(
-@@ -50850,6 +50793,170 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
+@@ -50777,6 +50720,185 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
                       DAG.getNode(ISD::MUL, DL, VT, Q, Divisor));
  }
  
@@ -108,10 +108,25 @@ index 922657ca9..13391a8df 100644
 +  SDValue Dividend = N->getOperand(0);
 +  SDValue Divisor = N->getOperand(1);
 +
-+  if (VT != MVT::v2i64 && VT != MVT::v4i64 && VT != MVT::v8i64)
-+    return SDValue();
 +  if (!Subtarget.hasDQI() || !Subtarget.useAVX512Regs())
 +    return SDValue();
++
++  // Widen to the next power of two to get a machine type.
++  unsigned NumElts = VT.getVectorNumElements();
++  if (!isPowerOf2_32(NumElts) && VT.getSizeInBits() < 512) {
++    SDValue WideDividend = DAG.WidenVector(Dividend, DL);
++    EVT WideVT = WideDividend.getValueType();
++    SDValue WideDivisor = DAG.WidenVector(Divisor, DL);
++    SDValue Wide =
++        DAG.getNode(N->getOpcode(), DL, WideVT, WideDividend, WideDivisor);
++    return DAG.getExtractSubvector(DL, VT, Wide, 0);
++  }
++
++  // The rounded FP steps below run in a zmm so VT has to widen into one, and
++  // one lane does not pay for the chain.
++  if (VT.getSizeInBits() > 512 || NumElts < 2)
++    return SDValue();
++
 +  bool Widen = VT != MVT::v8i64;
 +  // The chain multiplies twice on its critical path, so v2i64 only pays
 +  // off where vpmullq is fast.
@@ -265,7 +280,7 @@ index 922657ca9..13391a8df 100644
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 9ba3d7036..3e61d2f9e 100644
+index 3518d0447..c693f9848 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -753,6 +753,220 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
@@ -489,6 +504,16 @@ index 9ba3d7036..3e61d2f9e 100644
    static const CostKindTblEntry AVX512BWUniformCostTable[] = {
      { ISD::SHL,  MVT::v16i8,  { 3, 5, 5, 7 } }, // psllw + pand.
      { ISD::SRL,  MVT::v16i8,  { 3,10, 5, 8 } }, // psrlw + pand.
+@@ -5610,6 +5824,9 @@ X86TTIImpl::getMemIntrinsicInstrCost(const MemIntrinsicCostAttributes &MICA,
+   case Intrinsic::masked_load:
+   case Intrinsic::masked_store:
+     return getMaskedMemoryOpCost(MICA, CostKind);
++  case Intrinsic::masked_expandload:
++  case Intrinsic::masked_compressstore:
++    return 2;
+   }
+   return BaseT::getMemIntrinsicInstrCost(MICA, CostKind);
+ }
 -- 
 2.55.0
 

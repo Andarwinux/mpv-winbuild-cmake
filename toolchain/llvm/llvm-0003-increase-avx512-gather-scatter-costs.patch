@@ -1,17 +1,26 @@
-From 41419fa94ed7e5c897b36a8f632f76a88a392171 Mon Sep 17 00:00:00 2001
+From bf8379ede7ba86d2853037e651022f184bf7af4e Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 26 May 2026 00:00:00 +0000
 Subject: [PATCH] increase avx512 gather/scatter costs
 
 ---
- llvm/lib/Target/X86/X86TargetTransformInfo.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ llvm/lib/Target/X86/X86TargetTransformInfo.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index e80fd692df..b97911b7a6 100644
+index e3d838a7f..3ea654ed2 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-@@ -6435,14 +6435,14 @@ int X86TTIImpl::getGatherOverhead() const {
+@@ -5110,7 +5110,7 @@ InstructionCost X86TTIImpl::getVectorInstrCost(
+ 
+     // Consider cheap cases.
+     if (IsCheapPInsrPExtrInsertPS())
+-      return 1 + RegisterFileMoveCost;
++      return 100 + RegisterFileMoveCost;
+ 
+     // For extractions we just need to shuffle the element to index 0, which
+     // should be very cheap (assume cost = 1). For insertions we need to shuffle
+@@ -6596,14 +6596,14 @@ int X86TTIImpl::getGatherOverhead() const {
    // TODO: Remove the explicit hasAVX512()?, That would mean we would only
    // enable gather with a -march.
    if (ST->hasAVX512() || (ST->hasAVX2() && ST->hasFastGather()))

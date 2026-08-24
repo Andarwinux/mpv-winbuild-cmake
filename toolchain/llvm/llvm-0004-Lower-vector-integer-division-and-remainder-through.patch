@@ -1,15 +1,15 @@
-From b7be8bbc51e6fa007cee6c5e5667bd9393f43ee4 Mon Sep 17 00:00:00 2001
+From b0a3c1058950acc0461737a812367dec9eb66ab1 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Thu, 20 Aug 2026 00:00:00 +0000
 Subject: [PATCH] Lower i64 vector div/rem through FP reciprocal
 
 ---
- llvm/lib/Target/X86/X86ISelLowering.cpp       | 250 +++++++++++++-----
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 252 +++++++++++++-----
  .../lib/Target/X86/X86TargetTransformInfo.cpp | 217 +++++++++++++++
- 2 files changed, 403 insertions(+), 64 deletions(-)
+ 2 files changed, 404 insertions(+), 65 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index bf435b0c2..35b4afe2d 100644
+index a0c92a22..2c402339 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
 @@ -50643,73 +50643,16 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
@@ -93,7 +93,16 @@ index bf435b0c2..35b4afe2d 100644
    EVT FPVT = VT.changeVectorElementType(*DAG.getContext(), FPSclVT);
  
    bool IsStrict = DAG.getMachineFunction().getFunction().hasFnAttribute(
-@@ -50777,6 +50720,185 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
+@@ -50728,7 +50671,7 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
+       SDValue WideDividend = DAG.WidenVector(Dividend, DL);
+       EVT WideVT = WideDividend.getValueType();
+       SDValue WideDivisor = DAG.WidenVector(Divisor, DL);
+-      SDValue Wide = DAG.getNode(Opc, DL, WideVT, WideDividend, WideDivisor);
++      SDValue Wide = DAG.getNode(N->getOpcode(), DL, WideVT, WideDividend, WideDivisor);
+       return DAG.getExtractSubvector(DL, VT, Wide, 0);
+     }
+   } else if (!IsSigned && VT.getScalarSizeInBits() == 32 &&
+@@ -50789,6 +50732,185 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
                       DAG.getNode(ISD::MUL, DL, VT, Q, Divisor));
  }
  
@@ -280,7 +289,7 @@ index bf435b0c2..35b4afe2d 100644
                            TargetLowering::DAGCombinerInfo &DCI,
                            const X86Subtarget &Subtarget) {
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 3518d0447..c693f9848 100644
+index 3ea654ed..386e51d8 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -753,6 +753,220 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(

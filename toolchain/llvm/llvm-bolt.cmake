@@ -1,5 +1,5 @@
 set(bolt_training_common_args
-    ${ARCH_FLAGS} ${ARCH_FLAGS_FORCE} ${OPT_FLAGS} --target=${TARGET_CPU}-pc-windows-gnu --sysroot=${MINGW_INSTALL_PREFIX} -Xclang -mlong-double-64 -fno-temp-file -fsplit-lto-unit -fuse-ld=lld --ld-path=$PWD/ld.lld -O3 -fno-auto-import -fdata-sections -ffunction-sections -ffast-math -gcodeview -mguard=cf -w -g3 -Wl,--thinlto-jobs=all,--gc-sections,--icf=all,-O3,--lto-O3,--lto-CGO3,--disable-runtime-pseudo-reloc,--disable-auto-import,--pdb=,${MINGW_INSTALL_PREFIX}/lib/sleefmath.o,${MINGW_INSTALL_PREFIX}/lib/llvmlibc.a,${MINGW_INSTALL_PREFIX}/lib/libsleefgnuabi.a
+    ${ARCH_FLAGS} ${ARCH_FLAGS_FORCE} ${OPT_FLAGS} --target=${TARGET_CPU}-pc-windows-gnu --sysroot=${MINGW_INSTALL_PREFIX} -Xclang -mlong-double-64 -fno-temp-file -fno-split-lto-unit -fuse-ld=lld --ld-path=$PWD/ld.lld -O3 -fno-auto-import -fdata-sections -ffunction-sections -ffast-math -gcodeview -mguard=cf -w -g3 -Wl,--thinlto-jobs=all,--gc-sections,--icf=all,-O3,--lto-O3,--lto-CGO3,--disable-runtime-pseudo-reloc,--disable-auto-import,--pdb=,${MINGW_INSTALL_PREFIX}/lib/sleefmath.o,${MINGW_INSTALL_PREFIX}/lib/llvmlibc.a,${MINGW_INSTALL_PREFIX}/lib/libsleefgnuabi.a
 )
 ExternalProject_Add(llvm-bolt
     URL https://www.sqlite.org/2026/sqlite-amalgamation-3510300.zip

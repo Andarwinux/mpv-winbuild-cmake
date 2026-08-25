@@ -155,6 +155,16 @@ if(LLVM_ENABLE_UNSAFE_X86_AVX512_VFABI)
 else()
     set(llvm_patch "llvm-custom-VecFuncs-changes.patch")
 endif()
+if(LLVM_HOST_LIBCXX_FORCE_VECTOR_SIZE_512)
+    set(libcxx_host_vector_width
+        COMMAND ${EXEC} sed -i [['s/__native_vector_size = 32/__native_vector_size = 64/g']] <SOURCE_DIR>/libcxx/include/__algorithm/simd_utils.h
+        COMMAND ${EXEC} sed -i [['s/__native_vector_size = 32/__native_vector_size = 64/g']] <SOURCE_DIR>/libcxx/include/__cxx03/__algorithm/simd_utils.h
+    )
+else()
+    set(libcxx_host_vector_width
+        COMMAND true
+    )
+endif()
 
 set(cmake_conf_args
     -GNinja

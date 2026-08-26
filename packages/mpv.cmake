@@ -10,6 +10,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Dd3d11=enabled
         -Dd3d9-hwaccel=enabled
         -Ddirect3d=enabled
+        -Ddvda=enabled
         -Ddvdnav=enabled
         -Degl-angle=enabled
         -Dgl-dxinterop-d3d9=enabled

@@ -1,18 +1,18 @@
-From fed3cda3a2583dc6471d566b304433575d5b86b3 Mon Sep 17 00:00:00 2001
+From 34afbe1a727eb89b3f16cac9116d7a20f69e3100 Mon Sep 17 00:00:00 2001
 From: Adam Scott <adamscott200322@gmail.com>
 Date: Thu, 20 Aug 2026 00:00:00 +0000
 Subject: [PATCH] Lower i64 vector div/rem through FP reciprocal
 
 ---
- llvm/lib/Target/X86/X86ISelLowering.cpp       | 263 +++++++++++++-----
- .../lib/Target/X86/X86TargetTransformInfo.cpp | 217 +++++++++++++++
- 2 files changed, 407 insertions(+), 73 deletions(-)
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 266 +++++++++++++-----
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 217 ++++++++++++++
+ 2 files changed, 410 insertions(+), 73 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
-index a0c92a22b..f723e6c64 100644
+index 3a66310ff1..65cb6ccd45 100644
 --- a/llvm/lib/Target/X86/X86ISelLowering.cpp
 +++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
-@@ -50643,6 +50643,162 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
+@@ -50651,6 +50651,162 @@ static SDValue combineMulToPMADD52(SDNode *N, const SDLoc &DL,
    return SDValue();
  }
  
@@ -175,7 +175,7 @@ index a0c92a22b..f723e6c64 100644
  // x86 has no vector integer divide instructions. Lower vector
  // UDIV/SDIV/UREM/SREM through float division instead of scalarizing into N
  // scalar hardware divides.
-@@ -50701,92 +50857,53 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
+@@ -50709,92 +50865,56 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
    auto BothFitFP = [&](const fltSemantics &Sem) {
      return FitsFP(Dividend, Sem) && FitsFP(Divisor, Sem);
    };
@@ -277,14 +277,14 @@ index a0c92a22b..f723e6c64 100644
 +  // Widen a non-power-of-two lane count to get a machine type, but only
 +  // while it still fits one divide. Two chains lose to a chain plus a scalar.
 +  unsigned NumElts = VT.getVectorNumElements();
-+  if ((IsStrict || !UseExactFPDiv) && !isPowerOf2_32(NumElts)) {
++  bool Needs512 = IsStrict || !UseExactFPDiv;
++  if (Needs512 && !isPowerOf2_32(NumElts)) {
 +    if (NextPowerOf2(NumElts) * FPSclVT.getSizeInBits() > 512)
 +      return SDValue();
-+    SDValue WideDividend = DAG.WidenVector(Dividend, DL);
-+    EVT WideVT = WideDividend.getValueType();
-+    SDValue WideDivisor = DAG.WidenVector(Divisor, DL);
-+    SDValue Wide = DAG.getNode(Opc, DL, WideVT, WideDividend, WideDivisor);
-+    return DAG.getExtractSubvector(DL, VT, Wide, 0);
++    Dividend = DAG.WidenVector(Dividend, DL);
++    Divisor = DAG.WidenVector(Divisor, DL);
++    N = DAG.getNode(Opc, DL, Dividend.getValueType(), Dividend, Divisor)
++            .getNode();
    }
 -  if (!IsRem)
 -    return Q;
@@ -292,18 +292,21 @@ index a0c92a22b..f723e6c64 100644
 -  return DAG.getNode(ISD::SUB, DL, VT, Dividend,
 -                     DAG.getNode(ISD::MUL, DL, VT, Q, Divisor));
 +
-+  if (UseExactFPDiv)
-+    return combineIntDivRemViaExactFPDiv(N, FPSclVT, IsSigned, IsRem, IsStrict,
-+                                         DAG, DCI, Subtarget, DL);
-+
-+  // Wide i64 needs the reciprocal refinement chain instead.
-+  return combineIntDivRemViaFPReciprocal(N, IsSigned, IsRem, DAG, Subtarget,
-+                                         DL);
++  SDValue Res =
++      UseExactFPDiv
++          ? combineIntDivRemViaExactFPDiv(N, FPSclVT, IsSigned, IsRem, IsStrict,
++                                          DAG, DCI, Subtarget, DL)
++          : combineIntDivRemViaFPReciprocal(N, IsSigned, IsRem, DAG, Subtarget,
++                                            DL);
++  // Narrow a widened result back to VT.
++  if (Res && Res.getValueType() != VT)
++    Res = DAG.getExtractSubvector(DL, VT, Res, 0);
++  return Res;
  }
  
  static SDValue combineMul(SDNode *N, SelectionDAG &DAG,
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 1cec1f655..7f6ccb4a7 100644
+index 4a3a683eb3..ac42737244 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 @@ -753,6 +753,220 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(

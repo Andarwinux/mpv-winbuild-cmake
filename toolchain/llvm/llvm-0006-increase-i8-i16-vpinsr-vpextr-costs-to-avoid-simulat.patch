@@ -1,0 +1,26 @@
+From 0c1784bba2909bcab7e1a97dc314a1c022f0a42c Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Mon, 31 Aug 2026 00:00:00 +0000
+Subject: [PATCH] increase i8/i16 vpinsr/vpextr costs to avoid simulated
+ gather/scatter
+
+---
+ llvm/lib/Target/X86/X86TargetTransformInfo.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+index 05c115363..67d811287 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+@@ -5324,6 +5324,8 @@ InstructionCost X86TTIImpl::getVectorInstrCost(
+ 
+     // Consider cheap cases.
+     if (IsCheapPInsrPExtrInsertPS())
++      if (MScalarTy == MVT::i16 || MScalarTy == MVT::i8)
++        return 100;
+       return 1 + RegisterFileMoveCost;
+ 
+     // For extractions we just need to shuffle the element to index 0, which
+-- 
+2.55.0
+

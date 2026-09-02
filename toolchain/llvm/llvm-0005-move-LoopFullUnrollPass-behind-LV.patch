@@ -1,17 +1,17 @@
-From 782822b522610c2f4e8e6b6f494e8db860ba4ac3 Mon Sep 17 00:00:00 2001
+From e0ff8e3d3d9a74928735fc75449cfd0bcf2d44d8 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 30 Aug 2026 00:00:00 +0000
 Subject: [PATCH] move LoopFullUnrollPass behind LV
 
 ---
- llvm/lib/Passes/PassBuilderPipelines.cpp | 37 ++++++++++++++----------
- 1 file changed, 22 insertions(+), 15 deletions(-)
+ llvm/lib/Passes/PassBuilderPipelines.cpp | 33 ++++++++++++++----------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
 diff --git a/llvm/lib/Passes/PassBuilderPipelines.cpp b/llvm/lib/Passes/PassBuilderPipelines.cpp
-index d77b8e1f4..0abc8ba1c 100644
+index 901250fdd..0ece5034f 100644
 --- a/llvm/lib/Passes/PassBuilderPipelines.cpp
 +++ b/llvm/lib/Passes/PassBuilderPipelines.cpp
-@@ -563,12 +563,12 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
+@@ -561,11 +561,11 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
    // inaccurate. The normal unroller doesn't pay attention to forced full unroll
    // attributes so we need to make sure and allow the full unroll pass to pay
    // attention to it.
@@ -19,18 +19,16 @@ index d77b8e1f4..0abc8ba1c 100644
 -      PGOOpt->Action != PGOOptions::SampleUse)
 -    LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 -                                    /* OnlyWhenForced= */ !PTO.LoopUnrolling,
--                                    PTO.ForgetAllSCEVInLoopUnroll,
--                                    /* PrepareForLTO= */ isLTOPreLink(Phase)));
+-                                    PTO.ForgetAllSCEVInLoopUnroll));
 +  //if (!isThinLTOPreLink(Phase) || !PGOOpt ||
 +  //    PGOOpt->Action != PGOOptions::SampleUse)
 +  //  LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 +  //                                  /* OnlyWhenForced= */ !PTO.LoopUnrolling,
-+  //                                  PTO.ForgetAllSCEVInLoopUnroll,
-+  //                                  /* PrepareForLTO= */ isLTOPreLink(Phase)));
++  //                                  PTO.ForgetAllSCEVInLoopUnroll));
  
    invokeLoopOptimizerEndEPCallbacks(LPM2, Level);
  
-@@ -746,12 +746,12 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
+@@ -743,11 +743,11 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
    // inaccurate. The normal unroller doesn't pay attention to forced full unroll
    // attributes so we need to make sure and allow the full unroll pass to pay
    // attention to it.
@@ -38,18 +36,16 @@ index d77b8e1f4..0abc8ba1c 100644
 -      PGOOpt->Action != PGOOptions::SampleUse)
 -    LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 -                                    /* OnlyWhenForced= */ !PTO.LoopUnrolling,
--                                    PTO.ForgetAllSCEVInLoopUnroll,
--                                    /* PrepareForLTO= */ isLTOPreLink(Phase)));
+-                                    PTO.ForgetAllSCEVInLoopUnroll));
 +  //if (!isThinLTOPreLink(Phase) || !PGOOpt ||
 +  //    PGOOpt->Action != PGOOptions::SampleUse)
 +  //  LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 +  //                                  /* OnlyWhenForced= */ !PTO.LoopUnrolling,
-+  //                                  PTO.ForgetAllSCEVInLoopUnroll,
-+  //                                  /* PrepareForLTO= */ isLTOPreLink(Phase)));
++  //                                  PTO.ForgetAllSCEVInLoopUnroll));
  
    invokeLoopOptimizerEndEPCallbacks(LPM2, Level);
  
-@@ -1388,6 +1388,13 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
+@@ -1384,6 +1384,13 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
                                       /*AggregateToVector=*/true)));
    }
  
@@ -63,7 +59,7 @@ index d77b8e1f4..0abc8ba1c 100644
    if (!isFullLTOPostLink(LTOPhase)) {
      // Eliminate loads by forwarding stores from the previous iteration to loads
      // of the current iteration.
-@@ -2302,9 +2309,9 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+@@ -2298,9 +2305,9 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
    // FIXME: Add loop interchange.
  
    // Unroll small loops and perform peeling.

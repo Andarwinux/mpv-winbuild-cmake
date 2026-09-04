@@ -52,7 +52,7 @@ ExternalProject_Add(curl
         -DCMAKE_UNITY_BUILD=ON
         -DUNITY_BUILD_BATCH_SIZE=0
         -DCMAKE_UNITY_BUILD_BATCH_SIZE=0
-        "-DCMAKE_C_FLAGS='-DNGHTTP3_STATICLIB -DNGHTTP2_STATICLIB -DNGTCP2_STATICLIB -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lcrypt32 -lsecur32'"
+        "-DCMAKE_C_FLAGS='-DNGHTTP3_STATICLIB -DNGHTTP2_STATICLIB -DNGTCP2_STATICLIB -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lcrypt32 -lsecur32 -include libssh/scp.h'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

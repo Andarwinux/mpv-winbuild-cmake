@@ -1,0 +1,305 @@
+From cdfa6a27cece496687e735f47e5d626c9f55daf7 Mon Sep 17 00:00:00 2001
+From: zh Wang <rekind133@outlook.com>
+Date: Wed, 24 Jun 2026 12:13:59 +0800
+Subject: [PATCH] Support partial-reduce dot products
+
+Lower the llvm.vector.partial.reduce dot product shapes onto the X86 dot
+product instructions:
+
+  i8 x i8 -> i32:     vpdpbusd (AVX512-VNNI, AVX-VNNI)
+                      vpdpbssd / vpdpbuud (AVX-VNNI-INT8, AVX10.2)
+  i16 x i16 -> i32:   vpdpwssd (AVX512-VNNI, AVX-VNNI)
+                      vpdpwsud / vpdpwuud (AVX-VNNI-INT16, AVX10.2)
+  bf16 x bf16 -> f32: vdpbf16ps (AVX512-BF16)
+  f16 x f16 -> f32:   vdpphps (AVX10.2)
+
+The 128/256-bit shapes, and the 512-bit shapes on targets using 512-bit
+registers, are registered as Custom. 512-bit shapes for which only the VEX
+encoding exists are split into two 256-bit dot products, and the 128/256-bit
+shapes are widened to 512 bits on targets without VLX.
+
+Teach X86TTIImpl::getPartialReductionCost about these shapes, costing one
+dot product per legal accumulator vector and otherwise falling back to the
+generic expansion cost, so that LoopVectorize can form partial reductions
+for them.
+
+The DAG combiner forms partial reductions with narrower-than-legal types
+when the widened shape is supported, so also widen the integer
+PARTIAL_REDUCE_*MLA results the same way as PARTIAL_REDUCE_FMLA (expand,
+then widen).
+---
+ .../SelectionDAG/LegalizeVectorTypes.cpp      |   3 +
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 141 ++++++++++++++++++
+ .../lib/Target/X86/X86TargetTransformInfo.cpp |  60 ++++++++
+ llvm/lib/Target/X86/X86TargetTransformInfo.h  |   4 +-
+ 4 files changed, 205 insertions(+), 3 deletions(-)
+
+diff --git a/llvm/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp b/llvm/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp
+index f6e7feab5..35ea443ed 100644
+--- a/llvm/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp
++++ b/llvm/lib/CodeGen/SelectionDAG/LegalizeVectorTypes.cpp
+@@ -5550,6 +5550,9 @@ void DAGTypeLegalizer::WidenVectorResult(SDNode *N, unsigned ResNo) {
+       Res = WidenVecRes_UnaryOpWithTwoResults(N, ResNo);
+     break;
+   }
++  case ISD::PARTIAL_REDUCE_UMLA:
++  case ISD::PARTIAL_REDUCE_SMLA:
++  case ISD::PARTIAL_REDUCE_SUMLA:
+   case ISD::PARTIAL_REDUCE_FMLA:
+     Res = WidenVecRes_PARTIAL_REDUCE_MLA(N);
+     break;
+diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
+index a41cb2914..60fd340ac 100644
+--- a/llvm/lib/Target/X86/X86ISelLowering.cpp
++++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
+@@ -2651,6 +2651,49 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
+     }
+   }
+ 
++  // Partial reductions that map onto the dot product instructions:
++  //   vpdpbusd / vpdpwssd (AVX512-VNNI, AVX-VNNI)
++  //   vpdpbssd / vpdpbuud (AVX-VNNI-INT8, AVX10.2)
++  //   vpdpwsud / vpdpwuud (AVX-VNNI-INT16, AVX10.2)
++  //   vdpbf16ps (AVX512-BF16)
++  //   vdpphps (AVX10.2)
++  // 512-bit shapes are split in two when only the VEX encoding is available.
++  if (!Subtarget.useSoftFloat()) {
++    bool HasVNNI = Subtarget.hasVNNI() || Subtarget.hasAVXVNNI();
++    bool HasVNNIINT8 = Subtarget.hasAVXVNNIINT8() || Subtarget.hasAVX10_2();
++    bool HasVNNIINT16 = Subtarget.hasAVXVNNIINT16() || Subtarget.hasAVX10_2();
++    for (MVT AccVT : {MVT::v4i32, MVT::v8i32, MVT::v16i32}) {
++      if (AccVT == MVT::v16i32 && !Subtarget.useAVX512Regs())
++        break;
++      unsigned NumElts = AccVT.getVectorNumElements();
++      MVT I8VT = MVT::getVectorVT(MVT::i8, NumElts * 4);
++      MVT I16VT = MVT::getVectorVT(MVT::i16, NumElts * 2);
++      MVT F32VT = MVT::getVectorVT(MVT::f32, NumElts);
++      if (HasVNNI) {
++        setPartialReduceMLAAction(ISD::PARTIAL_REDUCE_SUMLA, AccVT, I8VT,
++                                  Custom);
++        setPartialReduceMLAAction(ISD::PARTIAL_REDUCE_SMLA, AccVT, I16VT,
++                                  Custom);
++      }
++      if (HasVNNIINT8)
++        setPartialReduceMLAAction(
++            {ISD::PARTIAL_REDUCE_SMLA, ISD::PARTIAL_REDUCE_UMLA}, AccVT, I8VT,
++            Custom);
++      if (HasVNNIINT16)
++        setPartialReduceMLAAction(
++            {ISD::PARTIAL_REDUCE_SUMLA, ISD::PARTIAL_REDUCE_UMLA}, AccVT, I16VT,
++            Custom);
++      if (Subtarget.hasBF16())
++        setPartialReduceMLAAction(ISD::PARTIAL_REDUCE_FMLA, F32VT,
++                                  MVT::getVectorVT(MVT::bf16, NumElts * 2),
++                                  Custom);
++      if (Subtarget.hasAVX10_2())
++        setPartialReduceMLAAction(ISD::PARTIAL_REDUCE_FMLA, F32VT,
++                                  MVT::getVectorVT(MVT::f16, NumElts * 2),
++                                  Custom);
++    }
++  }
++
+   if (!Subtarget.useSoftFloat() && Subtarget.hasVLX()) {
+     setTruncStoreAction(MVT::v4i64, MVT::v4i8,  Legal);
+     setTruncStoreAction(MVT::v4i64, MVT::v4i16, Legal);
+@@ -34626,6 +34669,98 @@ SDValue X86TargetLowering::visitMaskedStore(SelectionDAG &DAG, const SDLoc &DL,
+   return DAG.getMemIntrinsicNode(X86ISD::CSTORE, DL, Tys, Ops, Ty, MMO);
+ }
+ 
++/// Lower a bf16 x bf16 -> f32 or f16 x f16 -> f32 partial reduction to
++/// VDPBF16PS or VDPPHPS.
++static SDValue LowerPARTIAL_REDUCE_FMLA(SDValue Op,
++                                        const X86Subtarget &Subtarget,
++                                        SelectionDAG &DAG) {
++  SDLoc DL(Op);
++  MVT VT = Op.getSimpleValueType();
++  SDValue Acc = Op.getOperand(0);
++  SDValue LHS = Op.getOperand(1);
++  SDValue RHS = Op.getOperand(2);
++  unsigned Opc = LHS.getSimpleValueType().getScalarType() == MVT::f16
++                     ? X86ISD::DPFP16PS
++                     : X86ISD::DPBF16PS;
++
++  // Only the 512-bit form exists without VLX, so widen to that and extract.
++  if (!VT.is512BitVector() && !Subtarget.hasVLX()) {
++    Acc = widenSubVector(Acc, false, Subtarget, DAG, DL, 512);
++    LHS = widenSubVector(LHS, false, Subtarget, DAG, DL, 512);
++    RHS = widenSubVector(RHS, false, Subtarget, DAG, DL, 512);
++    SDValue Res = DAG.getNode(Opc, DL, MVT::v16f32, Acc, LHS, RHS);
++    return extractSubVector(Res, 0, DAG, DL, VT.getSizeInBits());
++  }
++
++  return DAG.getNode(Opc, DL, VT, Acc, LHS, RHS);
++}
++
++/// Lower an i8 x i8 -> i32 or i16 x i16 -> i32 partial reduction to the
++/// matching VNNI dot product.
++static SDValue LowerPARTIAL_REDUCE_MLA(SDValue Op,
++                                       const X86Subtarget &Subtarget,
++                                       SelectionDAG &DAG) {
++  SDLoc DL(Op);
++  MVT VT = Op.getSimpleValueType();
++  SDValue Acc = Op.getOperand(0);
++  SDValue LHS = Op.getOperand(1);
++  SDValue RHS = Op.getOperand(2);
++  bool IsI8 = LHS.getSimpleValueType().getScalarType() == MVT::i8;
++
++  // Pick the instruction, and whether the 512-bit EVEX and the VEX encodings
++  // exist for it.
++  unsigned Opc;
++  bool Has512, HasVEX;
++  switch (Op.getOpcode()) {
++  default:
++    llvm_unreachable("Unexpected partial reduction opcode");
++  case ISD::PARTIAL_REDUCE_SUMLA:
++    if (IsI8) {
++      // VPDPBUSD multiplies unsigned bytes with signed bytes.
++      std::swap(LHS, RHS);
++      Opc = X86ISD::VPDPBUSD;
++      Has512 = Subtarget.hasVNNI();
++      HasVEX = Subtarget.hasAVXVNNI();
++    } else {
++      Opc = X86ISD::VPDPWSUD;
++      Has512 = Subtarget.hasAVX10_2();
++      HasVEX = Subtarget.hasAVXVNNIINT16();
++    }
++    break;
++  case ISD::PARTIAL_REDUCE_SMLA:
++    if (IsI8) {
++      Opc = X86ISD::VPDPBSSD;
++      Has512 = Subtarget.hasAVX10_2();
++      HasVEX = Subtarget.hasAVXVNNIINT8();
++    } else {
++      Opc = X86ISD::VPDPWSSD;
++      Has512 = Subtarget.hasVNNI();
++      HasVEX = Subtarget.hasAVXVNNI();
++    }
++    break;
++  case ISD::PARTIAL_REDUCE_UMLA:
++    Opc = IsI8 ? X86ISD::VPDPBUUD : X86ISD::VPDPWUUD;
++    Has512 = Subtarget.hasAVX10_2();
++    HasVEX = IsI8 ? Subtarget.hasAVXVNNIINT8() : Subtarget.hasAVXVNNIINT16();
++    break;
++  }
++
++  // Split into two 256-bit dot products if there is no 512-bit encoding.
++  if (VT.is512BitVector() && !Has512)
++    return splitVectorOp(Op, DAG, DL);
++
++  // The dot products take their i8/i16 elements packed in i32 lanes.
++  LHS = DAG.getBitcast(VT, LHS);
++  RHS = DAG.getBitcast(VT, RHS);
++
++  // Without VLX only the 512-bit EVEX form exists, so use that unless the VEX
++  // encoding is available.
++  if (!VT.is512BitVector() && !Subtarget.hasVLX() && !HasVEX)
++    return getAVX512Node(Opc, DL, VT, {Acc, LHS, RHS}, DAG, Subtarget);
++
++  return DAG.getNode(Opc, DL, VT, Acc, LHS, RHS);
++}
++
+ /// Provide custom lowering hooks for some operations.
+ SDValue X86TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
+   switch (Op.getOpcode()) {
+@@ -34800,6 +34935,12 @@ SDValue X86TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
+   case X86ISD::CVTPS2PH:        return LowerCVTPS2PH(Op, DAG);
+   case ISD::PREFETCH:           return LowerPREFETCH(Op, Subtarget, DAG);
+   case ISD::FLDEXP:             return LowerFLDEXP(Op, Subtarget, DAG);
++  case ISD::PARTIAL_REDUCE_SMLA:
++  case ISD::PARTIAL_REDUCE_UMLA:
++  case ISD::PARTIAL_REDUCE_SUMLA:
++                                return LowerPARTIAL_REDUCE_MLA(Op, Subtarget, DAG);
++  case ISD::PARTIAL_REDUCE_FMLA:
++                                return LowerPARTIAL_REDUCE_FMLA(Op, Subtarget, DAG);
+     // clang-format on
+   }
+ }
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+index 6b37869ac..a34ff0fa5 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+@@ -6147,6 +6147,66 @@ X86TTIImpl::getAddressComputationCost(Type *PtrTy, ScalarEvolution *SE,
+   return BaseT::getAddressComputationCost(PtrTy, SE, Ptr, CostKind);
+ }
+ 
++InstructionCost X86TTIImpl::getPartialReductionCost(
++    unsigned Opcode, Type *InputTypeA, Type *InputTypeB, Type *AccumType,
++    ElementCount VF, TTI::PartialReductionExtendKind OpAExtend,
++    TTI::PartialReductionExtendKind OpBExtend, std::optional<unsigned> BinOp,
++    TTI::TargetCostKind CostKind, std::optional<FastMathFlags> FMF) const {
++  auto ExpandCost = [&]() {
++    return BaseT::getPartialReductionCost(Opcode, InputTypeA, InputTypeB,
++                                          AccumType, VF, OpAExtend, OpBExtend,
++                                          BinOp, CostKind, FMF);
++  };
++
++  // The dot product instructions multiply-accumulate i8 x i8 -> i32,
++  // i16 x i16 -> i32, bf16 x bf16 -> f32 or f16 x f16 -> f32. Partial
++  // reductions may also multiply inputs extended from different types, which
++  // they can't handle.
++  if (VF.isScalable() || !BinOp || OpAExtend == TTI::PR_None ||
++      OpBExtend == TTI::PR_None || InputTypeA != InputTypeB)
++    return ExpandCost();
++
++  unsigned Opc;
++  if (Opcode == Instruction::Add && *BinOp == Instruction::Mul &&
++      AccumType->isIntegerTy(32) &&
++      (InputTypeA->isIntegerTy(8) || InputTypeA->isIntegerTy(16))) {
++    if (OpAExtend != OpBExtend)
++      Opc = ISD::PARTIAL_REDUCE_SUMLA;
++    else if (OpAExtend == TTI::PR_SignExtend)
++      Opc = ISD::PARTIAL_REDUCE_SMLA;
++    else
++      Opc = ISD::PARTIAL_REDUCE_UMLA;
++  } else if (Opcode == Instruction::FAdd && *BinOp == Instruction::FMul &&
++             AccumType->isFloatTy() &&
++             (InputTypeA->isBFloatTy() || InputTypeA->isHalfTy())) {
++    // VDPBF16PS and VDPPHPS, like the expansion, reassociate the additions and
++    // fuse the multiplications.
++    if (!FMF || !FMF->allowReassoc() || !FMF->allowContract())
++      return InstructionCost::getInvalid();
++    Opc = ISD::PARTIAL_REDUCE_FMLA;
++  } else {
++    return ExpandCost();
++  }
++
++  unsigned Ratio =
++      AccumType->getScalarSizeInBits() / InputTypeA->getScalarSizeInBits();
++  if (!VF.isKnownMultipleOf(Ratio))
++    return ExpandCost();
++
++  // One dot product per legal accumulator vector. Accumulators narrower than
++  // a legal vector are widened by expanding the partial reduction instead.
++  auto *AccVecTy = VectorType::get(AccumType, VF.divideCoefficientBy(Ratio));
++  auto *InputVecTy = VectorType::get(InputTypeA, VF);
++  std::pair<InstructionCost, MVT> AccLT = getTypeLegalizationCost(AccVecTy);
++  std::pair<InstructionCost, MVT> InputLT = getTypeLegalizationCost(InputVecTy);
++  if (AccLT.second.getFixedSizeInBits() >
++          AccVecTy->getPrimitiveSizeInBits().getFixedValue() ||
++      !TLI->isPartialReduceMLALegalOrCustom(Opc, AccLT.second, InputLT.second))
++    return ExpandCost();
++
++  return AccLT.first;
++}
++
+ InstructionCost
+ X86TTIImpl::getArithmeticReductionCost(unsigned Opcode, VectorType *ValTy,
+                                        std::optional<FastMathFlags> FMF,
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.h b/llvm/lib/Target/X86/X86TargetTransformInfo.h
+index 422e4aad2..dd413277c 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.h
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.h
+@@ -157,9 +157,7 @@ public:
+       ElementCount VF, TTI::PartialReductionExtendKind OpAExtend,
+       TTI::PartialReductionExtendKind OpBExtend, std::optional<unsigned> BinOp,
+       TTI::TargetCostKind CostKind,
+-      std::optional<FastMathFlags> FMF) const override {
+-    return InstructionCost::getInvalid();
+-  }
++      std::optional<FastMathFlags> FMF) const override;
+ 
+   InstructionCost getMinMaxCost(Intrinsic::ID IID, Type *Ty,
+                                 TTI::TargetCostKind CostKind,
+-- 
+2.55.0
+

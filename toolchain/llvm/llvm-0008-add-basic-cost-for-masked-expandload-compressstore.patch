@@ -1,0 +1,26 @@
+From 57be81ec54ee6661347de8ce2322abde6dcbcfa3 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Fri, 11 Sep 2026 00:00:00 +0000
+Subject: [PATCH] add basic cost for masked expandload/compressstore
+
+---
+ llvm/lib/Target/X86/X86TargetTransformInfo.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+index 5f553f339..a34ff0fa5 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+@@ -6009,6 +6009,9 @@ X86TTIImpl::getMemIntrinsicInstrCost(const MemIntrinsicCostAttributes &MICA,
+   case Intrinsic::masked_load:
+   case Intrinsic::masked_store:
+     return getMaskedMemoryOpCost(MICA, CostKind);
++  case Intrinsic::masked_expandload:
++  case Intrinsic::masked_compressstore:
++    return 2;
+   }
+   return BaseT::getMemIntrinsicInstrCost(MICA, CostKind);
+ }
+-- 
+2.55.0
+

@@ -44,6 +44,7 @@ ExternalProject_Add(llvm-libcxx
         _NOCCACHE=set:1
     BUILD_COMMAND ""
     ${libcxx_vector_width}
+    COMMAND ${EXEC} _LTO_ENABLED=0 ninja -C <BINARY_DIR> libunwind.a
     COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy ${MINGW_INSTALL_PREFIX}/lib/libc++.a ${MINGW_INSTALL_PREFIX}/lib/libstdc++.a

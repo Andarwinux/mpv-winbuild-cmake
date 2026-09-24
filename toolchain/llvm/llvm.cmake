@@ -16,7 +16,7 @@ ExternalProject_Add(llvm
     GIT_TAG main
     LIST_SEPARATOR ^^
     CONFIGURE_COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR>/llvm -B<BINARY_DIR>
-        -G Ninja
+        -GNinja
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_FIND_NO_INSTALL_PREFIX=OFF
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
@@ -209,11 +209,21 @@ ExternalProject_Add(llvm
         -DLLVM_ENABLE_ZSTD=FORCE_ON
         -DLLVM_USE_STATIC_ZSTD=ON
         -Dzstd_LIBRARY=${CMAKE_INSTALL_PREFIX}/lib/libzstd.a
+        -Dzstd_STATIC_LIBRARY=${CMAKE_INSTALL_PREFIX}/lib/libzstd.a
         -Dzstd_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include
         -DLLVM_ENABLE_LIBXML2=FORCE_ON
+        -DLIBXML2_LIBRARY=${CMAKE_INSTALL_PREFIX}/lib/libxml2.a
         -DLIBXML2_LIBRARIES=${CMAKE_INSTALL_PREFIX}/lib/libxml2.a
-        -DLIBXML2_INCLUDE_DIRS=${CMAKE_INSTALL_PREFIX}/include/libxml2
+        -DLIBXML2_STATIC_LIBRARY=${CMAKE_INSTALL_PREFIX}/lib/libxml2.a
+        -DLIBXML2_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/libxml2
         -DHAVE_LIBXML2=ON
+        -DHAVE_ZLIB=ON
+        -DLLVM_ENABLE_LZMA=OFF
+        -DZLIB_FOUND=ON
+        -Dzstd_FOUND=ON
+        -DLibXml2_FOUND=ON
+        -DPkgConfig_FOUND=OFF
+        -DPKG_CONFIG_EXECUTABLE=OFF
         "-DCMAKE_REQUIRED_FLAGS='-O0 -fno-lto -fno-whole-program-vtables'"
         "-DCMAKE_REQUIRED_LINK_OPTIONS='-Wl,-O0,--lto-O0,--lto-CGO0,--no-gc-sections,--icf=none,--no-lto-whole-program-visibility,-mllvm,-import-instr-limit=0'"
         "-DCMAKE_C_FLAGS='-DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 ${tc_cflags} ${tc_libcxx} ${tc_compiler_rt} ${llvm_pgo}'"

@@ -1,5 +1,6 @@
 find_program(PKGCONFIG NAMES pkg-config)
 find_program(NASM NAMES nasm)
+find_program(GNUMAKE NAMES make)
 ExternalProject_Add(llvm-wrapper
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${SOURCE_LOCATION}
@@ -72,6 +73,11 @@ else()
 endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nasm.in
                ${CMAKE_INSTALL_PREFIX}/bin/nasm
+               FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+               @ONLY)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/make.in
+               ${CMAKE_INSTALL_PREFIX}/bin/make
                FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
                @ONLY)
 

@@ -132,7 +132,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/exec.in ${CMAKE_CURRENT_BINARY_DIR}/e
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/exec_host.in ${CMAKE_CURRENT_BINARY_DIR}/exec_host @ONLY)
 set(EXEC ${CMAKE_CURRENT_BINARY_DIR}/exec)
 set(EXEC_HOST ${CMAKE_CURRENT_BINARY_DIR}/exec_host)
-set(MAKE ${EXEC} make -j${MAKEJOBS})
+set(MAKE ${EXEC} ${CMAKE_INSTALL_PREFIX}/bin/make)
 
 if(TARGET_CPU STREQUAL "x86_64")
     execute_process(

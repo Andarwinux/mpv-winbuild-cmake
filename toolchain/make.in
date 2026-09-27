@@ -1,0 +1,10 @@
+#!/bin/bash
+
+case "$MAKEFLAGS" in
+    *--jobserver-auth=*)
+        exec @GNUMAKE@ "$@"
+        ;;
+    *)
+        exec @GNUMAKE@ -j@MAKEJOBS@ "$@"
+        ;;
+esac

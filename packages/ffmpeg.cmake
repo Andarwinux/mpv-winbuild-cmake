@@ -60,6 +60,7 @@ ExternalProject_Add(ffmpeg
         --prefix=${MINGW_INSTALL_PREFIX}
         --arch=${TARGET_CPU}
         --target-os=mingw64
+        --toolchain=llvm
         --pkg-config-flags=--static
         --disable-autodetect
         --disable-decoder=libaom_av1,aac_fixed,ac3_fixed

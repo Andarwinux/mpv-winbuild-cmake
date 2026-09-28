@@ -16,7 +16,6 @@ list(APPEND ep
     opus
     speex
     libmodplug
-    libvpx
     game-music-emu
     libpng
     x265
@@ -80,7 +79,6 @@ list(APPEND ep
     liblc3
     libvidstab
     frei0r
-    vvenc
     codec2
     ggml
     whisper
@@ -123,7 +121,7 @@ list(LENGTH ep ep_length)
 message(STATUS "Parsing ${ep_length} packages")
 
 # Exclude packages which dont depend on mpv when update
-list(APPEND removed "libvpx" "vvenc")
+list(APPEND removed "")
 list(REMOVE_ITEM repo ${removed})
 list(REMOVE_ITEM ep ${removed})
 list(TRANSFORM repo APPEND "-force-update" OUTPUT_VARIABLE update)

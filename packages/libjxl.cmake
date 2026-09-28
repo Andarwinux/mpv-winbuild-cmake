@@ -19,7 +19,6 @@ ExternalProject_Add(libjxl
     CONFIGURE_COMMAND ""
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
-        ${libjxl_disable_sse}
         ${libjxl_force_skip_check}
         -DJPEGXL_EMSCRIPTEN=OFF
         -DJPEGXL_BUNDLE_LIBPNG=OFF

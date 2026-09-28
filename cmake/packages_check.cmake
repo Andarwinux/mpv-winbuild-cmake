@@ -1,36 +1,10 @@
-set(vapoursynth_pkgconfig_libs "-lVapourSynth -Wl,-delayload=VapourSynth.dll")
-set(vapoursynth_script_pkgconfig_libs "-lVSScript -Wl,-delayload=VSScript.dll")
-
 if(TARGET_CPU STREQUAL "x86_64")
     set(dlltool_image "i386:x86-64")
     set(openssl_target "mingw64")
-    set(libvpx_target "x86_64-win64-gcc")
     set(mimalloc_macro "-D_M_X64")
-    if(MARCH_HAS_AVX)
-        set(aom_vpx_sse2avx
-            COMMAND ${EXEC} sed -i [['/%macro INIT_XMM/,/%endmacro/ s/%assign avx_enabled 0/%assign avx_enabled 1/']] <SOURCE_DIR>/third_party/x86inc/x86inc.asm
-        )
-        set(x265_sse2avx
-            COMMAND ${EXEC} sed -i [['/%macro INIT_XMM/,/%endmacro/ s/%assign avx_enabled 0/%assign avx_enabled 1/']] <SOURCE_DIR>/source/common/x86/x86inc.asm
-        )
-        set(novzeroupper
-            COMMAND ${EXEC} sed -i [['s/%define vzeroupper_required .*/%define vzeroupper_required 0/']]
-        )
-        set(libjxl_disable_sse
-            -DJPEGXL_ENABLE_HWY_SSE2=OFF
-            -DJPEGXL_ENABLE_HWY_SSE4=OFF
-        )
-        set(ffmpeg_nosse2avx
-            COMMAND ${MAKE} libswscale/x86/ops_int.o _NASM_SSE2AVX=0
-        )
-    else()
-        set(novzeroupper
-            COMMAND true
-        )
-        set(ffmpeg_nosse2avx
-            COMMAND true
-        )
-    endif()
+    set(novzeroupper
+        COMMAND ${EXEC} sed -i [['s/%define vzeroupper_required .*/%define vzeroupper_required 0/']]
+    )
     set(libjxl_force_skip_check
         -DCXX_MAVX2_SUPPORTED=ON
         -DCXX_MF16C_SUPPORTED=ON
@@ -109,11 +83,7 @@ if(TARGET_CPU STREQUAL "x86_64")
 elseif(TARGET_CPU STREQUAL "aarch64")
     set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
-    set(libvpx_target "arm64-win64-gcc")
     set(novzeroupper
-        COMMAND true
-    )
-    set(ffmpeg_nosse2avx
         COMMAND true
     )
     set(libjxl_force_skip_check

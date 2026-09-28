@@ -3,7 +3,7 @@
 FLAGS="--reproducible"
 
 if [ "$_NASM_SSE2AVX" != "0" ]; then
-    FLAGS+=" -DFORCE_VEX_ENCODING=@sse2avx@"
+    FLAGS+=" -DFORCE_VEX_ENCODING=1"
 fi
 
 @NASM@ $@ $FLAGS

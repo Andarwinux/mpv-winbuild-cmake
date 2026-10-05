@@ -28,7 +28,6 @@ ExternalProject_Add(mpc-qt
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
-        _FULL_DEBUGINFO=set:1
         _PDB_GENERATE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/mpc-qt.exe ${MINGW_INSTALL_PREFIX}/bin/mpc-qt.exe

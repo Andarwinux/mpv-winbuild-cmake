@@ -42,7 +42,6 @@ ExternalProject_Add(libplacebo
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _FORCE_HIDE_DLLEXPORT=set:1
-        _FULL_DEBUGINFO=set:1
         _IS_REASSOC_ALLOWED=set:1
     BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
     INSTALL_COMMAND ""

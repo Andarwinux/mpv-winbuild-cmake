@@ -33,7 +33,6 @@ ExternalProject_Add(llvm-libc
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
-        _FULL_DEBUGINFO=set:1
         _FORCE_BUILTIN=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libc.src.string.memmem

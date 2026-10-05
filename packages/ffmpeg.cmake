@@ -148,7 +148,6 @@ ExternalProject_Add(ffmpeg
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
-        _FULL_DEBUGINFO=set:1
     BUILD_COMMAND ${MAKE} ffmpeg.exe
     INSTALL_COMMAND ${MAKE} install-headers install-libs install-progs
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

@@ -68,12 +68,7 @@ else
         FLAGS+=" -fvisibility-from-dllstorageclass -fvisibility-dllexport=hidden"
     fi
     if [ "$_NO_DEBUGINFO" != "1" ]; then
-        FLAGS+=" -fdebug-info-for-profiling"
-        if [ "$_FULL_DEBUGINFO" == "1" ]; then
-            FLAGS+=" -g3"
-        else
-            FLAGS+=" -gline-tables-only"
-        fi
+        FLAGS+=" -gline-tables-only"
     else
         FLAGS+=" -g0"
     fi

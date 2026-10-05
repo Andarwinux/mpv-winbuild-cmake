@@ -90,7 +90,6 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             _BINARY_DIR=set:<BINARY_DIR>
             _IS_EXCEPTIONS_ALLOWED=set:1
             _FORCE_HIDE_DLLEXPORT=set:1
-            _FULL_DEBUGINFO=set:1
             _PDB_GENERATE=set:1
         BUILD_COMMAND ${EXEC} meson install -C <BINARY_DIR>/build --only-changed --tags devel
         INSTALL_COMMAND ""
@@ -108,7 +107,6 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             _BINARY_DIR=set:<BINARY_DIR>
             _IS_EXCEPTIONS_ALLOWED=set:1
             _FORCE_HIDE_DLLEXPORT=set:1
-            _FULL_DEBUGINFO=set:1
         COMMAND ${EXEC} _IS_CONFIGURE=1 meson setup --reconfigure <BINARY_DIR>/legacy <BINARY_DIR>/source/${package}
             ${mpv_conf}
             -Dlibmpv=false

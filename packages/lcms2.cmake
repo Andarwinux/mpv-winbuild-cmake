@@ -2,7 +2,7 @@ ExternalProject_Add(lcms2
     GIT_REPOSITORY https://github.com/mm2/Little-CMS.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !testbed testbed/meson.build !plugins/*/testbed plugins/*/testbed/meson.build"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !testbed !doc !Projects !utils !m4 !fuzzers testbed/meson.build !plugins/*/testbed plugins/*/testbed/meson.build"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

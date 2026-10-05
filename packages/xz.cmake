@@ -1,7 +1,8 @@
 ExternalProject_Add(xz
     GIT_REPOSITORY https://github.com/tukaani-project/xz.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !/doc !/dos !/doxygen !/extra !/po4a !po !m4 !debug !build-aux !/tests !/windows"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

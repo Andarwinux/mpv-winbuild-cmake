@@ -1,7 +1,8 @@
 ExternalProject_Add(xxhash
     GIT_REPOSITORY https://github.com/Cyan4973/xxHash.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !cli !tests !doc !fuzz"
     GIT_PROGRESS TRUE
     GIT_TAG dev
     UPDATE_COMMAND ""

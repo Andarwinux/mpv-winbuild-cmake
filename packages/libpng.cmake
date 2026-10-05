@@ -2,7 +2,8 @@ ExternalProject_Add(libpng
     DEPENDS zlib
     GIT_REPOSITORY https://github.com/pnggroup/libpng.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !projects !contrib !ci"
     GIT_PROGRESS TRUE
     GIT_TAG libpng18
     GIT_REMOTE_NAME origin

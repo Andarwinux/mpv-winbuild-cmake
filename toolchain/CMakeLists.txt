@@ -6,7 +6,6 @@ list(APPEND ep
     mingw-w64
     mingw-w64-headers
     mingw-w64-crt
-    mingw-w64-gendef
     cppwinrt
     zlib-host
     libxml2-host

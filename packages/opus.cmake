@@ -4,7 +4,8 @@ ExternalProject_Add(opus
         opus-dnn
     GIT_REPOSITORY https://github.com/xiph/opus.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--filter=tree:0"
+    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !tests !training !m4 !dnn/torch !dnn/training_tf2 !cmake"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_TAG main

@@ -2,7 +2,8 @@ ExternalProject_Add(vulkan
     DEPENDS vulkan-header
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Loader.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !docs"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     GIT_REMOTE_NAME origin

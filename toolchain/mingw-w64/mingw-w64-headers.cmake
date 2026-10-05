@@ -9,7 +9,6 @@ ExternalProject_Add(mingw-w64-headers
         --host=${TARGET_ARCH}
         --prefix=${MINGW_INSTALL_PREFIX}
         --enable-sdk=all
-        --enable-idl
         --with-default-msvcrt=ucrt
     BUILD_COMMAND ""
     INSTALL_COMMAND make install

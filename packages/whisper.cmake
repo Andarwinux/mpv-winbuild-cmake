@@ -5,7 +5,7 @@ ExternalProject_Add(whisper
     GIT_REPOSITORY https://github.com/ggml-org/whisper.cpp.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !examples !ggml"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !examples !ggml !bindings !models !samples !media !grammars !scripts bindings/javascript/package-tmpl.json"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

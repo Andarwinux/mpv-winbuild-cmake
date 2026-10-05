@@ -5,7 +5,7 @@ ExternalProject_Add(aom
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !examples"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !examples !test !tools test/test.cmake"
     GIT_REMOTE_NAME origin
     GIT_TAG main
     #PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/aom-*.patch
@@ -13,6 +13,7 @@ ExternalProject_Add(aom
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['/aom_config\.c\.template/i unset(AOM_CMAKE_CONFIG)']] <SOURCE_DIR>/cmake/aom_configure.cmake
+    COMMAND ${EXEC} echo > <SOURCE_DIR>/test/test.cmake
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DENABLE_EXAMPLES=OFF

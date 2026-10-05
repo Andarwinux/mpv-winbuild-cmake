@@ -2,7 +2,7 @@ ExternalProject_Add(spirv-tools-host
     GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Tools.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test test/CMakeLists.txt"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test !source/fuzz !kokoro !docs !examples test/CMakeLists.txt examples/CMakeLists.txt source/fuzz/CMakeLists.txt"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_TAG main

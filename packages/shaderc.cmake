@@ -20,6 +20,8 @@ ExternalProject_Add(shaderc
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_spirv-headers} <SOURCE_DIR>/third_party/spirv-headers
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${src_spirv-tools} <SOURCE_DIR>/third_party/spirv-tools
     COMMAND ${EXEC} echo > ${src_spirv-tools}/test/CMakeLists.txt
+    COMMAND ${EXEC} echo > ${src_spirv-tools}/examples/CMakeLists.txt
+    COMMAND ${EXEC} echo > ${src_spirv-tools}/source/fuzz/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DSHADERC_SKIP_TESTS=ON

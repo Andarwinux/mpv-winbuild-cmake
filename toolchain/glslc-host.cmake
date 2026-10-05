@@ -15,6 +15,8 @@ ExternalProject_Add(glslc-host
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${EXEC_HOST} echo > ${src_spirv-tools-host}/test/CMakeLists.txt
+    COMMAND ${EXEC} echo > ${src_spirv-tools-host}/examples/CMakeLists.txt
+    COMMAND ${EXEC} echo > ${src_spirv-tools-host}/source/fuzz/CMakeLists.txt
     COMMAND ${EXEC_HOST} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         -GNinja
         -DCMAKE_BUILD_TYPE=Release

@@ -9,7 +9,7 @@ ExternalProject_Add(harfbuzz
     GIT_TAG main
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test !perf !docs !util !subprojects"
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

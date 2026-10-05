@@ -2,12 +2,13 @@ ExternalProject_Add(graphite2
     GIT_REPOSITORY https://github.com/silnrsi/graphite.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !site !doc !contrib !gr2fonttest !python doc/CMakeLists.txt"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
+    CONFIGURE_COMMAND ${EXEC} echo > <SOURCE_DIR>/doc/CMakeLists.txt
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DGRAPHITE2_NFILEFACE=ON
         -DGRAPHITE2_NTRACING=OFF

@@ -1,7 +1,8 @@
 ExternalProject_Add(highway
     GIT_REPOSITORY https://github.com/google/highway.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !docs !g3doc !debian !subprojects !hwy/tests hwy/tests/list_targets.cc !hwy/examples !hwy/contrib/testdata"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION

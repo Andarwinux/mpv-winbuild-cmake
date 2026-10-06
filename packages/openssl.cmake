@@ -7,13 +7,15 @@ ExternalProject_Add(openssl
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test !demos !fuzz !VMS !dev !os-dep !doc doc/build.info fuzz/build.info"
     GIT_SUBMODULES ""
     GIT_CONFIG "submodule.recurse=false"
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
+    COMMAND ${EXEC} echo > <BINARY_DIR>/source/${package}/doc/build.info
+    COMMAND ${EXEC} echo > <BINARY_DIR>/source/${package}/fuzz/build.info
     COMMAND ${CMAKE_COMMAND} -E make_directory <BINARY_DIR>/apps/include
     COMMAND ${EXEC} ${GIT_EXECUTABLE} -C <BINARY_DIR>/source/${package} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/openssl-*.patch
     COMMAND ${EXEC} <BINARY_DIR>/source/${package}/Configure

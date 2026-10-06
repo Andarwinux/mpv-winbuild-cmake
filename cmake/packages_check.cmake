@@ -1,5 +1,4 @@
 if(TARGET_CPU STREQUAL "x86_64")
-    set(dlltool_image "i386:x86-64")
     set(openssl_target "mingw64")
     set(mimalloc_macro "-D_M_X64")
     set(novzeroupper
@@ -81,7 +80,6 @@ if(TARGET_CPU STREQUAL "x86_64")
         -DHAVE_IMMINTRIN_H=ON
     )
 elseif(TARGET_CPU STREQUAL "aarch64")
-    set(dlltool_image "arm64")
     set(openssl_target "mingwarm64")
     set(novzeroupper
         COMMAND true

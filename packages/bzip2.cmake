@@ -1,7 +1,8 @@
 ExternalProject_Add(bzip2
     GIT_REPOSITORY https://gitlab.com/bzip2/bzip2.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !docs"
     GIT_PROGRESS TRUE
     GIT_CONFIG "submodule.recurse=false"
     GIT_SUBMODULES ""

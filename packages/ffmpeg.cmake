@@ -51,11 +51,14 @@ ExternalProject_Add(ffmpeg
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests/ref/fate"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !doc tests/Makefile doc/Makefile doc/examples/Makefile"
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
-    CONFIGURE_COMMAND ${EXEC} <SOURCE_DIR>/configure
+    CONFIGURE_COMMAND ${EXEC} echo > <SOURCE_DIR>/tests/Makefile
+    COMMAND ${EXEC} echo > <SOURCE_DIR>/doc/Makefile
+    COMMAND ${EXEC} echo > <SOURCE_DIR>/doc/examples/Makefile
+    COMMAND ${EXEC} <SOURCE_DIR>/configure
         --cross-prefix=${TARGET_ARCH}-
         --prefix=${MINGW_INSTALL_PREFIX}
         --arch=${TARGET_CPU}

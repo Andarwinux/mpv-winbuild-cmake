@@ -31,12 +31,54 @@ elseif(host_arch STREQUAL "aarch64" OR host_arch STREQUAL "arm64")
         set(tc_cflags "${tc_cflags} -march=armv8.2-a+crypto")
     endif()
 endif()
-set(llvm_mllvm "-mllvm -enable-masked-interleaved-mem-accesses -mllvm -enable-interleaved-mem-accesses -mllvm -slp-vectorize-hor-store -mllvm -enable-early-exit-vectorization-with-side-effects")
-set(llvm_mllvm "${llvm_mllvm} -mllvm -enable-loopinterchange -mllvm -loop-interchange-reduction-to-mem -mllvm -enable-loop-distribute -mllvm -enable-unroll-and-jam -mllvm -allow-unroll-and-jam -mllvm -enable-loop-flatten -mllvm -aggressive-ext-opt -mllvm -enable-double-float-shrink")
-set(llvm_mllvm "${llvm_mllvm} -mllvm -adce-remove-loops -mllvm -enable-ext-tsp-block-placement -mllvm -vectorizer-maximize-bandwidth -mllvm -vectorizer-consider-reg-pressure -mllvm -prefer-predicated-reduction-select -mllvm -combiner-global-alias-analysis -mllvm -misched-postra -mllvm -enable-gc-empty-basic-blocks -mllvm -enable-jump-table-to-switch -mllvm -enable-loop-versioning-licm=false -mllvm -slp-vectorize-non-power-of-2 -mllvm -slp-enable-strided-stores -mllvm -slp-runtime-alias-checks-max-scalar-cost-percent=100 -mllvm -enable-dfa-jump-thread -mllvm -force-ordered-reductions=false -mllvm -enable-spill-copy-elim -mllvm -enable-local-reassign -mllvm -loop-idiom-force-memset-pattern-intrinsic -mllvm -loop-idiom-crc-strategy=clmul -mllvm -enable-partial-inlining -mllvm -inline-enable-cost-benefit-analysis -mllvm -inline-priority-mode=cost-benefit -mllvm -inline-threshold=360 -mllvm -inlinedefault-threshold=360 -mllvm -inlinehint-threshold=525 -mllvm -import-cold-multiplier=0.05 -mllvm -partial-unrolling-threshold=0 -mllvm -jump-is-expensive")
-set(llvm_mllvm_lto "-Wl,-mllvm,-disable-auto-upgrade-debug-info,-mllvm,-enable-masked-interleaved-mem-accesses,-mllvm,-enable-interleaved-mem-accesses,-mllvm,-slp-vectorize-hor-store,-mllvm,-enable-early-exit-vectorization-with-side-effects")
-set(llvm_mllvm_lto "${llvm_mllvm_lto} -Wl,-mllvm,-enable-loopinterchange,-mllvm,-loop-interchange-reduction-to-mem,-mllvm,-enable-loop-distribute,-mllvm,-enable-unroll-and-jam,-mllvm,-allow-unroll-and-jam,-mllvm,-enable-loop-flatten,-mllvm,-aggressive-ext-opt,-mllvm,-enable-double-float-shrink")
-set(llvm_mllvm_lto "${llvm_mllvm_lto} -Wl,-mllvm,-adce-remove-loops,-mllvm,-enable-ext-tsp-block-placement,-mllvm,-vectorizer-maximize-bandwidth,-mllvm,-vectorizer-consider-reg-pressure,-mllvm,-prefer-predicated-reduction-select,-mllvm,-combiner-global-alias-analysis,-mllvm,-misched-postra,-mllvm,-enable-gc-empty-basic-blocks,-mllvm,-enable-jump-table-to-switch,-mllvm,-enable-loop-versioning-licm=false,-mllvm,-slp-vectorize-non-power-of-2,-mllvm,-slp-enable-strided-stores,-mllvm,-slp-runtime-alias-checks-max-scalar-cost-percent=100,-mllvm,-enable-dfa-jump-thread,-mllvm,-force-ordered-reductions=false,-mllvm,-enable-spill-copy-elim,-mllvm,-enable-local-reassign,-mllvm,-loop-idiom-force-memset-pattern-intrinsic,-mllvm,-loop-idiom-crc-strategy=clmul,-mllvm,-enable-partial-inlining,-mllvm,-inline-enable-cost-benefit-analysis,-mllvm,-inline-priority-mode=cost-benefit,-mllvm,-inline-threshold=360,-mllvm,-inlinedefault-threshold=360,-mllvm,-inlinehint-threshold=525,-mllvm,-import-cold-multiplier=0.05,-mllvm,-partial-unrolling-threshold=0,-mllvm,-jump-is-expensive")
+set(mllvm_options
+    -enable-masked-interleaved-mem-accesses
+    -enable-interleaved-mem-accesses
+    -slp-vectorize-hor-store
+    -enable-early-exit-vectorization-with-side-effects
+    -enable-loopinterchange
+    -loop-interchange-reduction-to-mem
+    -enable-loop-distribute
+    -enable-unroll-and-jam
+    -allow-unroll-and-jam
+    -enable-loop-flatten
+    -aggressive-ext-opt
+    -enable-double-float-shrink
+    -adce-remove-loops
+    -enable-ext-tsp-block-placement
+    -vectorizer-maximize-bandwidth
+    -vectorizer-consider-reg-pressure
+    -prefer-predicated-reduction-select
+    -combiner-global-alias-analysis
+    -misched-postra
+    -enable-gc-empty-basic-blocks
+    -enable-jump-table-to-switch
+    -enable-loop-versioning-licm=false
+    -slp-vectorize-non-power-of-2
+    -slp-enable-strided-stores
+    -slp-runtime-alias-checks-max-scalar-cost-percent=100
+    -enable-dfa-jump-thread
+    -force-ordered-reductions=false
+    -enable-spill-copy-elim
+    -enable-local-reassign
+    -loop-idiom-force-memset-pattern-intrinsic
+    -loop-idiom-crc-strategy=clmul
+    -enable-partial-inlining
+    -inline-enable-cost-benefit-analysis
+    -inline-priority-mode=cost-benefit
+    -inline-threshold=360
+    -inlinedefault-threshold=360
+    -inlinehint-threshold=525
+    -import-cold-multiplier=0.05
+    -partial-unrolling-threshold=0
+    -jump-is-expensive
+)
+list(TRANSFORM mllvm_options PREPEND "-mllvm " OUTPUT_VARIABLE mllvm_options_cc)
+list(JOIN mllvm_options_cc " " mllvm_options_cc)
+list(TRANSFORM mllvm_options PREPEND "-mllvm," OUTPUT_VARIABLE mllvm_options_ld)
+list(JOIN mllvm_options_ld "," mllvm_options_ld)
+set(llvm_mllvm "${mllvm_options_cc}")
+set(llvm_mllvm_lto "-Wl,-mllvm,-disable-auto-upgrade-debug-info,${mllvm_options_ld}")
 if(LLVM_ENABLE_LTO STREQUAL "Thin")
     set(tc_cflags "${tc_cflags} -flto=thin -fwhole-program-vtables -fstrict-vtable-pointers -fsplit-lto-unit -funique-source-file-names")
     set(tc_ldflags "${tc_ldflags} ${llvm_mllvm_lto}")

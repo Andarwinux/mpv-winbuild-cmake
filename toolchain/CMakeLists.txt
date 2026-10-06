@@ -17,7 +17,6 @@ list(APPEND ep
     glslc-host
     ninja
     llvm
-    llvm-bolt
     llvm-compiler-rt-builtin
     llvm-host-compiler-rt-builtin
     llvm-libcxx

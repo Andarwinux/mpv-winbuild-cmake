@@ -1433,6 +1433,7 @@ set(highway_force_skip_check
     -DHWY_EMSCRIPTEN=OFF
     -DHWY_RISCV=OFF
     -DHAVE_ASM_HWCAP_H=OFF
+    -DHAVE_ELF_AUX_INFO=OFF
     -DHAVE_SYS_AUXV_H=OFF
 )
 

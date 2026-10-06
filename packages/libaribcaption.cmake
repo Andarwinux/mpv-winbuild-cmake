@@ -2,7 +2,6 @@ ExternalProject_Add(libaribcaption
     DEPENDS
         fontconfig
         freetype2
-        openssl
     GIT_REPOSITORY https://github.com/xqq/libaribcaption.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
@@ -19,8 +18,6 @@ ExternalProject_Add(libaribcaption
         -DARIBCC_NO_EXCEPTIONS=ON
         -DARIBCC_USE_FONTCONFIG=ON
         -DARIBCC_USE_FREETYPE=ON
-        "-DCMAKE_C_FLAGS='-DHAVE_OPENSSL=1'"
-        "-DCMAKE_CXX_FLAGS='-DHAVE_OPENSSL=1'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -88,6 +88,7 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         BUILD_ENVIRONMENT_MODIFICATION
             _PACKAGE_NAME=set:${package}
             _BINARY_DIR=set:<BINARY_DIR>
+            _IS_UNWIND_ALLOWED=set:1
             _IS_EXCEPTIONS_ALLOWED=set:1
             _FORCE_HIDE_DLLEXPORT=set:1
             _PDB_GENERATE=set:1

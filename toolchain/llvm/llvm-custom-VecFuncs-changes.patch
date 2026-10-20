@@ -1,4 +1,4 @@
-From 65d500287e56485f6aeea7dfac2a8afbd538649b Mon Sep 17 00:00:00 2001
+From ded53cfabf2c5512d38f61a97160760ac64ef761 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Mon, 22 Sep 2025 00:00:00 +0000
 Subject: [PATCH] custom VecFuncs changes
@@ -6,8 +6,7 @@ Subject: [PATCH] custom VecFuncs changes
 ---
  llvm/include/llvm/Analysis/VecFuncs.def | 454 +++++++++++++++---------
  llvm/include/llvm/IR/RuntimeLibcalls.td |  14 +-
- llvm/lib/IR/RuntimeLibcalls.cpp         |  11 +-
- 3 files changed, 306 insertions(+), 173 deletions(-)
+ 2 files changed, 297 insertions(+), 171 deletions(-)
 
 diff --git a/llvm/include/llvm/Analysis/VecFuncs.def b/llvm/include/llvm/Analysis/VecFuncs.def
 index 6af8b63366..88287b64fb 100644
@@ -707,10 +706,10 @@ index 6af8b63366..88287b64fb 100644
  TLI_DEFINE_VECFUNC("tgamma", "_ZGVsMxv_tgamma",  SCALABLE(2), MASKED, "_ZGVsMxv")
  TLI_DEFINE_VECFUNC("tgammaf", "_ZGVsMxv_tgammaf", SCALABLE(4), MASKED, "_ZGVsMxv")
 diff --git a/llvm/include/llvm/IR/RuntimeLibcalls.td b/llvm/include/llvm/IR/RuntimeLibcalls.td
-index d05cd842bd..d1284626a8 100644
+index 52b3ce23b2..9c569c87d1 100644
 --- a/llvm/include/llvm/IR/RuntimeLibcalls.td
 +++ b/llvm/include/llvm/IR/RuntimeLibcalls.td
-@@ -3984,6 +3984,10 @@ defset list<RuntimeLibcallImpl> LIBMVEC_X86_VECFUNCS = {
+@@ -4021,6 +4021,10 @@ defset list<RuntimeLibcallImpl> LIBMVEC_X86_VECFUNCS = {
    def LIBMVEC__ZGVdN8v_tanf : LibmvecLibcall<TAN_V8F32>;
    def LIBMVEC__ZGVdN8vv___powf_finite : LibmvecLibcall<POW_FINITE_V8F32>;
    def LIBMVEC__ZGVdN8vv_powf : LibmvecLibcall<POW_V8F32>;
@@ -721,7 +720,7 @@ index d05cd842bd..d1284626a8 100644
  }
  
  defset list<RuntimeLibcallImpl> LIBMVEC_AARCH64_VECFUNCS = {
-@@ -4272,7 +4276,7 @@ defset list<RuntimeLibcallImpl> SLEEFGNUABI_VF2_VECFUNCS = {
+@@ -4309,7 +4313,7 @@ defset list<RuntimeLibcallImpl> SLEEFGNUABI_VF2_VECFUNCS = {
    def _ZGVnN2v_tanh : RuntimeLibcallImpl<TANH_V2F64>;
    def _ZGVnN2v_tgamma : RuntimeLibcallImpl<TGAMMA_V2F64>;
    def _ZGVnN2vl8_modf : RuntimeLibcallImpl<MODF_V2F64>;
@@ -730,7 +729,7 @@ index d05cd842bd..d1284626a8 100644
    def _ZGVnN2vl8l8_sincospi : RuntimeLibcallImpl<SINCOSPI_V2F64>;
    def _ZGVnN2vv_atan2 : RuntimeLibcallImpl<ATAN2_V2F64>;
    def _ZGVnN2vv_copysign : RuntimeLibcallImpl<COPYSIGN_V2F64>;
-@@ -4318,7 +4322,7 @@ defset list<RuntimeLibcallImpl> SLEEFGNUABI_VF4_VECFUNCS = {
+@@ -4355,7 +4359,7 @@ defset list<RuntimeLibcallImpl> SLEEFGNUABI_VF4_VECFUNCS = {
    def _ZGVnN4v_tanhf : RuntimeLibcallImpl<TANH_V4F32>;
    def _ZGVnN4v_tgammaf : RuntimeLibcallImpl<TGAMMA_V4F32>;
    def _ZGVnN4vl4_modff : RuntimeLibcallImpl<MODF_V4F32>;
@@ -739,7 +738,7 @@ index d05cd842bd..d1284626a8 100644
    def _ZGVnN4vl4l4_sincospif : RuntimeLibcallImpl<SINCOSPI_V4F32>;
    def _ZGVnN4vv_atan2f : RuntimeLibcallImpl<ATAN2_V4F32>;
    def _ZGVnN4vv_copysignf : RuntimeLibcallImpl<COPYSIGN_V4F32>;
-@@ -4416,9 +4420,11 @@ defset list<RuntimeLibcallImpl> SLEEFGNUABI_SCALABLE_VECFUNCS = {
+@@ -4453,9 +4457,11 @@ defset list<RuntimeLibcallImpl> SLEEFGNUABI_SCALABLE_VECFUNCS = {
    def _ZGVsMxvvv_fmaf : RuntimeLibcallImpl<FMA_MASKED_NXV4F32>;
    def _ZGVsNxvl8_modf : RuntimeLibcallImpl<MODF_NXV2F64>;
    def _ZGVsNxvl4_modff : RuntimeLibcallImpl<MODF_NXV4F32>;
@@ -753,35 +752,6 @@ index d05cd842bd..d1284626a8 100644
    def _ZGVsNxvl8l8_sincospi : RuntimeLibcallImpl<SINCOSPI_NXV2F64>;
  }
  
-diff --git a/llvm/lib/IR/RuntimeLibcalls.cpp b/llvm/lib/IR/RuntimeLibcalls.cpp
-index a6c7f50202..6335706e7a 100644
---- a/llvm/lib/IR/RuntimeLibcalls.cpp
-+++ b/llvm/lib/IR/RuntimeLibcalls.cpp
-@@ -49,8 +49,9 @@ RuntimeLibcallsInfo::RuntimeLibcallsInfo(const Triple &TT,
-           RTLIB::impl__ZGVsMxvv_fmod, RTLIB::impl__ZGVsMxvv_fmodf,
-           RTLIB::impl__ZGVnN2vl8_modf, RTLIB::impl__ZGVnN4vl4_modff,
-           RTLIB::impl__ZGVsNxvl8_modf, RTLIB::impl__ZGVsNxvl4_modff,
--          RTLIB::impl__ZGVnN2vl8l8_sincos, RTLIB::impl__ZGVnN4vl4l4_sincosf,
--          RTLIB::impl__ZGVsNxvl8l8_sincos, RTLIB::impl__ZGVsNxvl4l4_sincosf,
-+          RTLIB::impl__ZGVnN2vl8l8_sincos_u35, RTLIB::impl__ZGVnN4vl4l4_sincosf_u35,
-+          RTLIB::impl__ZGVsNxvl8l8_sincos_u35, RTLIB::impl__ZGVsNxvl4l4_sincosf_u35,
-+          RTLIB::impl__ZGVsMxvl8l8_sincos_u35, RTLIB::impl__ZGVsMxvl4l4_sincosf_u35,
-           RTLIB::impl__ZGVnN4vl4l4_sincospif, RTLIB::impl__ZGVnN2vl8l8_sincospi,
-           RTLIB::impl__ZGVsNxvl4l4_sincospif,
-           RTLIB::impl__ZGVsNxvl8l8_sincospi})
-@@ -97,6 +98,12 @@ RuntimeLibcallsInfo::RuntimeLibcallsInfo(const Triple &TT,
-           RTLIB::impl_amd_vrs8_sincosf, RTLIB::impl_amd_vrs16_sincosf})
-       setAvailable(Impl);
-     break;
-+  case VectorLibrary::LIBMVEC:
-+    for (RTLIB::LibcallImpl Impl :
-+         {RTLIB::impl_LIBMVEC__ZGVbN2vl8l8_sincos_u35, RTLIB::impl_LIBMVEC__ZGVdN4vl8l8_sincos_u35,
-+          RTLIB::impl_LIBMVEC__ZGVbN4vl4l4_sincosf_u35, RTLIB::impl_LIBMVEC__ZGVdN8vl4l4_sincosf_u35})
-+      setAvailable(Impl);
-+    break;
-   default:
-     break;
-   }
 -- 
 2.56.0
 

@@ -131,7 +131,6 @@ ExternalProject_Add(ffmpeg
         --enable-nvenc
         --enable-openal
         --enable-opencl
-        --enable-opengl
         --enable-openssl
         --enable-response-files
         --enable-runtime-cpudetect

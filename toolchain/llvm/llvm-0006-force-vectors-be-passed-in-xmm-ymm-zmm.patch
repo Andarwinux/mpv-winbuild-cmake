@@ -1,0 +1,35 @@
+From 6b2372497995374513bf974b8062dc0f687054c0 Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sat, 24 Oct 2026 00:00:00 +0000
+Subject: [PATCH] force vectors be passed in xmm/ymm/zmm
+
+---
+ llvm/lib/Target/X86/X86CallingConv.td | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/llvm/lib/Target/X86/X86CallingConv.td b/llvm/lib/Target/X86/X86CallingConv.td
+index bde5f81eaa7..efb3694d443 100644
+--- a/llvm/lib/Target/X86/X86CallingConv.td
++++ b/llvm/lib/Target/X86/X86CallingConv.td
+@@ -636,6 +636,18 @@ def CC_X86_Win64_C : CallingConv<[
+   // The 'CFGuardTarget' parameter, if any, is passed in RAX.
+   CCIfCFGuardTarget<CCAssignToReg<[RAX]>>,
+ 
++  CCIfType<[v16i8, v8i16, v4i32, v2i64, v8f16, v8bf16, v4f32, v2f64],
++            CCIfSubtarget<"hasSSE1()",
++            CCAssignToReg<[XMM0, XMM1, XMM2, XMM3]>>>,
++
++  CCIfType<[v32i8, v16i16, v8i32, v4i64, v16f16, v16bf16, v8f32, v4f64],
++            CCIfSubtarget<"hasAVX()",
++            CCAssignToReg<[YMM0, YMM1, YMM2, YMM3]>>>,
++
++  CCIfType<[v64i8, v32i16, v16i32, v8i64, v32f16, v32bf16, v16f32, v8f64],
++            CCIfSubtarget<"hasAVX512()",
++            CCAssignToReg<[ZMM0, ZMM1, ZMM2, ZMM3]>>>,
++
+   // 128 bit vectors are passed by pointer
+   CCIfType<[v16i8, v8i16, v4i32, v2i64, v8f16, v8bf16, v4f32, v2f64], CCPassIndirect<i64>>,
+ 
+-- 
+2.56.0
+

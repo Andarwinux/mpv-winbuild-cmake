@@ -25,7 +25,7 @@ list(APPEND ep
     llvm-compiler-rt
     llvm-host-compiler-rt
     sleef
-    directx-headers
+    #directx-headers
     llvm-clang
 )
 

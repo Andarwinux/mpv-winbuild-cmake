@@ -6,7 +6,7 @@ ExternalProject_Add(llvm-clang
         mingw-w64-crt
         cppwinrt
         sleef
-        directx-headers
+        #directx-headers
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${SOURCE_LOCATION}
     UPDATE_COMMAND ""

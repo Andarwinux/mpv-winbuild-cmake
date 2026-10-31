@@ -4,6 +4,8 @@ ExternalProject_Add(speex
     GIT_CLONE_FLAGS "--depth=1 --filter=tree:0"
     GIT_PROGRESS TRUE
     UPDATE_COMMAND ""
+    GIT_REMOTE_NAME origin
+    GIT_TAG main
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>

@@ -72,7 +72,6 @@ list(APPEND ep
     libplacebo
     libva
     libaribcaption
-    libsixel
     opencl-header
     opencl
     fdk-aac

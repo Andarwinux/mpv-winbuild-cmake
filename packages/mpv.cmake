@@ -30,7 +30,6 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
         -Drubberband=enabled
         -Dsdl2-gamepad=enabled
         -Dshaderc=enabled
-        -Dsixel=enabled
         -Dspirv-cross=enabled
         -Duchardet=enabled
         -Dvaapi-win32=enabled
@@ -70,7 +69,6 @@ if(NOT DEFINED CMAKE_SCRIPT_MODE_FILE)
             spirv-cross
             vapoursynth
             libsdl2
-            libsixel
             curl
         GIT_REPOSITORY https://github.com/mpv-player/mpv.git
         SOURCE_DIR ${SOURCE_LOCATION}

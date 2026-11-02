@@ -1,17 +1,17 @@
-From e0ff8e3d3d9a74928735fc75449cfd0bcf2d44d8 Mon Sep 17 00:00:00 2001
+From 02e61257c318efb07f54cfb8fcfa0fa72e947618 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 30 Aug 2026 00:00:00 +0000
 Subject: [PATCH] move LoopFullUnrollPass behind LV
 
 ---
- llvm/lib/Passes/PassBuilderPipelines.cpp | 33 ++++++++++++++----------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+ llvm/lib/Passes/PassBuilderPipelines.cpp | 27 +++++++++++++++---------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/lib/Passes/PassBuilderPipelines.cpp b/llvm/lib/Passes/PassBuilderPipelines.cpp
-index 901250fdd..0ece5034f 100644
+index d1229a93ecf..41df3d3b679 100644
 --- a/llvm/lib/Passes/PassBuilderPipelines.cpp
 +++ b/llvm/lib/Passes/PassBuilderPipelines.cpp
-@@ -561,11 +561,11 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
+@@ -449,11 +449,11 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
    // inaccurate. The normal unroller doesn't pay attention to forced full unroll
    // attributes so we need to make sure and allow the full unroll pass to pay
    // attention to it.
@@ -28,7 +28,7 @@ index 901250fdd..0ece5034f 100644
  
    invokeLoopOptimizerEndEPCallbacks(LPM2, Level);
  
-@@ -743,11 +743,11 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
+@@ -631,11 +631,11 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
    // inaccurate. The normal unroller doesn't pay attention to forced full unroll
    // attributes so we need to make sure and allow the full unroll pass to pay
    // attention to it.
@@ -45,7 +45,7 @@ index 901250fdd..0ece5034f 100644
  
    invokeLoopOptimizerEndEPCallbacks(LPM2, Level);
  
-@@ -1384,6 +1384,13 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
+@@ -1289,6 +1289,13 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
                                       /*AggregateToVector=*/true)));
    }
  
@@ -59,19 +59,6 @@ index 901250fdd..0ece5034f 100644
    if (!isFullLTOPostLink(LTOPhase)) {
      // Eliminate loads by forwarding stores from the previous iteration to loads
      // of the current iteration.
-@@ -2298,9 +2305,9 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
-   // FIXME: Add loop interchange.
- 
-   // Unroll small loops and perform peeling.
--  LPM.addPass(LoopFullUnrollPass(static_cast<int>(Level),
--                                 /* OnlyWhenForced= */ !PTO.LoopUnrolling,
--                                 PTO.ForgetAllSCEVInLoopUnroll));
-+  //LPM.addPass(LoopFullUnrollPass(static_cast<int>(Level),
-+  //                               /* OnlyWhenForced= */ !PTO.LoopUnrolling,
-+  //                               PTO.ForgetAllSCEVInLoopUnroll));
-   // The loop passes in LPM (LoopFullUnrollPass) do not preserve MemorySSA.
-   // *All* loop passes must preserve it, in order to be able to use it.
-   MainFPM.addPass(
 -- 
-2.55.0
+2.56.0
 

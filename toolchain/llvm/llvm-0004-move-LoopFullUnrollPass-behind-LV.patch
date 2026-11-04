@@ -1,4 +1,4 @@
-From 02e61257c318efb07f54cfb8fcfa0fa72e947618 Mon Sep 17 00:00:00 2001
+From 075c8480685d38786333ffcae72bdaf4b1a48dea Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 30 Aug 2026 00:00:00 +0000
 Subject: [PATCH] move LoopFullUnrollPass behind LV
@@ -8,10 +8,10 @@ Subject: [PATCH] move LoopFullUnrollPass behind LV
  1 file changed, 17 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/lib/Passes/PassBuilderPipelines.cpp b/llvm/lib/Passes/PassBuilderPipelines.cpp
-index d1229a93ecf..41df3d3b679 100644
+index 7a7e26276d..89ab8d5f37 100644
 --- a/llvm/lib/Passes/PassBuilderPipelines.cpp
 +++ b/llvm/lib/Passes/PassBuilderPipelines.cpp
-@@ -449,11 +449,11 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
+@@ -446,11 +446,11 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
    // inaccurate. The normal unroller doesn't pay attention to forced full unroll
    // attributes so we need to make sure and allow the full unroll pass to pay
    // attention to it.
@@ -19,16 +19,16 @@ index d1229a93ecf..41df3d3b679 100644
 -      PGOOpt->Action != PGOOptions::SampleUse)
 -    LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 -                                    /* OnlyWhenForced= */ !PTO.LoopUnrolling,
--                                    PTO.ForgetAllSCEVInLoopUnroll));
+-                                    *PTO.ForgetAllSCEVInLoopUnroll));
 +  //if (!isThinLTOPreLink(Phase) || !PGOOpt ||
 +  //    PGOOpt->Action != PGOOptions::SampleUse)
 +  //  LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 +  //                                  /* OnlyWhenForced= */ !PTO.LoopUnrolling,
-+  //                                  PTO.ForgetAllSCEVInLoopUnroll));
++  //                                  *PTO.ForgetAllSCEVInLoopUnroll));
  
    invokeLoopOptimizerEndEPCallbacks(LPM2, Level);
  
-@@ -631,11 +631,11 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
+@@ -628,11 +628,11 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
    // inaccurate. The normal unroller doesn't pay attention to forced full unroll
    // attributes so we need to make sure and allow the full unroll pass to pay
    // attention to it.
@@ -36,23 +36,23 @@ index d1229a93ecf..41df3d3b679 100644
 -      PGOOpt->Action != PGOOptions::SampleUse)
 -    LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 -                                    /* OnlyWhenForced= */ !PTO.LoopUnrolling,
--                                    PTO.ForgetAllSCEVInLoopUnroll));
+-                                    *PTO.ForgetAllSCEVInLoopUnroll));
 +  //if (!isThinLTOPreLink(Phase) || !PGOOpt ||
 +  //    PGOOpt->Action != PGOOptions::SampleUse)
 +  //  LPM2.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 +  //                                  /* OnlyWhenForced= */ !PTO.LoopUnrolling,
-+  //                                  PTO.ForgetAllSCEVInLoopUnroll));
++  //                                  *PTO.ForgetAllSCEVInLoopUnroll));
  
    invokeLoopOptimizerEndEPCallbacks(LPM2, Level);
  
-@@ -1289,6 +1289,13 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
+@@ -1286,6 +1286,13 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
                                       /*AggregateToVector=*/true)));
    }
  
 +  LoopPassManager LPM;
 +  LPM.addPass(LoopFullUnrollPass(static_cast<int>(Level),
 +                                 /* OnlyWhenForced= */ !PTO.LoopUnrolling,
-+                                 PTO.ForgetAllSCEVInLoopUnroll));
++                                 *PTO.ForgetAllSCEVInLoopUnroll));
 +  FPM.addPass(createFunctionToLoopPassAdaptor(std::move(LPM),
 +                                              /*UseMemorySSA=*/false));
 +

@@ -11,6 +11,7 @@ ExternalProject_Add(highway
         ${cmake_conf_args}
         ${highway_force_skip_check}
         -DHWY_ENABLE_CONTRIB=OFF
+        -DHWY_ENABLE_IO=OFF
         -DHWY_ENABLE_EXAMPLES=OFF
         -DHWY_ENABLE_TESTS=OFF
         -DHWY_ENABLE_INSTALL=ON

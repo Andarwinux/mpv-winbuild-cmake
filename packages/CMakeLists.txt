@@ -87,6 +87,7 @@ list(APPEND ep
     c-ares
     libpsl
     curl
+    chromaprint
     ffmpeg
     mpv
     mpv-debug-plugin

@@ -47,6 +47,7 @@ ExternalProject_Add(ffmpeg
         whisper
         x265
         curl
+        chromaprint
     GIT_REPOSITORY https://github.com/Andarwinux/FFmpeg.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -78,6 +79,7 @@ ExternalProject_Add(ffmpeg
         --enable-amf
         --enable-avisynth
         --enable-bzlib
+        --enable-chromaprint
         --enable-cross-compile
         --enable-cuda-llvm
         --enable-cuvid

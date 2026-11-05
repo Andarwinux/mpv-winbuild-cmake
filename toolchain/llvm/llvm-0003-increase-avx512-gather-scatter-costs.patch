@@ -1,17 +1,36 @@
-From 61b9fb5aff8a0fc577de84a2bd87c3410a00da0c Mon Sep 17 00:00:00 2001
+From 1bc5ecbea3e6b628feb1a30e4e5e8c0f659eddd1 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 26 May 2026 00:00:00 +0000
 Subject: [PATCH] increase avx512 gather/scatter costs
 
 ---
- llvm/lib/Target/X86/X86TargetTransformInfo.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ llvm/lib/Target/X86/X86TargetTransformInfo.cpp  | 16 +++++++++-------
+ llvm/lib/Transforms/Vectorize/LoopVectorize.cpp |  5 ++---
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 8e0cf1fc5..7dd85639f 100644
+index cf11d35b6..ec1c8d824 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-@@ -6596,14 +6596,14 @@ int X86TTIImpl::getGatherOverhead() const {
+@@ -6251,7 +6251,8 @@ X86TTIImpl::getAddressComputationCost(Type *PtrTy, ScalarEvolution *SE,
+   // Even in the case of (loop invariant) stride whose value is not known at
+   // compile time, the address computation will not incur more than one extra
+   // ADD instruction.
+-  if (PtrTy->isVectorTy() && SE) {
++  if (PtrTy->isVectorTy() && SE && !BaseT::isConstantStridedAccessLessThan(SE, Ptr, 65536)) {
++    return InstructionCost::getInvalid();
+     if (BaseT::isStridedAccess(Ptr) && !BaseT::getConstantStrideStep(SE, Ptr))
+       return 1;
+     if (!ST->hasAVX2()) {
+@@ -6261,6 +6262,7 @@ X86TTIImpl::getAddressComputationCost(Type *PtrTy, ScalarEvolution *SE,
+         return NumVectorInstToHideOverhead;
+     }
+   }
++  return PtrTy->isVectorTy() ? 1 : 0;
+ 
+   return BaseT::getAddressComputationCost(PtrTy, SE, Ptr, CostKind);
+ }
+@@ -7186,14 +7188,14 @@ int X86TTIImpl::getGatherOverhead() const {
    // TODO: Remove the explicit hasAVX512()?, That would mean we would only
    // enable gather with a -march.
    if (ST->hasAVX512() || (ST->hasAVX2() && ST->hasFastGather()))
@@ -28,6 +47,60 @@ index 8e0cf1fc5..7dd85639f 100644
  
    return 1024;
  }
+@@ -7253,7 +7255,7 @@ InstructionCost X86TTIImpl::getGSVectorCost(unsigned Opcode,
+     // Handle splitting of vector of pointers
+     auto *SplitSrcTy =
+         FixedVectorType::get(SrcVTy->getScalarType(), VF / SplitFactor);
+-    return SplitFactor * getGSVectorCost(Opcode, CostKind, SplitSrcTy, Ptr,
++    return 10 * SplitFactor * getGSVectorCost(Opcode, CostKind, SplitSrcTy, Ptr,
+                                          Alignment, AddressSpace);
+   }
+ 
+@@ -7287,7 +7289,7 @@ X86TTIImpl::getGatherScatterOpCost(const MemIntrinsicCostAttributes &MICA,
+        (!isLegalMaskedScatter(SrcVTy, Align(Alignment)) ||
+         forceScalarizeMaskedScatter(cast<VectorType>(SrcVTy),
+                                     Align(Alignment)))))
+-    return BaseT::getMemIntrinsicInstrCost(MICA, CostKind);
++    return InstructionCost::getInvalid();
+ 
+   assert(SrcVTy->isVectorTy() && "Unexpected data type for Gather/Scatter");
+   unsigned AddressSpace = MICA.getAddressSpace();
+@@ -7808,7 +7810,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
+                            MaskCost + NumOfUnfoldedLoads * MemOpCost +
+                            NumOfMoves;
+ 
+-    return Cost;
++    return Cost / 4;
+   }
+ 
+   // Store.
+@@ -7846,7 +7848,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
+       MaskCost +
+       NumOfMemOps * (MemOpCost + NumOfShufflesPerStore * ShuffleCost) +
+       NumOfMoves;
+-  return Cost;
++  return Cost / 4;
+ }
+ 
+ InstructionCost X86TTIImpl::getInterleavedMemoryOpCost(
+diff --git a/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp b/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
+index bbcc16555..1dfb497fc 100644
+--- a/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
++++ b/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
+@@ -4361,11 +4361,10 @@ void LoopVectorizationCostModel::setCostBasedWideningDecision(ElementCount VF) {
+       // write down this decision and use it during vectorization.
+       InstructionCost Cost;
+       InstWidening Decision;
+-      if (InterleaveCost <= GatherScatterCost &&
+-          InterleaveCost < ScalarizationCost) {
++      if (InterleaveCost != InstructionCost::getInvalid()) {
+         Decision = CM_Interleave;
+         Cost = InterleaveCost;
+-      } else if (GatherScatterCost < ScalarizationCost) {
++      } else if (true) {
+         Decision = CM_GatherScatter;
+         Cost = GatherScatterCost;
+       } else {
 -- 
-2.55.0
+2.56.0
 

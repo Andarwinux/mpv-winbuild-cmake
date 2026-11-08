@@ -1,11 +1,13 @@
-From c9d61e8598351061a9e0015bb4611a9474a2173d Mon Sep 17 00:00:00 2001
+From 53d955b1be8297c9d364c0e7fbd356cc3b918074 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Wed, 14 Jan 2026 00:00:00 +0000
 Subject: [PATCH] add DCE support
 
 ---
  src/arm/cpu.c            |  8 ++++----
+ src/cpu.h                |  1 +
  src/ext/x86/x86inc.asm   | 19 +++++++++++++++----
+ src/x86/cpu.c            |  1 +
  src/x86/itx16_avx2.asm   |  2 ++
  src/x86/itx16_avx512.asm | 12 +++++++-----
  src/x86/itx16_sse.asm    |  2 ++
@@ -19,7 +21,7 @@ Subject: [PATCH] add DCE support
  src/x86/mc_avx512.asm    | 40 +++++++++++++++++++++-------------------
  src/x86/mc_sse.asm       |  2 ++
  src/x86/msac.asm         |  2 +-
- 15 files changed, 85 insertions(+), 50 deletions(-)
+ 17 files changed, 87 insertions(+), 50 deletions(-)
 
 diff --git a/src/arm/cpu.c b/src/arm/cpu.c
 index c895049..7dce9f8 100644
@@ -49,6 +51,18 @@ index c895049..7dce9f8 100644
      if (IsProcessorFeaturePresent(PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE))
          flags |= DAV1D_ARM_CPU_FLAG_I8MM;
  #endif
+diff --git a/src/cpu.h b/src/cpu.h
+index 5d712bb..5d29da6 100644
+--- a/src/cpu.h
++++ b/src/cpu.h
+@@ -122,6 +122,7 @@ static ALWAYS_INLINE unsigned dav1d_get_default_cpu_flags(void) {
+ }
+ 
+ static ALWAYS_INLINE unsigned dav1d_get_cpu_flags(void) {
++    return dav1d_get_default_cpu_flags();
+     unsigned flags = dav1d_cpu_flags & dav1d_cpu_flags_mask;
+ 
+ #if TRIM_DSP_FUNCTIONS
 diff --git a/src/ext/x86/x86inc.asm b/src/ext/x86/x86inc.asm
 index ece93f1..f0c5339 100644
 --- a/src/ext/x86/x86inc.asm
@@ -106,6 +120,18 @@ index ece93f1..f0c5339 100644
      %else
          global %2
      %endif
+diff --git a/src/x86/cpu.c b/src/x86/cpu.c
+index 80f91e1..25d4548 100644
+--- a/src/x86/cpu.c
++++ b/src/x86/cpu.c
+@@ -45,6 +45,7 @@ uint64_t dav1d_cpu_xgetbv(unsigned xcr);
+ #define X(reg, mask) (((reg) & (mask)) == (mask))
+ 
+ COLD unsigned dav1d_get_cpu_flags_x86(void) {
++    return dav1d_get_default_cpu_flags();
+     union {
+         CpuidRegisters r;
+         struct {
 diff --git a/src/x86/itx16_avx2.asm b/src/x86/itx16_avx2.asm
 index 0da970a..248aec6 100644
 --- a/src/x86/itx16_avx2.asm
@@ -178,7 +204,7 @@ index 9f5f909..0dd5e89 100644
  .pass2_fast2_start:
      call m(inv_txfm_add_dct_dct_32x8_10bpc).transpose_8x32
 diff --git a/src/x86/itx16_sse.asm b/src/x86/itx16_sse.asm
-index 3833e17..1d75513 100644
+index cca9958..8f7b56c 100644
 --- a/src/x86/itx16_sse.asm
 +++ b/src/x86/itx16_sse.asm
 @@ -26,6 +26,8 @@
@@ -619,7 +645,7 @@ index 50e670e..0c6f275 100644
  .w16:
      vbroadcasti32x4     ym4, [blend_shuf]
 diff --git a/src/x86/mc_sse.asm b/src/x86/mc_sse.asm
-index 9beb6c2..a8c5d16 100644
+index f93cdc0..8066a8a 100644
 --- a/src/x86/mc_sse.asm
 +++ b/src/x86/mc_sse.asm
 @@ -24,6 +24,8 @@
@@ -644,5 +670,5 @@ index 4156efe..a305500 100644
      jmp m(msac_decode_symbol_adapt4, _sse2).renorm2
  %endif
 -- 
-2.54.0
+2.56.0
 

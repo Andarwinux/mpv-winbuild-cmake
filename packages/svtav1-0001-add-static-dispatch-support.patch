@@ -1,4 +1,4 @@
-From c30fe90de19d48b7f0280f4930736c118b830a66 Mon Sep 17 00:00:00 2001
+From bed255ad06a6ae6929e4d3c4bd9c0b721c7bda53 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Wed, 31 Dec 2025 00:00:00 +0000
 Subject: [PATCH] add static dispatch support
@@ -9,11 +9,12 @@ Subject: [PATCH] add static dispatch support
  Source/Lib/ASM_AVX2/dav1d_x86inc.asm          | 15 ++--
  Source/Lib/ASM_AVX2/itx16_avx2.asm            |  2 +-
  Source/Lib/ASM_AVX2/itx_avx2.asm              |  2 +-
- Source/Lib/ASM_AVX2/variance_impl_avx2.c      |  6 +-
+ Source/Lib/ASM_AVX2/variance_impl_avx2.c      |  8 +--
  Source/Lib/ASM_SSE2/x86inc.asm                | 33 +++++----
  Source/Lib/Codec/aom_dsp_rtcd.c               | 46 ++++++++++---
  Source/Lib/Codec/common_dsp_rtcd.c            | 68 ++++++++++++++++---
- 9 files changed, 138 insertions(+), 48 deletions(-)
+ third_party/aom/aom_ports/x86.h               |  9 ++-
+ 10 files changed, 147 insertions(+), 50 deletions(-)
 
 diff --git a/Source/Lib/ASM_AVX2/compute_sad_intrin_avx2.c b/Source/Lib/ASM_AVX2/compute_sad_intrin_avx2.c
 index 4d76b72..e8ad229 100644
@@ -160,9 +161,18 @@ index b6f14d3..b325e30 100644
  %%end:
  %endif
 diff --git a/Source/Lib/ASM_AVX2/variance_impl_avx2.c b/Source/Lib/ASM_AVX2/variance_impl_avx2.c
-index a66a916..c02b02b 100644
+index a66a916..979bdb7 100644
 --- a/Source/Lib/ASM_AVX2/variance_impl_avx2.c
 +++ b/Source/Lib/ASM_AVX2/variance_impl_avx2.c
+@@ -219,7 +219,7 @@ static inline int bilinear_sum_sse_avx2(__m256i sum_reg, __m256i sse_reg, unsign
+     *sse = _mm_cvtsi128_si32(_mm256_castsi256_si128(sse_reg)) + _mm_cvtsi128_si32(_mm256_extracti128_si256(sse_reg, 1));
+     const int sum = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum_reg)) +
+         _mm_cvtsi128_si32(_mm256_extracti128_si256(sum_reg, 1));
+-    _mm256_zeroupper();
++    //_mm256_zeroupper();
+     return sum;
+ }
+ 
 @@ -411,7 +411,7 @@ unsigned int svt_aom_sub_pixel_variance32xh_avx2(const uint8_t* src, int src_str
          }
      }
@@ -443,6 +453,26 @@ index 676547e..04d9f12 100644
  #if CONFIG_ENABLE_INTER_COMPOUND
      SET_SSE41_AVX2(svt_av1_build_compound_diffwtd_mask, svt_av1_build_compound_diffwtd_mask_c, svt_av1_build_compound_diffwtd_mask_sse4_1, svt_av1_build_compound_diffwtd_mask_avx2);
  #endif
+diff --git a/third_party/aom/aom_ports/x86.h b/third_party/aom/aom_ports/x86.h
+index 7b5f446..5d08b11 100644
+--- a/third_party/aom/aom_ports/x86.h
++++ b/third_party/aom/aom_ports/x86.h
+@@ -193,7 +193,14 @@ static inline uint64_t xgetbv(void) {
+ #define FEATURE_SET(reg, feature) (((reg) & (feature##_BITS)) == (feature##_BITS))
+ 
+ static inline int x86_simd_caps(void) {
+-    unsigned int flags = 0;
++    unsigned int flags = HAS_MMX|HAS_SSE|HAS_SSE2|HAS_SSE3|HAS_SSSE3|HAS_SSE4_1|HAS_SSE4_2|HAS_AVX|HAS_AVX2;
++    #if defined(__AVX512F__)
++    flags |= HAS_AVX512;
++    #endif
++    #if defined(__AVX512VBMI2__)
++    flags |= HAS_AVX512_DL;
++    #endif
++    return flags;
+     unsigned int mask  = ~0u;
+     unsigned int max_cpuid_val, reg_eax, reg_ebx, reg_ecx, reg_edx;
+     char*        env;
 -- 
 2.56.0
 

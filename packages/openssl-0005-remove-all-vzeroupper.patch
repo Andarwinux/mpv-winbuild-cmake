@@ -1,10 +1,11 @@
-From 9aa1648a49faa73fdf9075d9443f7d4db80ddee4 Mon Sep 17 00:00:00 2001
+From aa2252a7f03c4ab563b89d011c18da683134ac9d Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sat, 6 Jun 2026 00:00:00 +0000
 Subject: [PATCH] remove all vzeroupper
 
 ---
  crypto/aes/asm/aes-cfb-avx512.pl       |  4 ++--
+ crypto/aes/asm/aes-vaes-x86_64.pl      |  1 -
  crypto/aes/asm/aesni-mb-x86_64.pl      |  8 ++++----
  crypto/aes/asm/aesni-xts-avx512.pl     |  4 ++--
  crypto/bn/asm/rsaz-2k-avx512.pl        |  4 ++--
@@ -17,6 +18,7 @@ Subject: [PATCH] remove all vzeroupper
  crypto/chacha/asm/chacha-x86.pl        |  4 ++--
  crypto/chacha/asm/chacha-x86_64.pl     | 10 +++++-----
  crypto/ec/asm/ecp_nistz256-x86_64.pl   |  8 ++++----
+ crypto/ml_kem/asm/ml_kem_avx2.pl       |  2 +-
  crypto/modes/asm/aes-gcm-avx512.pl     |  6 +++---
  crypto/modes/asm/aesni-gcm-x86_64.pl   |  8 ++++----
  crypto/modes/asm/ghash-x86_64.pl       |  8 ++++----
@@ -29,10 +31,10 @@ Subject: [PATCH] remove all vzeroupper
  crypto/sha/asm/sha1-x86_64.pl          |  8 ++++----
  crypto/sha/asm/sha256-mb-x86_64.pl     |  4 ++--
  crypto/sha/asm/sha512-x86_64.pl        | 14 +++++++-------
- 25 files changed, 85 insertions(+), 85 deletions(-)
+ 27 files changed, 86 insertions(+), 87 deletions(-)
 
 diff --git a/crypto/aes/asm/aes-cfb-avx512.pl b/crypto/aes/asm/aes-cfb-avx512.pl
-index d9e1815..1c2f158 100644
+index 3a1b512c..6de07dce 100644
 --- a/crypto/aes/asm/aes-cfb-avx512.pl
 +++ b/crypto/aes/asm/aes-cfb-avx512.pl
 @@ -611,7 +611,7 @@ $code.=<<___;
@@ -53,8 +55,20 @@ index d9e1815..1c2f158 100644
  ___
  
  $code.=<<___ if($win64);
+diff --git a/crypto/aes/asm/aes-vaes-x86_64.pl b/crypto/aes/asm/aes-vaes-x86_64.pl
+index 772c4792..24f6c2d1 100644
+--- a/crypto/aes/asm/aes-vaes-x86_64.pl
++++ b/crypto/aes/asm/aes-vaes-x86_64.pl
+@@ -125,7 +125,6 @@ ___
+     if ($win64) {
+         $code .= <<___;
+     # Clear the volatile upper lanes of ZMM6-ZMM15 last.
+-    vzeroupper
+ 
+     # Clear the Win64 volatile general-purpose registers used by the caller.
+     xor %eax,%eax
 diff --git a/crypto/aes/asm/aesni-mb-x86_64.pl b/crypto/aes/asm/aesni-mb-x86_64.pl
-index 99a3be2..601e8c2 100644
+index e5e7eb46..eb9e3a88 100644
 --- a/crypto/aes/asm/aesni-mb-x86_64.pl
 +++ b/crypto/aes/asm/aesni-mb-x86_64.pl
 @@ -729,7 +729,7 @@ $code.=<<___;
@@ -94,10 +108,10 @@ index 99a3be2..601e8c2 100644
  $code.=<<___ if ($win64);
  	movaps	-0xd8(%rax),%xmm6
 diff --git a/crypto/aes/asm/aesni-xts-avx512.pl b/crypto/aes/asm/aesni-xts-avx512.pl
-index 16f2bbe..f080130 100644
+index 8cd75517..825a73a3 100644
 --- a/crypto/aes/asm/aesni-xts-avx512.pl
 +++ b/crypto/aes/asm/aesni-xts-avx512.pl
-@@ -1555,7 +1555,7 @@ ___
+@@ -1556,7 +1556,7 @@ ___
      $code .= <<___;
      mov %rbp,$TW
      pop %rbp
@@ -106,7 +120,7 @@ index 16f2bbe..f080130 100644
      ret
  
      .L_less_than_128_bytes_${rndsuffix}:
-@@ -2391,7 +2391,7 @@ ___
+@@ -2392,7 +2392,7 @@ ___
      $code .= <<___;
      mov %rbp,$TW
      pop %rbp
@@ -116,7 +130,7 @@ index 16f2bbe..f080130 100644
  
      .L_less_than_128_bytes_${rndsuffix}:
 diff --git a/crypto/bn/asm/rsaz-2k-avx512.pl b/crypto/bn/asm/rsaz-2k-avx512.pl
-index 7e1db31..11284d6 100644
+index 6c0cb566..c05edeb1 100644
 --- a/crypto/bn/asm/rsaz-2k-avx512.pl
 +++ b/crypto/bn/asm/rsaz-2k-avx512.pl
 @@ -380,7 +380,7 @@ $code.=<<___;
@@ -138,7 +152,7 @@ index 7e1db31..11284d6 100644
  .cfi_restore    %r15
      mov  8(%rsp),%r14
 diff --git a/crypto/bn/asm/rsaz-2k-avxifma.pl b/crypto/bn/asm/rsaz-2k-avxifma.pl
-index 652d659..a64d311 100644
+index 52d97818..514edf5d 100644
 --- a/crypto/bn/asm/rsaz-2k-avxifma.pl
 +++ b/crypto/bn/asm/rsaz-2k-avxifma.pl
 @@ -424,7 +424,7 @@ $code.=<<___;
@@ -169,7 +183,7 @@ index 652d659..a64d311 100644
  $code.=<<___ if ($win64);
      vmovapd `16*0`(%rsp), %xmm6
 diff --git a/crypto/bn/asm/rsaz-3k-avx512.pl b/crypto/bn/asm/rsaz-3k-avx512.pl
-index 403e090..d82364b 100644
+index fe5b1ebe..b26655a2 100644
 --- a/crypto/bn/asm/rsaz-3k-avx512.pl
 +++ b/crypto/bn/asm/rsaz-3k-avx512.pl
 @@ -455,7 +455,7 @@ $code.=<<___;
@@ -191,7 +205,7 @@ index 403e090..d82364b 100644
  .cfi_def_cfa_register   %rax
  ___
 diff --git a/crypto/bn/asm/rsaz-3k-avxifma.pl b/crypto/bn/asm/rsaz-3k-avxifma.pl
-index 9141e55..f1ce989 100644
+index aa11c546..5bb7c48d 100644
 --- a/crypto/bn/asm/rsaz-3k-avxifma.pl
 +++ b/crypto/bn/asm/rsaz-3k-avxifma.pl
 @@ -510,7 +510,7 @@ $code.=<<___;
@@ -222,7 +236,7 @@ index 9141e55..f1ce989 100644
  $code.=<<___ if ($win64);
      vmovapd `16*0`(%rsp), %xmm6
 diff --git a/crypto/bn/asm/rsaz-4k-avx512.pl b/crypto/bn/asm/rsaz-4k-avx512.pl
-index f41c1c6..774343b 100644
+index b07180f6..e70eb68b 100644
 --- a/crypto/bn/asm/rsaz-4k-avx512.pl
 +++ b/crypto/bn/asm/rsaz-4k-avx512.pl
 @@ -495,7 +495,7 @@ $code.=<<___;
@@ -244,7 +258,7 @@ index f41c1c6..774343b 100644
  .cfi_def_cfa_register   %rax
  ___
 diff --git a/crypto/bn/asm/rsaz-4k-avxifma.pl b/crypto/bn/asm/rsaz-4k-avxifma.pl
-index 2f7b036..014ad07 100644
+index 28a44780..bf20bc72 100644
 --- a/crypto/bn/asm/rsaz-4k-avxifma.pl
 +++ b/crypto/bn/asm/rsaz-4k-avxifma.pl
 @@ -599,7 +599,7 @@ $code.=<<___;
@@ -275,7 +289,7 @@ index 2f7b036..014ad07 100644
  $code.=<<___ if ($win64);
      vmovapd `16*0`(%rsp), %xmm6
 diff --git a/crypto/bn/asm/rsaz-avx2.pl b/crypto/bn/asm/rsaz-avx2.pl
-index 239ffb7..48e0c2c 100755
+index 72e4afe2..acd99188 100755
 --- a/crypto/bn/asm/rsaz-avx2.pl
 +++ b/crypto/bn/asm/rsaz-avx2.pl
 @@ -155,7 +155,7 @@ rsaz_1024_sqr_avx2:		# 702 cycles, 14% faster than rsaz_1024_mul_avx2
@@ -342,7 +356,7 @@ index 239ffb7..48e0c2c 100755
  $code.=<<___ if ($win64);
  	movaps	-0xa8(%r11),%xmm6
 diff --git a/crypto/chacha/asm/chacha-x86.pl b/crypto/chacha/asm/chacha-x86.pl
-index 6a64a57..5f9993e 100755
+index 7e28d6b1..58837e48 100755
 --- a/crypto/chacha/asm/chacha-x86.pl
 +++ b/crypto/chacha/asm/chacha-x86.pl
 @@ -861,7 +861,7 @@ my ($ap,$bp,$cp,$dp)=map(($_&~3)+(($_-1)&3),($ai,$bi,$ci,$di));	# previous
@@ -364,7 +378,7 @@ index 6a64a57..5f9993e 100755
  &function_end("ChaCha20_xop");
  }
 diff --git a/crypto/chacha/asm/chacha-x86_64.pl b/crypto/chacha/asm/chacha-x86_64.pl
-index ed54836..2d57526 100755
+index d991d407..9cd34b1f 100755
 --- a/crypto/chacha/asm/chacha-x86_64.pl
 +++ b/crypto/chacha/asm/chacha-x86_64.pl
 @@ -1481,7 +1481,7 @@ $code.=<<___	if ($win64);
@@ -413,7 +427,7 @@ index ed54836..2d57526 100755
  	lea		.Lsigma(%rip),%r10
  	vbroadcasti128	(%r10),$xa3		# key[0]
 diff --git a/crypto/ec/asm/ecp_nistz256-x86_64.pl b/crypto/ec/asm/ecp_nistz256-x86_64.pl
-index 43a7129..0e7a160 100755
+index 73156dd8..4170136e 100755
 --- a/crypto/ec/asm/ecp_nistz256-x86_64.pl
 +++ b/crypto/ec/asm/ecp_nistz256-x86_64.pl
 @@ -2819,7 +2819,7 @@ $code.=<<___;
@@ -452,8 +466,21 @@ index 43a7129..0e7a160 100755
  ___
  $code.=<<___	if ($win64);
  	movaps	(%rsp), %xmm6
+diff --git a/crypto/ml_kem/asm/ml_kem_avx2.pl b/crypto/ml_kem/asm/ml_kem_avx2.pl
+index 60d126df..5c611294 100644
+--- a/crypto/ml_kem/asm/ml_kem_avx2.pl
++++ b/crypto/ml_kem/asm/ml_kem_avx2.pl
+@@ -75,7 +75,7 @@ my $code = "";
+ # Unix has no nonvolatile vector registers and can clear all of them at once.
+ my $clear_vectors = $win64
+     ? (join('', map { "    vpxor %ymm$_, %ymm$_, %ymm$_\n" } 0..5)
+-       . "    vzeroupper\n")
++       . "    \n")
+     : "    vzeroall\n";
+ 
+ if ($avx2) {
 diff --git a/crypto/modes/asm/aes-gcm-avx512.pl b/crypto/modes/asm/aes-gcm-avx512.pl
-index ad6461f..c503d26 100644
+index 3da7c69c..6af857ed 100644
 --- a/crypto/modes/asm/aes-gcm-avx512.pl
 +++ b/crypto/modes/asm/aes-gcm-avx512.pl
 @@ -439,7 +439,7 @@ ___
@@ -484,7 +511,7 @@ index ad6461f..c503d26 100644
  $code .= <<___;
  .Labort_gmult:
 diff --git a/crypto/modes/asm/aesni-gcm-x86_64.pl b/crypto/modes/asm/aesni-gcm-x86_64.pl
-index f3b920b..090515d 100644
+index 68f71eaf..b8adbf0c 100644
 --- a/crypto/modes/asm/aesni-gcm-x86_64.pl
 +++ b/crypto/modes/asm/aesni-gcm-x86_64.pl
 @@ -457,7 +457,7 @@ $code.=<<___ if ($win64);
@@ -524,7 +551,7 @@ index f3b920b..090515d 100644
  $code.=<<___ if ($win64);
  	movaps	-0xd8(%rax),%xmm6
 diff --git a/crypto/modes/asm/ghash-x86_64.pl b/crypto/modes/asm/ghash-x86_64.pl
-index 0798927..6a2638c 100644
+index e54eba5a..d72e03c3 100644
 --- a/crypto/modes/asm/ghash-x86_64.pl
 +++ b/crypto/modes/asm/ghash-x86_64.pl
 @@ -1048,7 +1048,7 @@ $code.=<<___ if ($win64);
@@ -564,7 +591,7 @@ index 0798927..6a2638c 100644
  $code.=<<___ if ($win64);
  	movaps	(%rsp),%xmm6
 diff --git a/crypto/poly1305/asm/poly1305-x86.pl b/crypto/poly1305/asm/poly1305-x86.pl
-index 42e5755..ca137f2 100755
+index 22819d21..fa01a9f4 100755
 --- a/crypto/poly1305/asm/poly1305-x86.pl
 +++ b/crypto/poly1305/asm/poly1305-x86.pl
 @@ -1461,7 +1461,7 @@ sub X { my $reg=shift; $reg=~s/^ymm/xmm/; $reg; }
@@ -586,7 +613,7 @@ index 42e5755..ca137f2 100755
  &set_label("nodata");
  &function_end("_poly1305_blocks_avx2");
 diff --git a/crypto/poly1305/asm/poly1305-x86_64.pl b/crypto/poly1305/asm/poly1305-x86_64.pl
-index a70ec0f..7ab65d9 100755
+index 1ef2fad2..2ed4f27a 100755
 --- a/crypto/poly1305/asm/poly1305-x86_64.pl
 +++ b/crypto/poly1305/asm/poly1305-x86_64.pl
 @@ -544,7 +544,7 @@ poly1305_blocks_avx:
@@ -626,7 +653,7 @@ index a70ec0f..7ab65d9 100755
  .cfi_endproc
  .size	poly1305_blocks_avx2,.-poly1305_blocks_avx2
 diff --git a/crypto/sha/asm/keccak1600-avx2.pl b/crypto/sha/asm/keccak1600-avx2.pl
-index 5c4bc28..a880531 100755
+index 5c4bc28d..a880531b 100755
 --- a/crypto/sha/asm/keccak1600-avx2.pl
 +++ b/crypto/sha/asm/keccak1600-avx2.pl
 @@ -295,7 +295,7 @@ SHA3_absorb:
@@ -666,7 +693,7 @@ index 5c4bc28..a880531 100755
  	lea	(%r11),%rsp
  	ret
 diff --git a/crypto/sha/asm/keccak1600-avx512.pl b/crypto/sha/asm/keccak1600-avx512.pl
-index 2a295d1..481a1ad 100755
+index 465479ab..730ec7e2 100755
 --- a/crypto/sha/asm/keccak1600-avx512.pl
 +++ b/crypto/sha/asm/keccak1600-avx512.pl
 @@ -379,7 +379,7 @@ $code.=<<___;
@@ -688,7 +715,7 @@ index 2a295d1..481a1ad 100755
  	lea	(%r11),%rsp
  	ret
 diff --git a/crypto/sha/asm/keccak1600-avx512vl.pl b/crypto/sha/asm/keccak1600-avx512vl.pl
-index 5a78024..2c99947 100755
+index 5a78024b..2c999476 100755
 --- a/crypto/sha/asm/keccak1600-avx512vl.pl
 +++ b/crypto/sha/asm/keccak1600-avx512vl.pl
 @@ -197,7 +197,7 @@ SHA3_absorb:
@@ -728,7 +755,7 @@ index 5a78024..2c99947 100755
  	lea	(%r11),%rsp
  	ret
 diff --git a/crypto/sha/asm/sha1-mb-x86_64.pl b/crypto/sha/asm/sha1-mb-x86_64.pl
-index 5a8c075..96f14fc 100644
+index 9f573421..e2b69584 100644
 --- a/crypto/sha/asm/sha1-mb-x86_64.pl
 +++ b/crypto/sha/asm/sha1-mb-x86_64.pl
 @@ -1084,7 +1084,7 @@ $code.=<<___;
@@ -768,7 +795,7 @@ index 5a8c075..96f14fc 100644
  $code.=<<___ if ($win64);
  	movaps	-0xd8(%rax),%xmm6
 diff --git a/crypto/sha/asm/sha1-x86_64.pl b/crypto/sha/asm/sha1-x86_64.pl
-index af9d172..0e70d7c 100755
+index 62823574..07adc9f1 100755
 --- a/crypto/sha/asm/sha1-x86_64.pl
 +++ b/crypto/sha/asm/sha1-x86_64.pl
 @@ -1001,7 +1001,7 @@ _avx_shortcut:
@@ -808,7 +835,7 @@ index af9d172..0e70d7c 100755
  $code.=<<___ if ($win64);
  	movaps	-40-6*16($fp),%xmm6
 diff --git a/crypto/sha/asm/sha256-mb-x86_64.pl b/crypto/sha/asm/sha256-mb-x86_64.pl
-index 0175f5b..f7a3749 100644
+index d43d31b4..18b57e2e 100644
 --- a/crypto/sha/asm/sha256-mb-x86_64.pl
 +++ b/crypto/sha/asm/sha256-mb-x86_64.pl
 @@ -1118,7 +1118,7 @@ $code.=<<___;
@@ -830,7 +857,7 @@ index 0175f5b..f7a3749 100644
  $code.=<<___ if ($win64);
  	movaps	-0xd8(%rax),%xmm6
 diff --git a/crypto/sha/asm/sha512-x86_64.pl b/crypto/sha/asm/sha512-x86_64.pl
-index 4db4b1b..da0ed08 100755
+index 1842718d..93607aa8 100755
 --- a/crypto/sha/asm/sha512-x86_64.pl
 +++ b/crypto/sha/asm/sha512-x86_64.pl
 @@ -1266,7 +1266,7 @@ ___
@@ -897,5 +924,5 @@ index 4db4b1b..da0ed08 100755
  
  $code.=<<___ if($win64);
 -- 
-2.54.0
+2.56.0
 

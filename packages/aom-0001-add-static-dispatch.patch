@@ -1,0 +1,165 @@
+From 0b915326f99244afdefacbb592bf105f39fe243f Mon Sep 17 00:00:00 2001
+From: _ <>
+Date: Sun, 8 Nov 2026 00:00:00 +0000
+Subject: [PATCH] add static dispatch
+
+---
+ aom/src/aom_encoder.c               |  4 ++--
+ aom_dsp/x86/sad_avx2.c              |  4 ----
+ aom_dsp/x86/variance_impl_avx2.c    |  5 -----
+ aom_ports/aarch64_cpudetect.c       | 15 ++++++++++++++-
+ aom_ports/x86.h                     |  6 +++++-
+ av1/encoder/x86/error_intrin_avx2.c |  1 -
+ 6 files changed, 21 insertions(+), 14 deletions(-)
+
+diff --git a/aom/src/aom_encoder.c b/aom/src/aom_encoder.c
+index 6ad6582..ec05c28 100644
+--- a/aom/src/aom_encoder.c
++++ b/aom/src/aom_encoder.c
+@@ -190,9 +190,9 @@ aom_codec_err_t aom_codec_encode(aom_codec_ctx_t *ctx, const aom_image_t *img,
+     /* Execute in a normalized floating point environment, if the platform
+      * requires it.
+      */
+-    FLOATING_POINT_INIT
++    //FLOATING_POINT_INIT
+     res = ctx->iface->enc.encode(get_alg_priv(ctx), img, pts, duration, flags);
+-    FLOATING_POINT_RESTORE
++    //FLOATING_POINT_RESTORE
+   }
+ 
+   return SAVE_STATUS(ctx, res);
+diff --git a/aom_dsp/x86/sad_avx2.c b/aom_dsp/x86/sad_avx2.c
+index dc8854b..2f08a8a 100644
+--- a/aom_dsp/x86/sad_avx2.c
++++ b/aom_dsp/x86/sad_avx2.c
+@@ -41,7 +41,6 @@ static inline unsigned int sad64xh_avx2(const uint8_t *src_ptr, int src_stride,
+   sum_sad128 = _mm256_extracti128_si256(sum_sad, 1);
+   sum_sad128 = _mm_add_epi32(_mm256_castsi256_si128(sum_sad), sum_sad128);
+   unsigned int res = (unsigned int)_mm_cvtsi128_si32(sum_sad128);
+-  _mm256_zeroupper();
+   return res;
+ }
+ 
+@@ -103,7 +102,6 @@ FSAD64
+     sum_sad128 = _mm256_extracti128_si256(sum_sad, 1);                        \
+     sum_sad128 = _mm_add_epi32(_mm256_castsi256_si128(sum_sad), sum_sad128);  \
+     unsigned int res = (unsigned int)_mm_cvtsi128_si32(sum_sad128);           \
+-    _mm256_zeroupper();                                                       \
+     return res;                                                               \
+   }
+ 
+@@ -147,7 +145,6 @@ static inline unsigned int sad32xh_avx2(const uint8_t *src_ptr, int src_stride,
+   sum_sad128 = _mm256_extracti128_si256(sum_sad, 1);
+   sum_sad128 = _mm_add_epi32(_mm256_castsi256_si128(sum_sad), sum_sad128);
+   unsigned int res = (unsigned int)_mm_cvtsi128_si32(sum_sad128);
+-  _mm256_zeroupper();
+   return res;
+ }
+ 
+@@ -215,7 +212,6 @@ FSAD32
+     sum_sad128 = _mm256_extracti128_si256(sum_sad, 1);                        \
+     sum_sad128 = _mm_add_epi32(_mm256_castsi256_si128(sum_sad), sum_sad128);  \
+     unsigned int res = (unsigned int)_mm_cvtsi128_si32(sum_sad128);           \
+-    _mm256_zeroupper();                                                       \
+     return res;                                                               \
+   }
+ 
+diff --git a/aom_dsp/x86/variance_impl_avx2.c b/aom_dsp/x86/variance_impl_avx2.c
+index 93439e5..da024ae 100644
+--- a/aom_dsp/x86/variance_impl_avx2.c
++++ b/aom_dsp/x86/variance_impl_avx2.c
+@@ -494,13 +494,11 @@ DECLARE_ALIGNED(32, static const uint8_t, bilinear_filters_avx2[512]) = {
+           f_sum = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum_reg)) +         \
+                   _mm_cvtsi128_si32(_mm256_extractf128_si256(sum_reg, 1));     \
+           *sse = f_sse;                                                        \
+-          _mm256_zeroupper();                                                  \
+           return f_sum;                                                        \
+         }                                                                      \
+       }                                                                        \
+     }                                                                          \
+     CALC_SUM_AND_SSE                                                           \
+-    _mm256_zeroupper();                                                        \
+     return sum;                                                                \
+   }                                                                            \
+   unsigned int aom_sub_pixel_variance32x##height##_avx2(                       \
+@@ -914,14 +912,12 @@ AOM_SUB_PIXEL_VAR_AVX2(64, 32, 32, 32, 6, 5)
+           f_sum = _mm_cvtsi128_si32(_mm256_castsi256_si128(sum_reg)) +         \
+                   _mm_cvtsi128_si32(_mm256_extractf128_si256(sum_reg, 1));     \
+           *sse = f_sse;                                                        \
+-          _mm256_zeroupper();                                                  \
+           return f_sse -                                                       \
+                  (unsigned int)(((int64_t)f_sum * f_sum) >> (4 + log2height)); \
+         }                                                                      \
+       }                                                                        \
+     }                                                                          \
+     CALC_SUM_AND_SSE                                                           \
+-    _mm256_zeroupper();                                                        \
+     return *sse - (unsigned int)(((int64_t)sum * sum) >> (4 + log2height));    \
+   }
+ 
+@@ -1155,7 +1151,6 @@ MAKE_SUB_PIXEL_VAR_16XH(4, 2)
+       }                                                                       \
+     }                                                                         \
+     CALC_SUM_AND_SSE                                                          \
+-    _mm256_zeroupper();                                                       \
+     return sum;                                                               \
+   }                                                                           \
+   unsigned int aom_sub_pixel_avg_variance32x##height##_avx2(                  \
+diff --git a/aom_ports/aarch64_cpudetect.c b/aom_ports/aarch64_cpudetect.c
+index 3b7c2d7..4185025 100644
+--- a/aom_ports/aarch64_cpudetect.c
++++ b/aom_ports/aarch64_cpudetect.c
+@@ -213,7 +213,20 @@ static int arm_get_cpu_caps(void) {
+ #endif
+ 
+ int aom_arm_cpu_caps(void) {
+-  int flags = 0;
++  int flags = HAS_NEON|HAS_ARM_CRC32;
++  #if defined(__ARM_FEATURE_DOTPROD)
++      flags |= HAS_NEON_DOTPROD;
++  #endif
++  #if defined(__ARM_FEATURE_MATMUL_INT8)
++      flags |= HAS_NEON_I8MM;
++  #endif
++  #if defined(__ARM_FEATURE_SVE)
++      flags |= HAS_SVE;
++  #endif
++  #if defined(__ARM_FEATURE_SVE2)
++      flags |= HAS_SVE2;
++  #endif
++  return flags;
+   if (!arm_cpu_env_flags(&flags)) {
+     flags = arm_get_cpu_caps() & arm_cpu_env_mask();
+   }
+diff --git a/aom_ports/x86.h b/aom_ports/x86.h
+index 4d00d72..46261c0 100644
+--- a/aom_ports/x86.h
++++ b/aom_ports/x86.h
+@@ -196,7 +196,11 @@ static inline uint64_t xgetbv(void) {
+   (((reg) & (feature##_BITS)) == (feature##_BITS))
+ 
+ static inline int x86_simd_caps(void) {
+-  unsigned int flags = 0;
++  unsigned int flags = HAS_MMX|HAS_SSE|HAS_SSE2|HAS_SSE3|HAS_SSSE3|HAS_SSE4_1|HAS_SSE4_2|HAS_AVX|HAS_AVX2;
++  #if defined(__AVX512VBMI2__)
++  flags |= HAS_AVX512;
++  #endif
++  return flags;
+   unsigned int mask = ~0u;
+   unsigned int max_cpuid_val, reg_eax, reg_ebx, reg_ecx, reg_edx;
+   char *env;
+diff --git a/av1/encoder/x86/error_intrin_avx2.c b/av1/encoder/x86/error_intrin_avx2.c
+index e5c8c06..dec4554 100644
+--- a/av1/encoder/x86/error_intrin_avx2.c
++++ b/av1/encoder/x86/error_intrin_avx2.c
+@@ -206,7 +206,6 @@ int64_t av1_block_error_avx2(const tran_low_t *coeff, const tran_low_t *dqcoeff,
+   _mm_storel_epi64((__m128i *)(&sse), sse_reg128);
+ 
+   _mm_storel_epi64((__m128i *)(ssz), ssz_reg128);
+-  _mm256_zeroupper();
+   return sse;
+ }
+ 
+-- 
+2.56.0
+

@@ -1,6 +1,4 @@
 ExternalProject_Add(aom
-    #DEPENDS
-        #vmaf
     GIT_REPOSITORY https://aomedia.googlesource.com/aom
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -8,7 +6,7 @@ ExternalProject_Add(aom
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !doc !examples !test !tools test/test.cmake"
     GIT_REMOTE_NAME origin
     GIT_TAG main
-    #PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/aom-*.patch
+    PATCH_COMMAND ${EXEC} ${GIT_EXECUTABLE} am --3way ${CMAKE_CURRENT_SOURCE_DIR}/aom-*.patch
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
@@ -25,8 +23,7 @@ ExternalProject_Add(aom
         -DCONFIG_UNIT_TESTS=0
         -DCONFIG_AV1_DECODER=0
         -DENABLE_APPS=0
-        -DAOM_TARGET_CPU=generic
-        #-DCONFIG_TUNE_VMAF=1
+        -DENABLE_X86_ASM=0
     ${aom_vpx_sse2avx}
     ${novzeroupper} <SOURCE_DIR>/third_party/x86inc/x86inc.asm
     BUILD_ENVIRONMENT_MODIFICATION

@@ -9,6 +9,7 @@ ExternalProject_Add(libsamplerate
     CONFIGURE_COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
         -DLIBSAMPLERATE_EXAMPLES=OFF
+        "-DCMAKE_C_FLAGS='-U__x86_64__ -D__i386__'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

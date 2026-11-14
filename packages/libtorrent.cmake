@@ -6,8 +6,9 @@ ExternalProject_Add(libtorrent
     GIT_REPOSITORY https://github.com/arvidn/libtorrent.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --no-single-branch --sparse --shallow-submodules --filter=tree:0"
-    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !docs !test !examples !fuzzers examples/cmake/FindLibtorrentRasterbar.cmake"
-    GIT_CONFIG "submodule.recurse=true"
+    GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !docs !test !examples !fuzzers !simulation !deps/libdatachannel !deps/asio-gnutls examples/cmake/FindLibtorrentRasterbar.cmake"
+    GIT_CONFIG "submodule.deps/try_signal.recurse=true;submodule.deps/asio-gnutls.active=false;submodule.deps/libdatachannel.active=false;submodule.simulation/libsimulator.active=false"
+    GIT_SUBMODULES deps/try_signal
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_TAG RC_2_0
@@ -21,7 +22,7 @@ ExternalProject_Add(libtorrent
         -DBOOST_BUILD_PATH=${boost_src}/tools/build
         -DCMAKE_CXX_STANDARD=23
         -Ddeprecated-functions=OFF
-        "-DCMAKE_CXX_FLAGS='-w'"
+        -Dwebtorrent=OFF
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

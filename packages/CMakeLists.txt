@@ -44,6 +44,7 @@ list(APPEND ep
     avisynth-headers
     nvcodec-headers
     libmysofa
+    highway
     aom
     xxhash
     dav1d
@@ -53,7 +54,6 @@ list(APPEND ep
     libssh
     libsrt
     libarchive
-    highway
     libjxl
     angle-headers
     mujs

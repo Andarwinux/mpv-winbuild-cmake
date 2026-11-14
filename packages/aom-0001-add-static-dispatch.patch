@@ -1,16 +1,17 @@
-From 0b915326f99244afdefacbb592bf105f39fe243f Mon Sep 17 00:00:00 2001
+From ebe3390259a3db17ad4312a090204133a8997755 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 8 Nov 2026 00:00:00 +0000
 Subject: [PATCH] add static dispatch
 
 ---
  aom/src/aom_encoder.c               |  4 ++--
+ aom_dsp/convolve_hwy.h              |  2 +-
  aom_dsp/x86/sad_avx2.c              |  4 ----
  aom_dsp/x86/variance_impl_avx2.c    |  5 -----
  aom_ports/aarch64_cpudetect.c       | 15 ++++++++++++++-
  aom_ports/x86.h                     |  6 +++++-
  av1/encoder/x86/error_intrin_avx2.c |  1 -
- 6 files changed, 21 insertions(+), 14 deletions(-)
+ 7 files changed, 22 insertions(+), 15 deletions(-)
 
 diff --git a/aom/src/aom_encoder.c b/aom/src/aom_encoder.c
 index 6ad6582..ec05c28 100644
@@ -28,6 +29,19 @@ index 6ad6582..ec05c28 100644
    }
  
    return SAVE_STATUS(ctx, res);
+diff --git a/aom_dsp/convolve_hwy.h b/aom_dsp/convolve_hwy.h
+index a93c65b..2ccf10e 100644
+--- a/aom_dsp/convolve_hwy.h
++++ b/aom_dsp/convolve_hwy.h
+@@ -1439,7 +1439,7 @@ HWY_MAYBE_UNUSED void Convolve8Horiz(const uint8_t *src, ptrdiff_t src_stride,
+   // TODO: jianj - 16x32 block is still fastest with handwritten avx2 which
+   // uses ssse3 implementation. Further optimize for this case.
+   if (w == 16 && h == 32) {
+-    aom_convolve8_horiz_ssse3(src, src_stride, dst, dst_stride, filter_x,
++    aom_convolve8_horiz_c(src, src_stride, dst, dst_stride, filter_x,
+                               x_step_q4, filter_y, y_step_q4, w, h);
+     return;
+   }
 diff --git a/aom_dsp/x86/sad_avx2.c b/aom_dsp/x86/sad_avx2.c
 index dc8854b..2f08a8a 100644
 --- a/aom_dsp/x86/sad_avx2.c
@@ -161,5 +175,5 @@ index e5c8c06..dec4554 100644
  }
  
 -- 
-2.56.0
+2.56.1
 

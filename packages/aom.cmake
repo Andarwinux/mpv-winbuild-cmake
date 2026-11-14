@@ -1,4 +1,7 @@
+get_property(src_hwy TARGET highway PROPERTY _EP_SOURCE_DIR)
 ExternalProject_Add(aom
+    DEPENDS
+        highway
     GIT_REPOSITORY https://aomedia.googlesource.com/aom
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
@@ -11,6 +14,7 @@ ExternalProject_Add(aom
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['/aom_config\.c\.template/i unset(AOM_CMAKE_CONFIG)']] <SOURCE_DIR>/cmake/aom_configure.cmake
+    COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy_directory ${src_hwy}/hwy <SOURCE_DIR>/third_party/highway/hwy
     COMMAND ${EXEC} echo > <SOURCE_DIR>/test/test.cmake
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
@@ -24,6 +28,7 @@ ExternalProject_Add(aom
         -DCONFIG_AV1_DECODER=0
         -DENABLE_APPS=0
         -DENABLE_X86_ASM=0
+        -DCONFIG_HIGHWAY=1
     ${aom_vpx_sse2avx}
     ${novzeroupper} <SOURCE_DIR>/third_party/x86inc/x86inc.asm
     BUILD_ENVIRONMENT_MODIFICATION

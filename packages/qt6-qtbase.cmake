@@ -12,12 +12,11 @@ ExternalProject_Add(qt6-qtbase
         libjpeg
     GIT_REPOSITORY https://github.com/qt/qtbase.git
     SOURCE_DIR ${SOURCE_LOCATION}
-    GIT_CLONE_FLAGS "--sparse --filter=tree:0"
+    GIT_CLONE_FLAGS "--depth=1 --no-single-branch --sparse --filter=tree:0"
     GIT_PROGRESS TRUE
     GIT_REMOTE_NAME origin
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !examples"
     GIT_TAG dev
-    GIT_RESET 11d52a60a134672d3f17c548cfca2d59f2a4d2c0
     UPDATE_COMMAND ""
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1

@@ -36,7 +36,6 @@ set(mllvm_options
     -enable-interleaved-mem-accesses
     -slp-vectorize-hor-store
     -enable-early-exit-vectorization-with-side-effects
-    -enable-loopinterchange
     -loop-interchange-reduction-to-mem
     -enable-loop-distribute
     -enable-unroll-and-jam

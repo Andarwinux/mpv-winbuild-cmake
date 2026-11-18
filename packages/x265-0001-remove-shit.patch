@@ -1,19 +1,19 @@
-From 0c73fe64a322d94f3e6e996a91add15a629258a5 Mon Sep 17 00:00:00 2001
+From 04737e003eea06cc2fd58cda1ca3bb2394db87c0 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 10 May 2026 00:00:00 +0000
 Subject: [PATCH] remove shit
 
 ---
- source/common/aarch64/asm-primitives.cpp |  60 +++++-
- source/common/cpu.cpp                    | 225 ++++-------------------
- source/common/cpu.h                      |   8 +-
- source/common/vec/vec-primitives.cpp     |   8 +-
- source/common/x86/asm-primitives.cpp     |  74 ++++----
- source/common/x86/x86inc.asm             |  13 +-
- 6 files changed, 143 insertions(+), 245 deletions(-)
+ source/common/aarch64/asm-primitives.cpp | 60 +++++++++++++++----
+ source/common/cpu.cpp                    | 26 ++++++++-
+ source/common/cpu.h                      |  8 +--
+ source/common/vec/vec-primitives.cpp     |  8 +--
+ source/common/x86/asm-primitives.cpp     | 74 ++++++++++++++----------
+ source/common/x86/x86inc.asm             | 13 +++--
+ 6 files changed, 131 insertions(+), 58 deletions(-)
 
 diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
-index c58e63a9..3b4ef338 100644
+index c58e63a..3b4ef33 100644
 --- a/source/common/aarch64/asm-primitives.cpp
 +++ b/source/common/aarch64/asm-primitives.cpp
 @@ -664,30 +664,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
@@ -135,225 +135,29 @@ index c58e63a9..3b4ef338 100644
          setupPixelPrimitives_sve2(p);
          setupSaoPrimitives_sve2(p);
 diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
-index 3022ae44..3d16e686 100644
+index 108c5f4..b9e9479 100644
 --- a/source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
-@@ -178,194 +178,26 @@ bool detect512()
- uint32_t cpu_detect(bool benableavx512 )
- {
+@@ -167,10 +167,17 @@ bool detect512()
  
--    uint32_t cpu = 0;
--    uint32_t eax, ebx, ecx, edx;
--    uint32_t vendor[4] = { 0 };
--    uint32_t max_extended_cap, max_basic_cap;
--    uint64_t xcr0 = 0;
--
--#if !X86_64
--    if (!PFX(cpu_cpuid_test)())
--        return 0;
--#endif
--
--    PFX(cpu_cpuid)(0, &max_basic_cap, vendor + 0, vendor + 2, vendor + 1);
--    if (max_basic_cap == 0)
--        return 0;
--
--    PFX(cpu_cpuid)(1, &eax, &ebx, &ecx, &edx);
--    if (edx & 0x00800000)
--        cpu |= X265_CPU_MMX;
--    else
--        return cpu;
--    if (edx & 0x02000000)
--        cpu |= X265_CPU_MMX2 | X265_CPU_SSE;
--    if (edx & 0x04000000)
--        cpu |= X265_CPU_SSE2;
--    if (ecx & 0x00000001)
--        cpu |= X265_CPU_SSE3;
--    if (ecx & 0x00000200)
--        cpu |= X265_CPU_SSSE3 | X265_CPU_SSE2_IS_FAST;
--    if (ecx & 0x00080000)
--        cpu |= X265_CPU_SSE4;
--    if (ecx & 0x00100000)
--        cpu |= X265_CPU_SSE42;
--
--    if (ecx & 0x08000000) /* XGETBV supported and XSAVE enabled by OS */
--    {
--        /* Check for OS support */
--        xcr0 = PFX(cpu_xgetbv)(0);
--        if ((xcr0 & 0x6) == 0x6) /* XMM/YMM state */
--        {
--            if (ecx & 0x10000000)
--            cpu |= X265_CPU_AVX;
--            if (ecx & 0x00001000)
--                cpu |= X265_CPU_FMA3;
--        }
--    }
--
--    if (max_basic_cap >= 7)
--    {
--        PFX(cpu_cpuid)(7, &eax, &ebx, &ecx, &edx);
--        /* AVX2 requires OS support, but BMI1/2 don't. */
--        if (ebx & 0x00000008)
--            cpu |= X265_CPU_BMI1;
--        if (ebx & 0x00000100)
--            cpu |= X265_CPU_BMI2;
--
--        if ((xcr0 & 0x6) == 0x6) /* XMM/YMM state */
--        {
--            if (ebx & 0x00000020)
--                cpu |= X265_CPU_AVX2;
--            if (benableavx512)
--            {
--                if ((xcr0 & 0xE0) == 0xE0) /* OPMASK/ZMM state */
--                {
--                    if ((ebx & 0xD0030000) == 0xD0030000)
--                    {
--                        cpu |= X265_CPU_AVX512;
--                        enable512 = true;
--                    }
--                }
--            }
--        }
--    }
--
--    PFX(cpu_cpuid)(0x80000000, &eax, &ebx, &ecx, &edx);
--    max_extended_cap = eax;
--
--    if (max_extended_cap >= 0x80000001)
--    {
--        PFX(cpu_cpuid)(0x80000001, &eax, &ebx, &ecx, &edx);
--
--        if (ecx & 0x00000020)
--            cpu |= X265_CPU_LZCNT; /* Supported by Intel chips starting with Haswell */
--        if (ecx & 0x00000040) /* SSE4a, AMD only */
--        {
--            int family = ((eax >> 8) & 0xf) + ((eax >> 20) & 0xff);
--            cpu |= X265_CPU_SSE2_IS_FAST;      /* Phenom and later CPUs have fast SSE units */
--            if (family == 0x14)
--            {
--                cpu &= ~X265_CPU_SSE2_IS_FAST; /* SSSE3 doesn't imply fast SSE anymore... */
--                cpu |= X265_CPU_SSE2_IS_SLOW;  /* Bobcat has 64-bit SIMD units */
--                cpu |= X265_CPU_SLOW_PALIGNR;  /* palignr is insanely slow on Bobcat */
--            }
--            if (family == 0x16)
--            {
--                cpu |= X265_CPU_SLOW_PSHUFB;   /* Jaguar's pshufb isn't that slow, but it's slow enough
--                                                * compared to alternate instruction sequences that this
--                                                * is equal or faster on almost all such functions. */
--            }
--        }
--
--        if (cpu & X265_CPU_AVX)
--        {
--            if (ecx & 0x00000800) /* XOP */
--                cpu |= X265_CPU_XOP;
--            if (ecx & 0x00010000) /* FMA4 */
--                cpu |= X265_CPU_FMA4;
--        }
--
--        if (!strcmp((char*)vendor, "AuthenticAMD"))
--        {
--            if (edx & 0x00400000)
--                cpu |= X265_CPU_MMX2;
--            if ((cpu & X265_CPU_SSE2) && !(cpu & X265_CPU_SSE2_IS_FAST))
--                cpu |= X265_CPU_SSE2_IS_SLOW; /* AMD CPUs come in two types: terrible at SSE and great at it */
--        }
--    }
--
--    if (!strcmp((char*)vendor, "GenuineIntel"))
--    {
--        PFX(cpu_cpuid)(1, &eax, &ebx, &ecx, &edx);
--        int family = ((eax >> 8) & 0xf) + ((eax >> 20) & 0xff);
--        int model  = ((eax >> 4) & 0xf) + ((eax >> 12) & 0xf0);
--        if (family == 6)
--        {
--            /* Detect Atom CPU */
--            if (model == 28)
--            {
--                cpu |= X265_CPU_SLOW_ATOM;
--                cpu |= X265_CPU_SLOW_PSHUFB;
--            }
--
--            /* Conroe has a slow shuffle unit. Check the model number to make sure not
--             * to include crippled low-end Penryns and Nehalems that don't have SSE4. */
--            else if ((cpu & X265_CPU_SSSE3) && !(cpu & X265_CPU_SSE4) && model < 23)
--                cpu |= X265_CPU_SLOW_SHUFFLE;
--        }
--    }
--
--    if ((!strcmp((char*)vendor, "GenuineIntel") || !strcmp((char*)vendor, "CyrixInstead")) && !(cpu & X265_CPU_SSE42))
--    {
--        /* cacheline size is specified in 3 places, any of which may be missing */
--        PFX(cpu_cpuid)(1, &eax, &ebx, &ecx, &edx);
--        int cache = (ebx & 0xff00) >> 5; // cflush size
--        if (!cache && max_extended_cap >= 0x80000006)
--        {
--            PFX(cpu_cpuid)(0x80000006, &eax, &ebx, &ecx, &edx);
--            cache = ecx & 0xff; // cacheline size
--        }
--        if (!cache && max_basic_cap >= 2)
--        {
--            // Cache and TLB Information
--            static const char cache32_ids[] = { '\x0a','\x0c','\x41','\x42','\x43','\x44','\x45','\x82','\x83','\x84','\x85','\0' };
--            static const char cache64_ids[] = { '\x22','\x23','\x25','\x29','\x2c','\x46','\x47','\x49','\x60','\x66','\x67',
--                                                '\x68','\x78','\x79','\x7a','\x7b','\x7c','\x7c','\x7f','\x86','\x87','\0' };
--            uint32_t buf[4];
--            int max, i = 0;
--            do
--            {
--                PFX(cpu_cpuid)(2, buf + 0, buf + 1, buf + 2, buf + 3);
--                max = buf[0] & 0xff;
--                buf[0] &= ~0xff;
--                for (int j = 0; j < 4; j++)
--                {
--                    if (!(buf[j] >> 31))
--                        while (buf[j])
--                        {
--                            if (strchr(cache32_ids, buf[j] & 0xff))
--                                cache = 32;
--                            if (strchr(cache64_ids, buf[j] & 0xff))
--                                cache = 64;
--                            buf[j] >>= 8;
--                        }
--                }
--            }
--            while (++i < max);
--        }
--
--        if (cache == 32)
--            cpu |= X265_CPU_CACHELINE_32;
--        else if (cache == 64)
--            cpu |= X265_CPU_CACHELINE_64;
--        else
--            x265_log(NULL, X265_LOG_WARNING, "unable to determine cacheline size\n");
--    }
--
--#if BROKEN_STACK_ALIGNMENT
--    cpu |= X265_CPU_STACK_MOD4;
--#endif
-+    uint32_t cpu = X265_CPU_MMX|X265_CPU_MMX2|X265_CPU_SSE|X265_CPU_SSE2|X265_CPU_SSE3|X265_CPU_SSSE3|X265_CPU_SSE2_IS_FAST|X265_CPU_SSE4|X265_CPU_SSE42;
+ uint32_t cpu_detect(bool benableavx512)
+ {
 +
-+    #ifdef __AVX__
-+        cpu |= X265_CPU_AVX;
-+    #endif
-+    #ifdef __AVX2__
-+        cpu |= X265_CPU_AVX2;
-+    #endif
-+    #ifdef __FMA__
-+        cpu |= X265_CPU_FMA3;
-+    #endif
-+    #ifdef __BMI__
-+        cpu |= X265_CPU_BMI1|X265_CPU_LZCNT;
-+    #endif
-+    #ifdef __BMI2__
-+        cpu |= X265_CPU_BMI2;
-+    #endif
-+    #ifdef __AVX512F__
++    uint32_t cpu = X265_CPU_MMX|X265_CPU_MMX2|X265_CPU_SSE|X265_CPU_SSE2|X265_CPU_SSE3|X265_CPU_SSSE3|X265_CPU_SSE2_IS_FAST|X265_CPU_SSE4|X265_CPU_SSE42|X265_CPU_AVX|X265_CPU_AVX2|X265_CPU_FMA3|X265_CPU_BMI1|X265_CPU_LZCNT|X265_CPU_BMI2;
++    #if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && defined(__AVX512BW__) && defined(__AVX512CD__)
 +        cpu |= X265_CPU_AVX512;
 +    #endif
++    return cpu;
++
+     (void)benableavx512;
+     uint32_t flags = 0;
  
-     return cpu;
- }
-@@ -435,7 +267,22 @@ uint32_t cpu_detect(bool benableavx512)
+-#ifdef ENABLE_ASSEMBLY
++#ifdef ENABLE_ASSEMBLY && 0
+     flags = x86_cpu_detect(benableavx512);
+     if (flags & X265_CPU_AVX512)
+         enable512 = true;
+@@ -244,7 +251,22 @@ uint32_t cpu_detect(bool benableavx512)
      uint32_t flags = 0;
  
  #ifdef ENABLE_ASSEMBLY
@@ -378,7 +182,7 @@ index 3022ae44..3d16e686 100644
  
      return flags;
 diff --git a/source/common/cpu.h b/source/common/cpu.h
-index ec62eb31..c39c7196 100644
+index ec62eb3..c39c719 100644
 --- a/source/common/cpu.h
 +++ b/source/common/cpu.h
 @@ -36,16 +36,16 @@ extern "C" void PFX(cpu_emms)(void);
@@ -403,7 +207,7 @@ index ec62eb31..c39c7196 100644
  
  unsigned long x265_getauxval(unsigned long);
 diff --git a/source/common/vec/vec-primitives.cpp b/source/common/vec/vec-primitives.cpp
-index c1d951cc..9bc83d68 100644
+index c1d951c..9bc83d6 100644
 --- a/source/common/vec/vec-primitives.cpp
 +++ b/source/common/vec/vec-primitives.cpp
 @@ -64,25 +64,25 @@ void setupIntrinsicMCSTF_avx2(MCSTFPrimitives&);
@@ -437,7 +241,7 @@ index c1d951cc..9bc83d68 100644
  #endif
      (void)p;
 diff --git a/source/common/x86/asm-primitives.cpp b/source/common/x86/asm-primitives.cpp
-index 0ee16888..42f01d2b 100644
+index a62db64..76f844c 100644
 --- a/source/common/x86/asm-primitives.cpp
 +++ b/source/common/x86/asm-primitives.cpp
 @@ -912,7 +912,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) // Main10
@@ -675,7 +479,7 @@ index 0ee16888..42f01d2b 100644
          p.pu[LUMA_32x8].sad = PFX(pixel_sad_32x8_avx512);
        //  p.pu[LUMA_32x16].sad = PFX(pixel_sad_32x16_avx512);
 diff --git a/source/common/x86/x86inc.asm b/source/common/x86/x86inc.asm
-index 4e0edf65..74ba5b77 100644
+index 4e0edf6..74ba5b7 100644
 --- a/source/common/x86/x86inc.asm
 +++ b/source/common/x86/x86inc.asm
 @@ -357,7 +357,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
@@ -720,5 +524,5 @@ index 4e0edf65..74ba5b77 100644
      %define mmsize 16
      %define mova movdqa
 -- 
-2.55.0
+2.56.1
 

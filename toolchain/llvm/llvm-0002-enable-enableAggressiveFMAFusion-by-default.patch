@@ -1,17 +1,17 @@
-From f5eecb15bc471cba8c35180963a30d81ab975e6d Mon Sep 17 00:00:00 2001
+From da41dafc1b2e1ad623d333c3a68fd099d3dd0088 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 19 May 2026 00:00:00 +0000
 Subject: [PATCH] enable enableAggressiveFMAFusion by default
 
 ---
- llvm/include/llvm/CodeGen/TargetLowering.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ llvm/include/llvm/CodeGen/TargetLowering.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/CodeGen/TargetLowering.h b/llvm/include/llvm/CodeGen/TargetLowering.h
-index 82c47cce0..4fab8c1a1 100644
+index 858a90e6c4..041725ad20 100644
 --- a/llvm/include/llvm/CodeGen/TargetLowering.h
 +++ b/llvm/include/llvm/CodeGen/TargetLowering.h
-@@ -982,7 +982,7 @@ public:
+@@ -1011,7 +1011,7 @@ public:
    /// Return true if target always benefits from combining into FMA for a
    /// given value type. This must typically return false on targets where FMA
    /// takes more cycles to execute than FADD.
@@ -20,6 +20,15 @@ index 82c47cce0..4fab8c1a1 100644
  
    /// Return true if target always benefits from combining into FMA for a
    /// given value type. This must typically return false on targets where FMA
+@@ -1257,7 +1257,7 @@ public:
+   /// Return true if fixed-length, non-power-of-two vectors should be broken
+   /// down into legal vector parts instead of scalars for internal values.
+   virtual bool preferVectorizedNonPowerOfTwoTypeBreakdown() const {
+-    return false;
++    return true;
+   }
+ 
+   bool shouldUseDynamicVectorTypeBreakdown(EVT VT, bool ForCallingConv) const {
 -- 
-2.54.0
+2.56.1
 

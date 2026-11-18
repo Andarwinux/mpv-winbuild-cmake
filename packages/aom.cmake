@@ -14,6 +14,8 @@ ExternalProject_Add(aom
     CONFIGURE_ENVIRONMENT_MODIFICATION
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${EXEC} sed -i [['/aom_config\.c\.template/i unset(AOM_CMAKE_CONFIG)']] <SOURCE_DIR>/cmake/aom_configure.cmake
+    COMMAND ${EXEC} sed -i [['/HWY_BASELINE_TARGETS/d']] <SOURCE_DIR>/av1/*/x86/*.cc <SOURCE_DIR>/aom_dsp/x86/*.cc
+    COMMAND ${EXEC} sed -i [['s/-DHWY_DISABLE_PCLMUL_AES//g']] <SOURCE_DIR>/CMakeLists.txt
     COMMAND ${EXEC} ${CMAKE_COMMAND} -E copy_directory ${src_hwy}/hwy <SOURCE_DIR>/third_party/highway/hwy
     COMMAND ${EXEC} echo > <SOURCE_DIR>/test/test.cmake
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>

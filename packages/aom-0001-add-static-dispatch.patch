@@ -1,4 +1,4 @@
-From ebe3390259a3db17ad4312a090204133a8997755 Mon Sep 17 00:00:00 2001
+From a25c668e8e393acaabc3724da3d57ed236402cea Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 8 Nov 2026 00:00:00 +0000
 Subject: [PATCH] add static dispatch
@@ -146,10 +146,10 @@ index 3b7c2d7..4185025 100644
      flags = arm_get_cpu_caps() & arm_cpu_env_mask();
    }
 diff --git a/aom_ports/x86.h b/aom_ports/x86.h
-index 4d00d72..46261c0 100644
+index 83868bb..2fdbdd9 100644
 --- a/aom_ports/x86.h
 +++ b/aom_ports/x86.h
-@@ -196,7 +196,11 @@ static inline uint64_t xgetbv(void) {
+@@ -227,7 +227,11 @@ static inline uint64_t xgetbv(void) {
    (((reg) & (feature##_BITS)) == (feature##_BITS))
  
  static inline int x86_simd_caps(void) {

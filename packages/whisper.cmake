@@ -22,6 +22,7 @@ ExternalProject_Add(whisper
         _BINARY_DIR=set:<BINARY_DIR>
         _IS_EXCEPTIONS_ALLOWED=set:1
         _IS_REASSOC_ALLOWED=set:1
+        _LTO_FULL=set:${use_fulllto}
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
             COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/whisper.pc ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/whisper.pc

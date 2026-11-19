@@ -7,7 +7,6 @@ cmake -DTARGET_ARCH=aarch64-w64-mingw32 \
 -DSINGLE_SOURCE_LOCATION="/build/src_packages/" \
 -DCMAKE_INSTALL_PREFIX="/build/install" \
 -DMINGW_INSTALL_PREFIX="/build_aarch64/install/aarch64-w64-mingw32" \
--DCOMPILER_TOOLCHAIN=clang \
 -DLLVM_ENABLE_LTO=Thin \
 -DENABLE_CCACHE=ON \
 -DQT_DISABLE_CCACHE=ON \

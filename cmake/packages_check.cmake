@@ -1470,3 +1470,9 @@ set(libsrt_force_skip_check
     -DHAVE_PTHREAD_SETNAME_NP=OFF
     -DHAVE_PTHREAD_SETNAME_NP_IN_PTHREAD_NP_H=OFF
 )
+
+if(USE_FULLLTO_FOR_DEVIRT)
+set(use_fulllto 1)
+else()
+set(use_fulllto 0)
+endif()

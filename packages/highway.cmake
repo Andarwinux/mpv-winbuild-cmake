@@ -22,6 +22,7 @@ ExternalProject_Add(highway
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
+        _LTO_FULL=set:${use_fulllto}
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libhwy.a
     INSTALL_COMMAND ${EXEC} ${CMAKE_COMMAND} --install <BINARY_DIR>
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1

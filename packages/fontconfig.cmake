@@ -15,6 +15,7 @@ ExternalProject_Add(fontconfig
         _IS_CONFIGURE=set:1
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR> <BINARY_DIR>/source/${package}
     COMMAND ${CMAKE_COMMAND} -E rm -rf <BINARY_DIR>/source/${package}/subprojects
+    COMMAND ${EXEC} sed -i [['s/executable/static_library/g']] <BINARY_DIR>/source/${package}/src/meson.build
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR>/build <BINARY_DIR>/source/${package}
         ${meson_conf_args}
         -Diconv=enabled

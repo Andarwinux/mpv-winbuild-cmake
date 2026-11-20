@@ -12,14 +12,14 @@ ExternalProject_Add(libpsl
     COMMAND ${EXEC} meson setup --reconfigure <BINARY_DIR> <SOURCE_DIR>
         ${meson_conf_args}
         -Dtests=false
-        -Druntime=no
+        -Druntime=libicu-win
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> src/suffixes_dafsa.h
     ${trim_path} <BINARY_DIR>/src/suffixes_dafsa.h
     COMMAND ${EXEC} meson install -C <BINARY_DIR> --only-changed --tags devel
-    INSTALL_COMMAND ""
+    INSTALL_COMMAND ${EXEC} sed -i [['s/-lpsl/-lpsl -licu/g']] ${MINGW_INSTALL_PREFIX}/lib/pkgconfig/libpsl.pc
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 

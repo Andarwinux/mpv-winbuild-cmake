@@ -1,0 +1,118 @@
+From 5b4fc66b9ba81b62d393fdc27b100cf8769cf947 Mon Sep 17 00:00:00 2001
+From: Andarwinux <Andarwinux@users.noreply.github.com>
+Date: Sat, 13 Dec 2025 00:00:00 +0000
+Subject: [PATCH] add static dispatch
+
+---
+ libass/ass_bitmap_engine.c | 12 ++++++------
+ libass/x86/x86inc.asm      | 25 +++++++++++++++++--------
+ 2 files changed, 23 insertions(+), 14 deletions(-)
+
+diff --git a/libass/ass_bitmap_engine.c b/libass/ass_bitmap_engine.c
+index 847adc4..8379775 100644
+--- a/libass/ass_bitmap_engine.c
++++ b/libass/ass_bitmap_engine.c
+@@ -114,7 +114,7 @@ unsigned ass_get_cpu_flags(unsigned mask)
+ {
+     unsigned flags = ASS_CPU_FLAG_NONE;
+ 
+-#if CONFIG_ASM && ARCH_X86
++#if CONFIG_ASM && ARCH_X86 & 0
+ 
+     if (!ass_has_cpuid())
+         return flags & mask;
+@@ -168,16 +168,16 @@ BitmapEngine ass_bitmap_engine_init(unsigned mask)
+     engine.tile_order = mask & ASS_FLAG_LARGE_TILES ? 5 : 4;
+ 
+ #if CONFIG_ASM
+-    unsigned flags = ass_get_cpu_flags(mask);
++    unsigned flags;
+ #if ARCH_X86
+-    if (flags & ASS_CPU_FLAG_X86_AVX2) {
++    if (true) {
+         ALL_PROTOTYPES(32, avx2)
+         ALL_FUNCTIONS(5, 32, avx2)
+         return engine;
+-    } else if (flags & ASS_CPU_FLAG_X86_SSE2) {
++    } else if (true) {
+         ALL_PROTOTYPES(16, sse2)
+         ALL_FUNCTIONS(4, 16, sse2)
+-        if (flags & ASS_CPU_FLAG_X86_SSSE3) {
++        if (true) {
+             ALL_PROTOTYPES(16, ssse3)
+             RASTERIZER_FUNCTION(fill_generic, ssse3)
+             GENERIC_FUNCTION(be_blur, ssse3)
+@@ -188,7 +188,7 @@ BitmapEngine ass_bitmap_engine_init(unsigned mask)
+         return engine;
+     }
+ #elif ARCH_AARCH64
+-    if (flags & ASS_CPU_FLAG_ARM_NEON) {
++    if (true) {
+         ALL_PROTOTYPES(16, neon)
+         ALL_FUNCTIONS(4, 16, neon)
+         return engine;
+diff --git a/libass/x86/x86inc.asm b/libass/x86/x86inc.asm
+index fc490b6..77134ce 100644
+--- a/libass/x86/x86inc.asm
++++ b/libass/x86/x86inc.asm
+@@ -361,7 +361,7 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+ %endmacro
+ 
+ %define required_stack_alignment ((mmsize + 15) & ~15)
+-%define vzeroupper_required (mmsize > 16 && (ARCH_X86_64 == 0 || xmm_regs_used > 16 || notcpuflag(avx512)))
++%define vzeroupper_required 0
+ %define high_mm_regs (16*cpuflag(avx512))
+ 
+ ; Large stack allocations on Windows need to use stack probing in order
+@@ -763,9 +763,9 @@ DECLARE_ARG 7, 8, 9, 10, 11, 12, 13, 14
+ 
+ %define last_branch_adr $$
+ %macro AUTO_REP_RET 0
+-    %if notcpuflag(ssse3)
+-        times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
+-    %endif
++    ;%if notcpuflag(ssse3)
++    ;    times ((last_branch_adr-$)>>31)+1 rep ; times 1 iff $ == last_branch_adr.
++    ;%endif
+     ret
+     annotate_function_size
+ %endmacro
+@@ -828,14 +828,23 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+     %xdefine current_function_section __SECT__
+     %if FORMAT_ELF
+         %if %1
++            section .text.%2 progbits alloc exec nowrite
+             global %2:function hidden
+         %else
+             global %2:function
+         %endif
+-    %elif FORMAT_MACHO && HAVE_PRIVATE_EXTERN && %1
+-        global %2:private_extern
++    %elif FORMAT_MACHO
++        %if HAVE_PRIVATE_EXTERN && %1
++            global %2:private_extern
++        %else
++            global %2
++        %endif
+     %else
+-        global %2
++        %if %1
++            section .text$%2 comdat=1:%2
++        %else
++            global %2
++        %endif
+     %endif
+     align function_align
+     %2:
+@@ -1085,7 +1094,7 @@ BRANCH_INSTR jz, je, jnz, jne, jl, jle, jnl, jnle, jg, jge, jng, jnge, ja, jae,
+ %endmacro
+ 
+ %macro INIT_XMM 0-1+
+-    %assign avx_enabled FORCE_VEX_ENCODING
++    %assign avx_enabled 1
+     %define RESET_MM_PERMUTATION INIT_XMM %1
+     %define mmsize 16
+     %define mova movdqa
+-- 
+2.56.1
+

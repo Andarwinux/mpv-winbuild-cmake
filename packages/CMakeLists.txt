@@ -12,7 +12,6 @@ list(APPEND ep
     lcms2
     ogg
     vorbis
-    opus-dnn
     opus
     speex
     libmodplug

@@ -58,7 +58,7 @@ index a831aaf5bc..3f3cf60b28 100644
                 MemIntrinsicCostAttributes(IID, Ty, Ptr, IsMasked, Alignment,
                                            &Ingredient),
 -               Ctx.CostKind);
-+               Ctx.CostKind) + InstructionCost::getInvalid();
++               Ctx.CostKind) * 8;
    }
  
    InstructionCost Cost = 0;

@@ -84,6 +84,9 @@ elseif(TARGET_CPU STREQUAL "aarch64")
     set(novzeroupper
         COMMAND true
     )
+    set(aom_aarch64_disable_asm
+        -DAOM_TARGET_CPU=generic
+    )
     set(libjxl_force_skip_check
         -DCXX_MAVX2_SUPPORTED=OFF
         -DCXX_MF16C_SUPPORTED=OFF

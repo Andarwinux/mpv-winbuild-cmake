@@ -1,5 +1,5 @@
 ExternalProject_Add(zstd
-    GIT_REPOSITORY https://github.com/facebook/zstd.git
+    GIT_REPOSITORY https://github.com/meta/zstd.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--depth=1 --sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests !doc !contrib"

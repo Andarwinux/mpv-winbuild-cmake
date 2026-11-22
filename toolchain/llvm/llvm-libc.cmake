@@ -28,7 +28,7 @@ ExternalProject_Add(llvm-libc
         -DLIBC_CC_SUPPORTS_NOSTDLIBPP=OFF
         -DLIBC_CC_SUPPORTS_PATTERN_INIT=OFF
         -DLIBC_CONF_STRING_LENGTH_IMPL=arch_vector
-        -DLIBC_CONF_FIND_FIRST_CHARACTER_IMPL=word
+        -DLIBC_CONF_FIND_FIRST_CHARACTER_IMPL=arch_vector
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
@@ -36,7 +36,7 @@ ExternalProject_Add(llvm-libc
         _FORCE_BUILTIN=set:1
         _NOCCACHE=set:1
     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR> libc.src.string.memmem
-                                                #libc.src.string.memchr
+                                                libc.src.string.memchr
                                                 libc.src.string.memcmp
                                                 libc.src.string.strspn
                                                 #libc.src.string.strlen

@@ -1,19 +1,28 @@
-From b9e185a9f903ccc52d0f83754571f32069b8b617 Mon Sep 17 00:00:00 2001
+From 71761919491d4b6d6f7944d191948e181ada889b Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 26 May 2026 00:00:00 +0000
 Subject: [PATCH] increase avx512 gather/scatter costs
 
 ---
- llvm/lib/Target/X86/X86TargetTransformInfo.cpp  | 4 ++--
- llvm/lib/Transforms/Vectorize/LoopVectorize.cpp | 5 ++---
+ llvm/lib/Target/X86/X86TargetTransformInfo.cpp  | 6 ++++--
+ llvm/lib/Transforms/Vectorize/LoopVectorize.cpp | 7 +++----
  llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp  | 2 +-
- 3 files changed, 5 insertions(+), 6 deletions(-)
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 76a11d7c77..b75632a733 100644
+index 76a11d7c77..adc854d51f 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-@@ -7866,7 +7866,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
+@@ -3866,6 +3866,8 @@ InstructionCost X86TTIImpl::getCmpSelInstrCost(
+     return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
+                                      Op1Info, Op2Info, I);
+ 
++  if(DL.getTypeSizeInBits(ValTy) > 512 || !ST->useAVX512Regs() && DL.getTypeSizeInBits(ValTy) > 256) return InstructionCost::getInvalid();
++
+   // Legalize the type.
+   std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(ValTy);
+ 
+@@ -7866,7 +7868,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
                             MaskCost + NumOfUnfoldedLoads * MemOpCost +
                             NumOfMoves;
  
@@ -22,7 +31,7 @@ index 76a11d7c77..b75632a733 100644
    }
  
    // Store.
-@@ -7904,7 +7904,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
+@@ -7904,7 +7906,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
        MaskCost +
        NumOfMemOps * (MemOpCost + NumOfShufflesPerStore * ShuffleCost) +
        NumOfMoves;
@@ -32,9 +41,18 @@ index 76a11d7c77..b75632a733 100644
  
  InstructionCost X86TTIImpl::getInterleavedMemoryOpCost(
 diff --git a/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp b/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
-index 43790466b0..1cf0a134fa 100644
+index a4d8598802..934764e487 100644
 --- a/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
 +++ b/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
+@@ -3555,7 +3555,7 @@ LoopVectorizationPlanner::selectInterleaveCount(VPlan &Plan, ElementCount VF,
+ 
+   // Interleave if we vectorized this loop and there is a reduction that could
+   // benefit from interleaving.
+-  if (VF.isVector() && HasReductions) {
++  if (VF.isVector() && HasReductions && false) {
+     LLVM_DEBUG(dbgs() << "LV: Interleaving because of reductions.\n");
+     return IC;
+   }
 @@ -4315,11 +4315,10 @@ void LoopVectorizationCostModel::setCostBasedWideningDecision(ElementCount VF) {
        // write down this decision and use it during vectorization.
        InstructionCost Cost;
@@ -50,7 +68,7 @@ index 43790466b0..1cf0a134fa 100644
          Cost = GatherScatterCost;
        } else {
 diff --git a/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp b/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp
-index a831aaf5bc..3f3cf60b28 100644
+index a831aaf5bc..8ae61cdbf8 100644
 --- a/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp
 +++ b/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp
 @@ -4605,7 +4605,7 @@ InstructionCost VPWidenMemoryRecipe::computeCost(ElementCount VF,
@@ -58,7 +76,7 @@ index a831aaf5bc..3f3cf60b28 100644
                 MemIntrinsicCostAttributes(IID, Ty, Ptr, IsMasked, Alignment,
                                            &Ingredient),
 -               Ctx.CostKind);
-+               Ctx.CostKind) * 8;
++               Ctx.CostKind) * 6;
    }
  
    InstructionCost Cost = 0;

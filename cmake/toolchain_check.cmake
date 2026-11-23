@@ -51,6 +51,7 @@ set(mllvm_options
     -combiner-global-alias-analysis
     -misched-postra
     -enable-gc-empty-basic-blocks
+    -enable-merge-functions
     -enable-jump-table-to-switch
     -enable-loop-versioning-licm=false
     -slp-vectorize-non-power-of-2

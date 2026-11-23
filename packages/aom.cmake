@@ -20,7 +20,6 @@ ExternalProject_Add(aom
     COMMAND ${EXEC} echo > <SOURCE_DIR>/test/test.cmake
     COMMAND ${EXEC} ${CMAKE_COMMAND} -H<SOURCE_DIR> -B<BINARY_DIR>
         ${cmake_conf_args}
-        ${aom_aarch64_disable_asm}
         -DENABLE_EXAMPLES=OFF
         -DENABLE_DOCS=OFF
         -DENABLE_TOOLS=OFF

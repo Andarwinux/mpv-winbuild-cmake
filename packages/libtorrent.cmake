@@ -23,6 +23,7 @@ ExternalProject_Add(libtorrent
         -DCMAKE_CXX_STANDARD=23
         -Ddeprecated-functions=OFF
         -Dwebtorrent=OFF
+        "-DCMAKE_CXX_FLAGS='-DTORRENT_HAS_SSE=0 -DTORRENT_HAS_ARM=0'"
     BUILD_ENVIRONMENT_MODIFICATION
         _PACKAGE_NAME=set:${package}
         _BINARY_DIR=set:<BINARY_DIR>

@@ -1,4 +1,4 @@
-From 04737e003eea06cc2fd58cda1ca3bb2394db87c0 Mon Sep 17 00:00:00 2001
+From 12483fe5c0cb5f7d4c71843a3d328c9ad1439e15 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Sun, 10 May 2026 00:00:00 +0000
 Subject: [PATCH] remove shit
@@ -13,10 +13,10 @@ Subject: [PATCH] remove shit
  6 files changed, 131 insertions(+), 58 deletions(-)
 
 diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
-index c58e63a..3b4ef33 100644
+index 142d208..fc7de7e 100644
 --- a/source/common/aarch64/asm-primitives.cpp
 +++ b/source/common/aarch64/asm-primitives.cpp
-@@ -664,30 +664,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
+@@ -638,30 +638,50 @@ void setupNeonDotProdPrimitives(EncoderPrimitives &)
  
  void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
  {
@@ -72,7 +72,7 @@ index c58e63a..3b4ef33 100644
      {
          setupSve2BitPermPrimitives(p);
      }
-@@ -696,7 +716,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
+@@ -670,7 +690,7 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
  
  void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
  {
@@ -81,7 +81,7 @@ index c58e63a..3b4ef33 100644
      {
          setupPixelPrimitives_neon(p);
          setupFilterPrimitives_neon(p);
-@@ -706,20 +726,35 @@ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
+@@ -680,20 +700,35 @@ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
          setupSaoPrimitives_neon(p);
      }
  #ifdef HAVE_NEON_DOTPROD
@@ -120,7 +120,7 @@ index c58e63a..3b4ef33 100644
      {
          setupFilterPrimitives_sve(p);
          setupSaoPrimitives_sve(p);
-@@ -728,7 +763,12 @@ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
+@@ -702,7 +737,12 @@ void setupIntrinsicPrimitives(EncoderPrimitives &p, int cpuMask)
      }
  #endif
  #if defined(HAVE_SVE2) && HAVE_SVE_BRIDGE
@@ -135,10 +135,10 @@ index c58e63a..3b4ef33 100644
          setupPixelPrimitives_sve2(p);
          setupSaoPrimitives_sve2(p);
 diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
-index 108c5f4..b9e9479 100644
+index 3b91689..49fec82 100644
 --- a/source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
-@@ -167,10 +167,17 @@ bool detect512()
+@@ -152,10 +152,17 @@ bool detect512()
  
  uint32_t cpu_detect(bool benableavx512)
  {
@@ -157,7 +157,7 @@ index 108c5f4..b9e9479 100644
      flags = x86_cpu_detect(benableavx512);
      if (flags & X265_CPU_AVX512)
          enable512 = true;
-@@ -244,7 +251,22 @@ uint32_t cpu_detect(bool benableavx512)
+@@ -188,7 +195,22 @@ uint32_t cpu_detect(bool benableavx512)
      uint32_t flags = 0;
  
  #ifdef ENABLE_ASSEMBLY

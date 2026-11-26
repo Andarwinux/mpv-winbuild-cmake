@@ -1,50 +1,92 @@
-From 71761919491d4b6d6f7944d191948e181ada889b Mon Sep 17 00:00:00 2001
+From c38c053b643a1d38808f40cd11c4748a8ab4a9a7 Mon Sep 17 00:00:00 2001
 From: _ <>
 Date: Tue, 26 May 2026 00:00:00 +0000
 Subject: [PATCH] increase avx512 gather/scatter costs
 
 ---
- llvm/lib/Target/X86/X86TargetTransformInfo.cpp  | 6 ++++--
- llvm/lib/Transforms/Vectorize/LoopVectorize.cpp | 7 +++----
- llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp  | 2 +-
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ llvm/lib/Target/X86/X86TargetTransformInfo.cpp | 18 ++++++++++++++++--
+ .../lib/Transforms/Vectorize/LoopVectorize.cpp |  7 +++----
+ llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp |  2 +-
+ 3 files changed, 20 insertions(+), 7 deletions(-)
 
 diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-index 76a11d7c77..adc854d51f 100644
+index fe0930e261..36b9e93ebf 100644
 --- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
 +++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
-@@ -3866,6 +3866,8 @@ InstructionCost X86TTIImpl::getCmpSelInstrCost(
+@@ -2054,6 +2054,7 @@ InstructionCost X86TTIImpl::getShuffleCost(
+   // vector and cheap if the subvectors are aligned.
+   if (Kind == TTI::SK_ExtractSubvector && LT.second.isVector()) {
+     int NumElts = LT.second.getVectorNumElements();
++    if (LT.second.isVectorOf(MVT::i1)) return Index + 5;
+     if ((Index % NumElts) == 0)
+       return TTI::TCC_Free;
+     std::pair<InstructionCost, MVT> SubLT = getTypeLegalizationCost(SubTp);
+@@ -2114,6 +2115,7 @@ InstructionCost X86TTIImpl::getShuffleCost(
+       bool MatchingTypes =
+           NumElts == NumSubElts &&
+           (SubTp->getElementCount().getKnownMinValue() % NumSubElts) == 0;
++      if (DstLT.second.isVectorOf(MVT::i1)) return Index + 5;
+       if ((Index % NumSubElts) == 0 && (NumElts % NumSubElts) == 0)
+         return MatchingTypes ? TTI::TCC_Free : SubLT.first;
+     }
+@@ -3868,6 +3870,9 @@ InstructionCost X86TTIImpl::getCmpSelInstrCost(
      return BaseT::getCmpSelInstrCost(Opcode, ValTy, CondTy, VecPred, CostKind,
                                       Op1Info, Op2Info, I);
  
 +  if(DL.getTypeSizeInBits(ValTy) > 512 || !ST->useAVX512Regs() && DL.getTypeSizeInBits(ValTy) > 256) return InstructionCost::getInvalid();
++  if(ValTy->getScalarSizeInBits() == 1 && ST->hasBWI()) return DL.getTypeSizeInBits(ValTy) > 64 ? InstructionCost::getInvalid() : 4;
 +
    // Legalize the type.
    std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(ValTy);
  
-@@ -7866,7 +7868,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
-                            MaskCost + NumOfUnfoldedLoads * MemOpCost +
-                            NumOfMoves;
+@@ -5168,6 +5173,9 @@ X86TTIImpl::getIntrinsicInstrCost(const IntrinsicCostAttributes &ICA,
+   case Intrinsic::mask_beforefirst:
+     ISD = ISD::MASK_BEFOREFIRST;
+     break;
++  case Intrinsic::experimental_vector_extract_last_active: {
++    return 1;
++  }
+   case Intrinsic::maxnum:
+   case Intrinsic::minnum:
+     // FMINNUM has same costs so don't duplicate.
+@@ -5494,10 +5502,10 @@ InstructionCost X86TTIImpl::getVectorInstrCost(
+   if (Index != -1U && (Opcode == Instruction::ExtractElement ||
+                        Opcode == Instruction::InsertElement)) {
+     // Extraction of vXi1 elements are now efficiently handled by MOVMSK.
+-    if (Opcode == Instruction::ExtractElement &&
++    if (true &&
+         ScalarType->getScalarSizeInBits() == 1 &&
+         cast<FixedVectorType>(Val)->getNumElements() > 1)
+-      return 1;
++      return 5;
  
--    return Cost;
-+    return Cost / 4;
-   }
+     // Legalize the type.
+     std::pair<InstructionCost, MVT> LT = getTypeLegalizationCost(Val);
+@@ -7756,6 +7764,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
+     ArrayRef<unsigned> Indices, Align Alignment, unsigned AddressSpace,
+     TTI::TargetCostKind CostKind, bool UseMaskForCond,
+     bool UseMaskForGaps) const {
++
+   // VecTy for interleave memop is <VF*Factor x Elt>.
+   // So, for VF=4, Interleave Factor = 3, Element type = i32 we have
+   // VecTy = <12 x i32>.
+@@ -7785,6 +7794,11 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
+   MVT VT =
+       MVT::getVectorVT(TLI->getSimpleValueType(DL, VecTy->getScalarType()), VF);
  
-   // Store.
-@@ -7904,7 +7906,7 @@ InstructionCost X86TTIImpl::getInterleavedMemoryOpCostAVX512(
-       MaskCost +
-       NumOfMemOps * (MemOpCost + NumOfShufflesPerStore * ShuffleCost) +
-       NumOfMoves;
--  return Cost;
-+  return Cost / 4;
- }
- 
- InstructionCost X86TTIImpl::getInterleavedMemoryOpCost(
++  if((Factor == 2 || Factor == 3 || Factor == 4 || Factor == 6) && DL.getTypeSizeInBits(VecTy) <= 2048) {
++    if((UseMaskedMemOp && (Factor != 6) && DL.getTypeSizeInBits(VecTy) <= 512) || !UseMaskedMemOp) return 8 + DL.getTypeSizeInBits(VecTy) / 512 * 8;
++  }
++  return InstructionCost::getInvalid();
++
+   InstructionCost MaskCost;
+   if (UseMaskedMemOp) {
+     APInt DemandedLoadStoreElts = APInt::getZero(VecTy->getNumElements());
 diff --git a/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp b/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
-index a4d8598802..934764e487 100644
+index 3e63061477..244f69f23a 100644
 --- a/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
 +++ b/llvm/lib/Transforms/Vectorize/LoopVectorize.cpp
-@@ -3555,7 +3555,7 @@ LoopVectorizationPlanner::selectInterleaveCount(VPlan &Plan, ElementCount VF,
+@@ -3554,7 +3554,7 @@ LoopVectorizationPlanner::selectInterleaveCount(VPlan &Plan, ElementCount VF,
  
    // Interleave if we vectorized this loop and there is a reduction that could
    // benefit from interleaving.
@@ -53,7 +95,7 @@ index a4d8598802..934764e487 100644
      LLVM_DEBUG(dbgs() << "LV: Interleaving because of reductions.\n");
      return IC;
    }
-@@ -4315,11 +4315,10 @@ void LoopVectorizationCostModel::setCostBasedWideningDecision(ElementCount VF) {
+@@ -4314,11 +4314,10 @@ void LoopVectorizationCostModel::setCostBasedWideningDecision(ElementCount VF) {
        // write down this decision and use it during vectorization.
        InstructionCost Cost;
        InstWidening Decision;
@@ -68,10 +110,10 @@ index a4d8598802..934764e487 100644
          Cost = GatherScatterCost;
        } else {
 diff --git a/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp b/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp
-index a831aaf5bc..8ae61cdbf8 100644
+index 40abcef958..a9e2bc5c0d 100644
 --- a/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp
 +++ b/llvm/lib/Transforms/Vectorize/VPlanRecipes.cpp
-@@ -4605,7 +4605,7 @@ InstructionCost VPWidenMemoryRecipe::computeCost(ElementCount VF,
+@@ -4617,7 +4617,7 @@ InstructionCost VPWidenMemoryRecipe::computeCost(ElementCount VF,
             Ctx.TTI.getMemIntrinsicInstrCost(
                 MemIntrinsicCostAttributes(IID, Ty, Ptr, IsMasked, Alignment,
                                            &Ingredient),

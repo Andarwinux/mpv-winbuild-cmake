@@ -1,0 +1,209 @@
+From 4c92af0aa3959f38094a11f59d6d3d3fa536ef25 Mon Sep 17 00:00:00 2001
+From: william <we3223@gmail.com>
+Date: Thu, 24 Sep 2026 00:07:36 +0800
+Subject: [PATCH] Enable DataAndControlFlow tail folding style on AVX-512
+
+---
+ llvm/include/llvm/CodeGen/TargetLowering.h    | 18 ++++++++
+ .../SelectionDAG/SelectionDAGBuilder.cpp      |  8 ++++
+ .../CodeGen/SelectionDAG/TargetLowering.cpp   | 45 +++++++++++++++++++
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 19 ++++++++
+ llvm/lib/Target/X86/X86ISelLowering.h         |  3 ++
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 17 +++++++
+ llvm/lib/Target/X86/X86TargetTransformInfo.h  |  4 ++
+ 7 files changed, 114 insertions(+)
+
+diff --git a/llvm/include/llvm/CodeGen/TargetLowering.h b/llvm/include/llvm/CodeGen/TargetLowering.h
+index fdded11d5e..a0d7193df1 100644
+--- a/llvm/include/llvm/CodeGen/TargetLowering.h
++++ b/llvm/include/llvm/CodeGen/TargetLowering.h
+@@ -5829,6 +5829,24 @@ public:
+   /// \returns The expansion if successful, SDValue() otherwise
+   SDValue expandROT(SDNode *N, bool AllowVectorOps, SelectionDAG &DAG) const;
+ 
++  /// Expand get_active_lane_mask into a scalar bitmask sequence.
++  /// \param DAG The SelectionDAG.
++  /// \param VT The target vector boolean type.
++  /// \param Index The loop iteration index.
++  /// \param TripCount The loop trip count.
++  /// \param DL The source location.
++  /// \returns The expanded SDValue, or an empty SDValue if expansion is not
++  /// supported.
++  SDValue expandGetActiveLaneMask(SelectionDAG &DAG, EVT VT, SDValue Index,
++                                  SDValue TripCount, const SDLoc &DL) const;
++
++  /// Return true if the target prefers to expand get_active_lane_mask
++  /// into a scalar bitmask sequence.
++  /// \param VT The vector mask type.
++  virtual bool shouldExpandGetActiveLaneMaskUsingScalar(EVT VT) const {
++    return false;
++  }
++
+   /// Expand shift-by-parts.
+   /// \param N Node to expand
+   /// \param Lo lower-output-part after conversion
+diff --git a/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp b/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
+index 9e25aaa8ed..fbeba2855b 100644
+--- a/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
++++ b/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
+@@ -8594,6 +8594,14 @@ void SelectionDAGBuilder::visitIntrinsicCall(const CallInst &I,
+     SDValue Index = getValue(I.getOperand(0));
+     SDValue TripCount = getValue(I.getOperand(1));
+     EVT ElementVT = Index.getValueType();
++    // Attempt to expand into a scalar bitmask if preferred by target.
++    if (TLI.shouldExpandGetActiveLaneMaskUsingScalar(CCVT)) {
++      if (SDValue Res =
++              TLI.expandGetActiveLaneMask(DAG, CCVT, Index, TripCount, sdl)) {
++        setValue(&I, Res);
++        return;
++      }
++    }
+ 
+     if (!TLI.shouldExpandGetActiveLaneMask(CCVT, ElementVT)) {
+       setValue(&I, DAG.getNode(ISD::GET_ACTIVE_LANE_MASK, sdl, CCVT, Index,
+diff --git a/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp b/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
+index f60b19a9df..07c95776cb 100644
+--- a/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
++++ b/llvm/lib/CodeGen/SelectionDAG/TargetLowering.cpp
+@@ -9029,6 +9029,51 @@ static bool isNonZeroModBitWidthOrUndef(SDValue Z, unsigned BW) {
+       /*AllowUndefs=*/true, /*AllowTruncation=*/true);
+ }
+ 
++SDValue TargetLowering::expandGetActiveLaneMask(SelectionDAG &DAG, EVT VT,
++                                                SDValue Index,
++                                                SDValue TripCount,
++                                                const SDLoc &DL) const {
++  if (!VT.isFixedLengthVector())
++    return SDValue();
++
++  unsigned NumElts = VT.getVectorNumElements();
++
++  if (NumElts > 64)
++    return SDValue();
++
++  EVT IndexVT = Index.getValueType();
++  // Scalar integer type wide enough to hold all lane bits (at least i8).
++  unsigned MaskBits = llvm::PowerOf2Ceil(std::max(8u, NumElts));
++  EVT MaskVT = EVT::getIntegerVT(*DAG.getContext(), MaskBits);
++
++  // Clamp remaining lanes: Diff = (TripCount <= Index) ? 0 : (TripCount -
++  // Index).
++  SDValue Sub = DAG.getNode(ISD::SUB, DL, IndexVT, TripCount, Index);
++  SDValue IsLe = DAG.getSetCC(
++      DL, getSetCCResultType(DAG.getDataLayout(), *DAG.getContext(), IndexVT),
++      TripCount, Index, ISD::SETULE);
++  SDValue Zero = DAG.getConstant(0, DL, IndexVT);
++  SDValue Diff = DAG.getSelect(DL, IndexVT, IsLe, Zero, Sub);
++  // Clamp to vector length: k = umin(Diff, NumElts).
++  SDValue MaxLanes = DAG.getConstant(NumElts, DL, IndexVT);
++  SDValue Clamped = DAG.getNode(ISD::UMIN, DL, IndexVT, Diff, MaxLanes);
++  // Build the scalar bitmask: (1 << k) - 1.
++  SDValue ShiftAmt = DAG.getZExtOrTrunc(Clamped, DL, MaskVT);
++  SDValue One = DAG.getConstant(1, DL, MaskVT);
++  SDValue Shl = DAG.getNode(ISD::SHL, DL, MaskVT, One, ShiftAmt);
++  SDValue ScalarMask = DAG.getNode(ISD::SUB, DL, MaskVT, Shl, One);
++  // Bitcast to a boolean vector matching the integer bit width.
++  EVT BoolVecVT =
++      EVT::getVectorVT(*DAG.getContext(), MVT::i1, MaskVT.getSizeInBits());
++  SDValue Bitcast = DAG.getNode(ISD::BITCAST, DL, BoolVecVT, ScalarMask);
++
++  if (BoolVecVT == VT)
++    return Bitcast;
++  // Extract the original subvector if padded (e.g. v4i1 from i8 -> v8i1).
++  return DAG.getNode(ISD::EXTRACT_SUBVECTOR, DL, VT, Bitcast,
++                     DAG.getVectorIdxConstant(0, DL));
++}
++
+ SDValue TargetLowering::expandFunnelShift(SDNode *Node,
+                                           SelectionDAG &DAG) const {
+   EVT VT = Node->getValueType(0);
+diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
+index 287d5a523e..cd03522da1 100644
+--- a/llvm/lib/Target/X86/X86ISelLowering.cpp
++++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
+@@ -33137,6 +33137,25 @@ X86TargetLowering::shouldExpandAtomicLoadInIR(const LoadInst *LI) const {
+                               : AtomicExpansionKind::None;
+ }
+ 
++bool X86TargetLowering::shouldExpandGetActiveLaneMaskUsingScalar(EVT VT) const {
++  if (!VT.isFixedLengthVector())
++    return false;
++
++  unsigned NumElts = VT.getVectorNumElements();
++
++  // Only consider power-of-2 vector lengths up to 64.
++  if (NumElts > 64 || !isPowerOf2_32(NumElts))
++    return false;
++
++  // AVX-512 natively supports mask registers (kmov/bzhi) for >=16.
++  if (Subtarget.hasAVX512())
++    return NumElts >= 16;
++
++  // Without AVX-512, bitcasting to vXi1 requires costly unpacking (e.g. pinsrb)
++  // on smaller vectors. Only expand v64i1 to avoid its 80+ vector instructions.
++  return NumElts == 64;
++}
++
+ enum BitTestKind : unsigned {
+   UndefBit,
+   ConstantBit,
+diff --git a/llvm/lib/Target/X86/X86ISelLowering.h b/llvm/lib/Target/X86/X86ISelLowering.h
+index 5a2fff1b23..c2f88a547d 100644
+--- a/llvm/lib/Target/X86/X86ISelLowering.h
++++ b/llvm/lib/Target/X86/X86ISelLowering.h
+@@ -110,6 +110,9 @@ namespace llvm {
+ 
+     unsigned getJumpTableEncoding() const override;
+     bool useSoftFloat() const override;
++    /// Return true if X86 prefers to expand get_active_lane_mask into a scalar
++    /// bitmask sequence.
++    bool shouldExpandGetActiveLaneMaskUsingScalar(EVT VT) const override;
+ 
+     void markLibCallAttributes(MachineFunction *MF, unsigned CC,
+                                ArgListTy &Args) const override;
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+index da75a8ff14..58e9798a5c 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+@@ -5126,6 +5126,23 @@ X86TTIImpl::getIntrinsicInstrCost(const IntrinsicCostAttributes &ICA,
+   case Intrinsic::abs:
+     ISD = ISD::ABS;
+     break;
++  case Intrinsic::get_active_lane_mask: {
++    VectorType *VT = dyn_cast<VectorType>(ICA.getReturnType());
++    if (!VT)
++      break;
++
++    EVT EVT = TLI->getValueType(DL, VT);
++    if (TLI->shouldExpandGetActiveLaneMaskUsingScalar(EVT)) {
++      if (CostKind == TTI::TCK_CodeSize)
++        return InstructionCost(4);
++      Type *IndexTy = ICA.getArgTypes()[0];
++      // Model ~5 scalar ALU ops for bitmask calculation plus 1 GPR-to-mask
++      // transfer (kmov).
++      return 5 * getArithmeticInstrCost(Instruction::Sub, IndexTy, CostKind) +
++             1;
++    }
++    break;
++  }
+   case Intrinsic::bitreverse:
+     ISD = ISD::BITREVERSE;
+     break;
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.h b/llvm/lib/Target/X86/X86TargetTransformInfo.h
+index 9ddd12f8ab..2a0b8e35f4 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.h
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.h
+@@ -58,6 +58,10 @@ public:
+   /// \name Vector TTI Implementations
+   /// @{
+ 
++  TailFoldingStyle getPreferredTailFoldingStyle() const override {
++    return ST->hasAVX512() ? TailFoldingStyle::Data
++                           : TailFoldingStyle::DataWithoutLaneMask;
++  }
+   unsigned getNumberOfRegisters(unsigned ClassID) const override;
+   unsigned getRegisterClassForType(bool Vector, Type *Ty) const override;
+   bool hasConditionalLoadStoreForType(Type *Ty, bool IsStore) const override;
+-- 
+2.56.1
+

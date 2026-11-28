@@ -1,0 +1,176 @@
+From e370f5a788b5f1ea74fc7c09bb812c6d1b87a787 Mon Sep 17 00:00:00 2001
+From: Adam Scott <adamscott200322@gmail.com>
+Date: Wed, 11 Nov 2026 15:42:50 +0000
+Subject: [PATCH] Take a uniform i64 divisors reciprocal from a scalar divide
+
+---
+ llvm/lib/Target/X86/X86ISelLowering.cpp       | 33 ++++++---
+ .../lib/Target/X86/X86TargetTransformInfo.cpp | 71 +++++++++++++++++--
+ 2 files changed, 89 insertions(+), 15 deletions(-)
+
+diff --git a/llvm/lib/Target/X86/X86ISelLowering.cpp b/llvm/lib/Target/X86/X86ISelLowering.cpp
+index fe03420117..e805ccd563 100644
+--- a/llvm/lib/Target/X86/X86ISelLowering.cpp
++++ b/llvm/lib/Target/X86/X86ISelLowering.cpp
+@@ -51996,8 +51996,10 @@ static SDValue combineInt64DivRemViaFPReciprocal(SDNode *N, bool IsSigned,
+ 
+   bool Widen = VT != MVT::v8i64;
+   // The chain multiplies twice on its critical path, so v2i64 only pays
+-  // off where vpmullq is fast.
+-  if (VT == MVT::v2i64 && Subtarget.isPMULLQSlow())
++  // off where vpmullq is fast. A uniform divisor takes its reciprocal from a
++  // scalar divide, which wins on throughput even where vpmullq is slow.
++  if (VT == MVT::v2i64 && Subtarget.isPMULLQSlow() &&
++      !DAG.getSplatValue(Divisor))
+     return SDValue();
+ 
+   MVT FPVT = MVT::v8f64;
+@@ -52025,9 +52027,21 @@ static SDValue combineInt64DivRemViaFPReciprocal(SDNode *N, bool IsSigned,
+   SDValue B = IsSigned ? DAG.getNode(ISD::ABS, DL, VT, Divisor) : Divisor;
+ 
+   // b_rcp = round_down(1.0 / round_up(double(b)))
+-  SDValue Recip =
+-      DAG.getNode(X86ISD::FDIV_RND, DL, FPVT, DAG.getConstantFP(1.0, DL, FPVT),
+-                  UToF(B, RU), RD);
++  SDValue Recip;
++  if (SDValue SplatB = DAG.getSplatValue(B)) {
++    // Only the packed SAE forms are 512-bit, so a uniform b takes b_rcp from
++    // a scalar divide and a broadcast.
++    SDValue SclB = DAG.getNode(X86ISD::SCALAR_UINT_TO_FP_RND, DL, MVT::v2f64,
++                               DAG.getUNDEF(MVT::v2f64), SplatB,
++                               RU); // vcvtusi2sd {ru-sae}
++    SDValue SclOne = DAG.getConstantFP(1.0, DL, MVT::v2f64);
++    SDValue SclRecip = DAG.getNode(X86ISD::FDIVS_RND, DL, MVT::v2f64, SclOne,
++                                   SclB, RD); // vdivsd {rd-sae}
++    Recip = DAG.getNode(X86ISD::VBROADCAST, DL, FPVT, SclRecip); // vbroadcastsd
++  } else {
++    Recip = DAG.getNode(X86ISD::FDIV_RND, DL, FPVT,
++                        DAG.getConstantFP(1.0, DL, FPVT), UToF(B, RU), RD);
++  }
+   // first = round_down(uint64(round_down(double(a)) * b_rcp))
+   SDValue First = FToU(FMul(UToF(A, RD), Recip));
+   // rem = a - first * b
+@@ -52163,9 +52177,12 @@ static SDValue combineIntDivRem(SDNode *N, SelectionDAG &DAG,
+     if (NextPowerOf2(NumElts) * FPSclVT.getSizeInBits() > 512)
+       return SDValue();
+     Dividend = DAG.WidenVector(Dividend, DL);
+-    Divisor = DAG.WidenVector(Divisor, DL);
+-    N = DAG.getNode(Opc, DL, Dividend.getValueType(), Dividend, Divisor)
+-            .getNode();
++    EVT WideVT = Dividend.getValueType();
++    // Widening hides a splat, so splat a uniform divisor wider instead.
++    SDValue SplatD = DAG.getSplatValue(Divisor);
++    Divisor = SplatD ? DAG.getSplatBuildVector(WideVT, DL, SplatD)
++                     : DAG.WidenVector(Divisor, DL);
++    N = DAG.getNode(Opc, DL, WideVT, Dividend, Divisor).getNode();
+   }
+ 
+   SDValue Res =
+diff --git a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+index 58e9798a5c..32972c3dc9 100644
+--- a/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
++++ b/llvm/lib/Target/X86/X86TargetTransformInfo.cpp
+@@ -781,8 +781,7 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+   bool VarDivToFP = IsDivRem && !Op2Info.isConstant() &&
+                     (!IsStrictFP || ST->useAVX512Regs());
+ 
+-  // i64 needs the qq converts, which are AVX512DQ only. Two tables because the
+-  // lowering picks by operand value and not by type.
++  // i64 needs the qq converts, which are AVX512DQ only.
+   static const CostKindTblEntry AVX512DQExactVarDivCostTable[] = {
+     { ISD::UDIV, MVT::v2i64,  {   5 } }, // cvt+divpd sequence
+     { ISD::SDIV, MVT::v2i64,  {   5 } },
+@@ -798,6 +797,21 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     { ISD::SREM, MVT::v8i64,  {  16 } },
+   };
+ 
++  static const CostKindTblEntry AVX512DQUniformVarDivCostTable[] = {
++    { ISD::UDIV, MVT::v2i64,  {   9 } }, // cvt+divsd sequence
++    { ISD::SDIV, MVT::v2i64,  {   9 } },
++    { ISD::UREM, MVT::v2i64,  {   9 } },
++    { ISD::SREM, MVT::v2i64,  {   9 } },
++    { ISD::UDIV, MVT::v4i64,  {   9 } },
++    { ISD::SDIV, MVT::v4i64,  {   9 } },
++    { ISD::UREM, MVT::v4i64,  {   9 } },
++    { ISD::SREM, MVT::v4i64,  {   9 } },
++    { ISD::UDIV, MVT::v8i64,  {  13 } },
++    { ISD::SDIV, MVT::v8i64,  {  17 } },
++    { ISD::UREM, MVT::v8i64,  {  13 } },
++    { ISD::SREM, MVT::v8i64,  {  17 } },
++  };
++
+   static const CostKindTblEntry AVX512DQVarDivCostTable[] = {
+     { ISD::UDIV, MVT::v2i64,  {  16 } },
+     { ISD::SDIV, MVT::v2i64,  {  16 } },
+@@ -842,13 +856,18 @@ InstructionCost X86TTIImpl::getArithmeticInstrCost(
+     bool ExactFPDiv =
+         OperandsFit(APFloat::semanticsPrecision(APFloat::IEEEdouble()));
+ 
+-    // Only the reciprocal chain multiplies, so only it is vpmullq gated.
+-    bool SlowMultiply =
+-        !ExactFPDiv && LT.second == MVT::v2i64 && ST->isPMULLQSlow();
++    // Only the reciprocal chain multiplies, so only it is vpmullq gated. A
++    // uniform divisor takes its reciprocal from a scalar divide, which wins on
++    // throughput even where vpmullq is slow.
++    bool SlowMultiply = !ExactFPDiv && LT.second == MVT::v2i64 &&
++                        ST->isPMULLQSlow() && !Op2Info.isUniform();
+ 
+     if (!SlowMultiply) {
+-      ArrayRef<CostKindTblEntry> Tbl =
+-          ExactFPDiv ? AVX512DQExactVarDivCostTable : AVX512DQVarDivCostTable;
++      ArrayRef<CostKindTblEntry> Tbl = AVX512DQVarDivCostTable;
++      if (ExactFPDiv)
++        Tbl = AVX512DQExactVarDivCostTable;
++      else if (Op2Info.isUniform())
++        Tbl = AVX512DQUniformVarDivCostTable;
+       if (const auto *Entry = CostTableLookup(Tbl, ISD, LT.second))
+         if (auto KindCost = Entry->Cost[CostKind])
+           return LT.first * *KindCost;
+@@ -8403,6 +8422,44 @@ bool X86TTIImpl::isProfitableToSinkOperands(Instruction *I,
+     return !Ops.empty();
+   }
+ 
++  unsigned Opc = I->getOpcode();
++  if (Opc == Instruction::Call)
++    switch (cast<CallInst>(I)->getIntrinsicID()) {
++    case Intrinsic::masked_udiv:
++      Opc = Instruction::UDiv;
++      break;
++    case Intrinsic::masked_sdiv:
++      Opc = Instruction::SDiv;
++      break;
++    case Intrinsic::masked_urem:
++      Opc = Instruction::URem;
++      break;
++    case Intrinsic::masked_srem:
++      Opc = Instruction::SRem;
++      break;
++    default:
++      break;
++    }
++
++  switch (Opc) {
++  case Instruction::UDiv:
++  case Instruction::SDiv:
++  case Instruction::URem:
++  case Instruction::SRem:
++    // A uniform divisor needs only one scalar divide, so sink the splat.
++    if (VTy->getElementType()->isIntegerTy(64) && ST->hasDQI() &&
++        ST->useAVX512Regs() &&
++        match(I->getOperand(1),
++              m_Shuffle(m_InsertElt(m_Value(), m_Value(), m_ZeroInt()),
++                        m_Value(), m_ZeroMask()))) {
++      Use &Shuf = I->getOperandUse(1);
++      Ops.push_back(&cast<Instruction>(Shuf)->getOperandUse(0));
++      Ops.push_back(&Shuf);
++      return true;
++    }
++    break;
++  }
++
+   // A uniform shift amount in a vector shift or funnel shift may be much
+   // cheaper than a generic variable vector shift, so make that pattern visible
+   // to SDAG by sinking the shuffle instruction next to the shift.
+-- 
+2.56.1
+
